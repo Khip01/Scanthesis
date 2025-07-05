@@ -1,7 +1,9 @@
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:scanthesis_app/provider/theme_provider.dart';
+import 'package:scanthesis_app/screens/home/bloc/file_picker/file_picker_bloc.dart';
 import 'package:scanthesis_app/screens/home_screen.dart';
 import 'package:scanthesis_app/utils/theme_util.dart';
 
@@ -32,13 +34,18 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
-    return MaterialApp(
-      theme: ThemeUtil.globalLightTheme,
-      darkTheme: ThemeUtil.globalDarkTheme,
-      themeMode: themeProvider.getThemeMode,
-      title: "Scanthesis App",
-      home: const HomeScreen(),
-      debugShowCheckedModeBanner: false,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => FilePickerBloc()),
+      ],
+      child: MaterialApp(
+        theme: ThemeUtil.globalLightTheme,
+        darkTheme: ThemeUtil.globalDarkTheme,
+        themeMode: themeProvider.getThemeMode,
+        title: "Scanthesis App",
+        home: const HomeScreen(),
+        debugShowCheckedModeBanner: false,
+      ),
     );
   }
 }

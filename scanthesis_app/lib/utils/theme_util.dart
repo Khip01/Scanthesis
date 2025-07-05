@@ -98,11 +98,12 @@ class ThemeUtil {
         color: StyleUtil.lightOnSurfaceColor,
       ),
       bodyMedium: ThemeData.light().textTheme.bodyMedium?.copyWith(
-        color: StyleUtil.iconDark,
+        color: StyleUtil.lightOnSurfaceColor,
       ),
       labelLarge: ThemeData.light().textTheme.labelLarge?.copyWith(
         color: StyleUtil.primaryColor,
       ),
     ),
+    iconTheme: const IconThemeData(color: StyleUtil.iconDark),
   );
 }

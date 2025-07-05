@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:scanthesis_app/provider/theme_provider.dart';
-import 'package:scanthesis_app/utils/style_util.dart';
+import 'package:scanthesis_app/screens/home/widgets/floating_input.dart';
 import 'package:scanthesis_app/widgets/custom_app_bar.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -30,7 +30,7 @@ class HomeScreen extends StatelessWidget {
                 elevation: 0,
               ),
               HomeContent(),
-              HomeFooter(),
+              HomeFooterSpacer(),
             ],
           ),
           FloatingInput(),
@@ -113,7 +113,7 @@ class _HomeContentState extends State<HomeContent> {
   Widget _codeCardContent() {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 14, horizontal: 18),
-      height: 900,
+      // height: 900,
       width: double.maxFinite,
       color: Theme.of(context).colorScheme.onSecondary,
       child: Text(
@@ -124,8 +124,8 @@ class _HomeContentState extends State<HomeContent> {
   }
 }
 
-class HomeFooter extends StatelessWidget {
-  const HomeFooter({super.key});
+class HomeFooterSpacer extends StatelessWidget {
+  const HomeFooterSpacer({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -133,56 +133,4 @@ class HomeFooter extends StatelessWidget {
   }
 }
 
-class FloatingInput extends StatelessWidget {
-  const FloatingInput({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: Container(
-        margin: EdgeInsets.only(bottom: 30),
-        height: 80,
-        width: 736,
-        child: Card(
-          elevation: 4,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text("Drop the file anywhere", style: TextStyle(fontSize: 16)),
-                Expanded(child: SizedBox()),
-                Tooltip(
-                  message: "Open File",
-                  child: IconButton(
-                    onPressed: () {},
-                    icon: Icon(Icons.folder_copy, size: 20),
-                  ),
-                ),
-                Tooltip(
-                  message: "Paste Copied Image",
-                  child: IconButton(
-                    onPressed: () {},
-                    icon: Icon(Icons.paste, size: 20),
-                  ),
-                ),
-                Tooltip(
-                  message: "Capture Screen",
-                  child: IconButton(
-                    onPressed: () {},
-                    icon: Icon(Icons.crop, size: 20),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}

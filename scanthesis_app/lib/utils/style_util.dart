@@ -25,9 +25,9 @@ class StyleUtil {
   static const Color dividerLight = Colors.black12;
 
   static const Color iconLight = Colors.white70;
+  static const Color iconDark = Colors.black54;// Window Button Colors
 
   // Window Button Colors
-  static const Color iconDark = Colors.black54;// Window Button Colors
   static const Color windowButtonGrey = Color(0x66B0BEC5); // Semi-transparent grey
   static const Color windowButtonGreyHover = Color(0x88B0BEC5); // Light grey
   static const Color windowCloseRed = Color(0xFFD32F2F); // Soft red
