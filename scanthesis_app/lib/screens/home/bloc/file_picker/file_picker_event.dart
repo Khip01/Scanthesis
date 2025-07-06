@@ -3,16 +3,16 @@ part of 'file_picker_bloc.dart';
 @immutable
 sealed class FilePickerEvent {}
 
-class AddFileEvent extends FilePickerEvent {
+class AddMultipleFileEvent extends FilePickerEvent {
   final List<File> files;
 
-  AddFileEvent({required this.files});
+  AddMultipleFileEvent({required this.files});
 }
 
-class UpdateFileEvent extends FilePickerEvent {
+class AddSingleFileEvent extends FilePickerEvent {
   final File file;
 
-  UpdateFileEvent({required this.file});
+  AddSingleFileEvent({required this.file});
 }
 
 class RemoveFileEvent extends FilePickerEvent {

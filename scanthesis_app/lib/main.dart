@@ -4,13 +4,21 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:scanthesis_app/provider/theme_provider.dart';
 import 'package:scanthesis_app/screens/home/bloc/file_picker/file_picker_bloc.dart';
+import 'package:scanthesis_app/screens/home/provider/clipboard_provider.dart';
 import 'package:scanthesis_app/screens/home_screen.dart';
 import 'package:scanthesis_app/utils/theme_util.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => ThemeProvider(),
+    // ChangeNotifierProvider(
+    //   create: (_) => ThemeProvider(),
+    //   child: MyApp(),
+    // ),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => ClipboardImageProvider()),
+      ],
       child: MyApp(),
     ),
   );
@@ -35,9 +43,7 @@ class MyApp extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (context) => FilePickerBloc()),
-      ],
+      providers: [BlocProvider(create: (context) => FilePickerBloc())],
       child: MaterialApp(
         theme: ThemeUtil.globalLightTheme,
         darkTheme: ThemeUtil.globalDarkTheme,

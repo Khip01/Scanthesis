@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:scanthesis_app/screens/home/handler/clipboard_handler.dart';
 import 'package:scanthesis_app/utils/style_util.dart';
 
 import '../bloc/file_picker/file_picker_bloc.dart';
@@ -35,45 +36,49 @@ class _FloatingInputState extends State<FloatingInput> {
               ListFileWidget(),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Drop the file anywhere",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    Expanded(child: SizedBox()),
-                    Tooltip(
-                      message: "Open File",
-                      child: BlocBuilder<FilePickerBloc, FilePickerState>(
-                        builder: (filePickerContext, filePickerState) {
-                          return IconButton(
+                child: BlocBuilder<FilePickerBloc, FilePickerState>(
+                  builder: (filePickerContext, filePickerState) {
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Drop the file anywhere",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        Expanded(child: SizedBox()),
+                        Tooltip(
+                          message: "Open File",
+                          child: IconButton(
                             onPressed: () async {
                               await _actionButtonOpenFile(
                                 filePickerContext: filePickerContext,
                               );
                             },
                             icon: Icon(Icons.folder_copy, size: 20),
-                          );
-                        },
-                      ),
-                    ),
-                    Tooltip(
-                      message: "Paste Copied Image",
-                      child: IconButton(
-                        onPressed: () {},
-                        icon: Icon(Icons.paste, size: 20),
-                      ),
-                    ),
-                    Tooltip(
-                      message: "Capture Screen",
-                      child: IconButton(
-                        onPressed: () {},
-                        icon: Icon(Icons.crop, size: 20),
-                      ),
-                    ),
-                  ],
+                          ),
+                        ),
+                        Tooltip(
+                          message: "Paste Copied Image",
+                          child: IconButton(
+                            onPressed: () async {
+                              await _actionButtonClipboard(
+                                filePickerContext: filePickerContext,
+                              );
+                            },
+                            icon: Icon(Icons.paste, size: 20),
+                          ),
+                        ),
+                        Tooltip(
+                          message: "Capture Screen",
+                          child: IconButton(
+                            onPressed: () {},
+                            icon: Icon(Icons.crop, size: 20),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ),
             ],
@@ -89,11 +94,22 @@ class _FloatingInputState extends State<FloatingInput> {
   }) async {
     List<File> files = await _getFiles();
 
-    // context guard
     if (!filePickerContext.mounted) return;
+    filePickerContext.read<FilePickerBloc>().add(
+      AddMultipleFileEvent(files: files),
+    );
+  }
 
-    // Bloc state update
-    filePickerContext.read<FilePickerBloc>().add(AddFileEvent(files: files));
+  Future _actionButtonClipboard({
+    required BuildContext filePickerContext,
+  }) async {
+    File? file = await ClipboardHandler.getImageFromClipboard(context);
+    if (file == null) return;
+
+    if (!filePickerContext.mounted) return;
+    filePickerContext.read<FilePickerBloc>().add(
+      AddSingleFileEvent(file: file),
+    );
   }
 
   // Other Functions
@@ -113,7 +129,7 @@ class _FloatingInputState extends State<FloatingInput> {
 }
 
 class ListFileWidget extends StatefulWidget {
-  ListFileWidget({super.key});
+  const ListFileWidget({super.key});
 
   @override
   State<ListFileWidget> createState() => _ListFileWidgetState();
