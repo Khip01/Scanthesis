@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:scanthesis_app/screens/home/handler/clipboard_handler.dart';
@@ -157,17 +158,30 @@ class _ListFileWidgetState extends State<ListFileWidget> {
             height: 80 + 16,
             width: double.maxFinite,
             padding: const EdgeInsets.only(left: 24, right: 24, top: 16),
-            child: Scrollbar(
-              controller: _listFileScrollController,
-              child: ListView.separated(
-                padding: EdgeInsets.only(bottom: 16),
+            child: Listener(
+              onPointerSignal: (PointerSignalEvent event) {
+                if (event is PointerScrollEvent) {
+                  final newOffset = _listFileScrollController.offset + event.scrollDelta.dy;
+                  _listFileScrollController.jumpTo(
+                    newOffset.clamp(
+                      _listFileScrollController.position.minScrollExtent,
+                      _listFileScrollController.position.maxScrollExtent,
+                    ),
+                  );
+                }
+              },
+              child: Scrollbar(
                 controller: _listFileScrollController,
-                separatorBuilder: (context, index) => SizedBox(width: 16),
-                scrollDirection: Axis.horizontal,
-                itemCount: files.length,
-                itemBuilder: (context, index) {
-                  return _fileItem(files[index]);
-                },
+                child: ListView.separated(
+                  padding: EdgeInsets.only(bottom: 16),
+                  controller: _listFileScrollController,
+                  separatorBuilder: (context, index) => SizedBox(width: 16),
+                  scrollDirection: Axis.horizontal,
+                  itemCount: files.length,
+                  itemBuilder: (context, index) {
+                    return _fileItem(files[index]);
+                  },
+                ),
               ),
             ),
           );
@@ -195,53 +209,62 @@ class _ListFileWidgetState extends State<ListFileWidget> {
               onTap: () {
                 // TODO: ACTION DIALOG PREVIEW FILE
               },
-              child: Container(
-                width: 250,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(12)),
-                  border: Border.all(
-                    color: Theme.of(context).dividerColor,
-                    width: 0.3,
-                  ),
+              child: Tooltip(
+                message: file.path.split('/').last,
+                preferBelow: false,
+                margin: EdgeInsets.only(bottom: 16),
+                constraints: BoxConstraints(
+                  maxWidth: 400,
                 ),
-                child: Stack(
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [_customIcon(), _customTitle(file)],
+                waitDuration: Duration(milliseconds: 500),
+                child: Container(
+                  width: 250,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                    border: Border.all(
+                      color: Theme.of(context).dividerColor,
+                      width: 0.3,
                     ),
-                    Visibility(
-                      visible: isHover,
-                      child: Align(
-                        alignment: Alignment.topRight,
-                        child: SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: InkWell(
-                            onTap: () async {
-                              await _actionDeleteFile(
-                                filePickerContext: filePickerContext,
-                                file: file,
-                              );
-                            },
-                            borderRadius: BorderRadius.circular(4),
-                            child: Ink(
-                              decoration: BoxDecoration(
-                                color: StyleUtil.windowCloseRedPressed,
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Icon(
-                                Icons.close,
-                                size: 12,
-                                color: StyleUtil.iconLight,
+                  ),
+                  child: Stack(
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [_customIcon(), _customTitle(file)],
+                      ),
+                      Visibility(
+                        visible: isHover,
+                        child: Align(
+                          alignment: Alignment.topRight,
+                          child: SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: InkWell(
+                              onTap: () async {
+                                await _actionDeleteFile(
+                                  filePickerContext: filePickerContext,
+                                  file: file,
+                                );
+                              },
+                              borderRadius: BorderRadius.circular(4),
+                              child: Ink(
+                                decoration: BoxDecoration(
+                                  color: StyleUtil.windowCloseRedPressed,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Icon(
+                                  Icons.close,
+                                  size: 12,
+                                  color: StyleUtil.iconLight,
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             );
