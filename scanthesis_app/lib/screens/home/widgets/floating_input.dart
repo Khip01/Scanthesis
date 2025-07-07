@@ -4,7 +4,13 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:scanthesis_app/screens/home/handler/clipboard_handler.dart';
+import 'package:scanthesis_app/screens/home/handler/screen_capture_handler.dart';
+import 'package:scanthesis_app/screens/home/provider/clipboard_provider.dart';
+import 'package:scanthesis_app/screens/home/provider/open_file_provider.dart';
+import 'package:scanthesis_app/screens/home/provider/screen_capture_provider.dart';
+import 'package:scanthesis_app/utils/helper_util.dart';
 import 'package:scanthesis_app/utils/style_util.dart';
 
 import '../bloc/file_picker/file_picker_bloc.dart';
@@ -19,6 +25,10 @@ class FloatingInput extends StatefulWidget {
 class _FloatingInputState extends State<FloatingInput> {
   @override
   Widget build(BuildContext context) {
+    final openFileProvider = Provider.of<OpenFileProvider>(context);
+    final clipboardImageProvider = Provider.of<ClipboardImageProvider>(context);
+    final screenCaptureProvider = Provider.of<ScreenCaptureProvider>(context);
+
     return Align(
       alignment: Alignment.bottomCenter,
       child: Container(
@@ -51,30 +61,73 @@ class _FloatingInputState extends State<FloatingInput> {
                         Tooltip(
                           message: "Open File",
                           child: IconButton(
-                            onPressed: () async {
-                              await _actionButtonOpenFile(
-                                filePickerContext: filePickerContext,
-                              );
-                            },
-                            icon: Icon(Icons.folder_copy, size: 20),
+                            onPressed:
+                                openFileProvider.isLoading
+                                    ? () {}
+                                    : () async {
+                                      await _actionButtonOpenFile(
+                                        filePickerContext: filePickerContext,
+                                      );
+                                    },
+                            icon:
+                                openFileProvider.isLoading
+                                    ? CircularProgressIndicator(
+                                      constraints: BoxConstraints(
+                                        maxHeight: 20,
+                                        maxWidth: 20,
+                                        minHeight: 20,
+                                        minWidth: 20,
+                                      ),
+                                    )
+                                    : Icon(Icons.folder_copy, size: 20),
                           ),
                         ),
                         Tooltip(
                           message: "Paste Copied Image",
                           child: IconButton(
-                            onPressed: () async {
-                              await _actionButtonClipboard(
-                                filePickerContext: filePickerContext,
-                              );
-                            },
-                            icon: Icon(Icons.paste, size: 20),
+                            onPressed:
+                                clipboardImageProvider.isLoading
+                                    ? () {}
+                                    : () async {
+                                      await _actionButtonClipboard(
+                                        filePickerContext: filePickerContext,
+                                      );
+                                    },
+                            icon:
+                                clipboardImageProvider.isLoading
+                                    ? CircularProgressIndicator(
+                                      constraints: BoxConstraints(
+                                        maxHeight: 20,
+                                        maxWidth: 20,
+                                        minHeight: 20,
+                                        minWidth: 20,
+                                      ),
+                                    )
+                                    : Icon(Icons.paste, size: 20),
                           ),
                         ),
                         Tooltip(
                           message: "Capture Screen",
                           child: IconButton(
-                            onPressed: () {},
-                            icon: Icon(Icons.crop, size: 20),
+                            onPressed:
+                                screenCaptureProvider.isLoading
+                                    ? () {}
+                                    : () async {
+                                      await _actionButtonTakeScreenshot(
+                                        filePickerContext: filePickerContext,
+                                      );
+                                    },
+                            icon:
+                                screenCaptureProvider.isLoading
+                                    ? CircularProgressIndicator(
+                                      constraints: BoxConstraints(
+                                        maxHeight: 20,
+                                        maxWidth: 20,
+                                        minHeight: 20,
+                                        minWidth: 20,
+                                      ),
+                                    )
+                                    : Icon(Icons.crop, size: 20),
                           ),
                         ),
                       ],
@@ -113,19 +166,54 @@ class _FloatingInputState extends State<FloatingInput> {
     );
   }
 
+  Future _actionButtonTakeScreenshot({
+    required BuildContext filePickerContext,
+  }) async {
+    File? file = await ScreenCaptureHandler.handleClickCapture(context);
+    if (file == null) return;
+
+    if (!filePickerContext.mounted) return;
+    filePickerContext.read<FilePickerBloc>().add(
+      AddSingleFileEvent(file: file),
+    );
+  }
+
   // Other Functions
   Future<List<File>> _getFiles() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      allowMultiple: true,
-      type: FileType.custom,
-      allowedExtensions: ['jpg', 'jpeg', 'png'],
-    );
+    // change state to loading
+    Provider.of<OpenFileProvider>(context, listen: false).setLoadingState(true);
 
-    if (result == null) return [];
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        allowMultiple: true,
+        type: FileType.custom,
+        allowedExtensions: ['jpg', 'jpeg', 'png'],
+      );
 
-    List<File> files = result.paths.map((path) => File(path!)).toList();
+      if (result == null) return [];
 
-    return files;
+      List<File> files = result.paths.map((path) => File(path!)).toList();
+
+      return files;
+    } catch (e) {
+      if (context.mounted) {
+        HelperUtil.showErrorDialog(
+          title: "Unexpected Error",
+          message:
+              "We encountered an error while accessing your clipboard: ${e.toString().split('\n')[0]}",
+          context: context,
+        );
+      }
+    } finally {
+      // change loading state to false
+      if (context.mounted) {
+        Provider.of<OpenFileProvider>(
+          context,
+          listen: false,
+        ).setLoadingState(false);
+      }
+    }
+    return [];
   }
 }
 
@@ -161,7 +249,8 @@ class _ListFileWidgetState extends State<ListFileWidget> {
             child: Listener(
               onPointerSignal: (PointerSignalEvent event) {
                 if (event is PointerScrollEvent) {
-                  final newOffset = _listFileScrollController.offset + event.scrollDelta.dy;
+                  final newOffset =
+                      _listFileScrollController.offset + event.scrollDelta.dy;
                   _listFileScrollController.jumpTo(
                     newOffset.clamp(
                       _listFileScrollController.position.minScrollExtent,
@@ -213,9 +302,7 @@ class _ListFileWidgetState extends State<ListFileWidget> {
                 message: file.path.split('/').last,
                 preferBelow: false,
                 margin: EdgeInsets.only(bottom: 16),
-                constraints: BoxConstraints(
-                  maxWidth: 400,
-                ),
+                constraints: BoxConstraints(maxWidth: 400),
                 waitDuration: Duration(milliseconds: 500),
                 child: Container(
                   width: 250,
