@@ -54,7 +54,7 @@ class _FloatingInputState extends State<FloatingInput> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Text(
-                          "Drop the file anywhere",
+                          "Drop the image file anywhere",
                           style: TextStyle(fontSize: 16),
                         ),
                         Expanded(child: SizedBox()),

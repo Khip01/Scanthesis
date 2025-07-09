@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   bitsdojo_window_linux
+  desktop_drop
   irondash_engine_context
   screen_capturer_linux
   super_native_extensions

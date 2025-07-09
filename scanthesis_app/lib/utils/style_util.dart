@@ -32,4 +32,8 @@ class StyleUtil {
   static const Color windowButtonGreyHover = Color(0x88B0BEC5); // Light grey
   static const Color windowCloseRed = Color(0xFFD32F2F); // Soft red
   static const Color windowCloseRedPressed = Color(0xFFFF5252); // Brighter red on pressed
+
+  // Warning Color
+  static const Color windowWarningYellow = Color(0xFFFFA000); // Primary warning
+
 }
