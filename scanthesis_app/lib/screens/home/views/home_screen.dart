@@ -92,7 +92,8 @@ class _DropzoneAreaState extends State<DropzoneArea>
 
   @override
   Widget build(BuildContext context) {
-    final PreviewImageProvider previewImageProvider = Provider.of<PreviewImageProvider>(context);
+    final PreviewImageProvider previewImageProvider =
+        Provider.of<PreviewImageProvider>(context);
 
     return BlocBuilder<FilePickerBloc, FilePickerState>(
       builder: (filePickerContext, filePickerState) {
@@ -201,7 +202,8 @@ class _DropzoneAreaState extends State<DropzoneArea>
         showError
             ? "No files accepted, please provide the correct image file format!"
             : "Some files were skipped due to invalid format!";
-    Color iconColor = showError ? StyleUtil.windowCloseRed : StyleUtil.windowWarningYellow;
+    Color iconColor =
+        showError ? StyleUtil.windowCloseRed : StyleUtil.windowWarningYellow;
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -238,9 +240,7 @@ class _DropzoneAreaState extends State<DropzoneArea>
         Provider.of<ThemeProvider>(context, listen: false).toggleTheme();
       },
       style: IconButton.styleFrom(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
   }

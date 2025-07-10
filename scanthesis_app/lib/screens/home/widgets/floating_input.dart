@@ -12,6 +12,7 @@ import 'package:scanthesis_app/screens/home/provider/clipboard_provider.dart';
 import 'package:scanthesis_app/screens/home/provider/open_file_provider.dart';
 import 'package:scanthesis_app/screens/home/provider/preview_image_provider.dart';
 import 'package:scanthesis_app/screens/home/provider/screen_capture_provider.dart';
+import 'package:scanthesis_app/screens/home/widgets/send_button_shortcut.dart';
 import 'package:scanthesis_app/utils/helper_util.dart';
 import 'package:scanthesis_app/utils/style_util.dart';
 
@@ -25,6 +26,20 @@ class FloatingInput extends StatefulWidget {
 }
 
 class _FloatingInputState extends State<FloatingInput> {
+  late FocusNode _sendButtonFocusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _sendButtonFocusNode = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    _sendButtonFocusNode.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -150,35 +165,10 @@ class _FloatingInputState extends State<FloatingInput> {
                             ),
                           ),
                         ),
-                        IgnorePointer(
-                          ignoring: filePickerState.files.isEmpty,
-                          child: Tooltip(
-                            message: "or press `Enter`",
-                            child: Padding(
-                              padding: const EdgeInsets.only(left: 12),
-                              child: ElevatedButton(
-                                onPressed:
-                                    filePickerState.files.isEmpty
-                                        ? null
-                                        : () {
-                                          // TODO: send data to API
-                                        },
-                                style: ElevatedButton.styleFrom(
-                                  enableFeedback: false,
-                                  padding: EdgeInsets.zero,
-                                  backgroundColor:
-                                      themeProvider.isDarkMode(context)
-                                          ? themeColorScheme.primary
-                                          : themeColorScheme.secondary,
-                                ),
-                                child: SizedBox(
-                                  height: 52,
-                                  width: 52,
-                                  child: Icon(Icons.send_rounded),
-                                ),
-                              ),
-                            ),
-                          ),
+                        _sendButton(
+                          filePickerState: filePickerState,
+                          themeProvider: themeProvider,
+                          themeColorScheme: themeColorScheme,
                         ),
                       ],
                     );
@@ -225,6 +215,63 @@ class _FloatingInputState extends State<FloatingInput> {
     if (!filePickerContext.mounted) return;
     filePickerContext.read<FilePickerBloc>().add(
       AddSingleFileEvent(file: file),
+    );
+  }
+
+  // TODO: WIDGET
+  Widget _sendButton({
+    required FilePickerState filePickerState,
+    required ThemeProvider themeProvider,
+    required ColorScheme themeColorScheme,
+  }) {
+    return IgnorePointer(
+      ignoring: filePickerState.files.isEmpty,
+      child: Tooltip(
+        message: "or press `Enter`",
+        child: Padding(
+          padding: const EdgeInsets.only(left: 12),
+          child: ElevatedButton(
+            onPressed:
+                filePickerState.files.isEmpty
+                    ? null
+                    : () {
+                      // TODO: send data to API
+                      print("Send Button Pressed Successfully!");
+                    },
+            style: ElevatedButton.styleFrom(
+              enableFeedback: false,
+              padding: EdgeInsets.zero,
+              backgroundColor:
+                  themeProvider.isDarkMode(context)
+                      ? themeColorScheme.primary
+                      : themeColorScheme.secondary,
+            ),
+            child: BlocListener<FilePickerBloc, FilePickerState>(
+              listener: (filePickerListenerContext, filePickerListenerState) {
+                if (filePickerListenerState.files.isNotEmpty) {
+                  _sendButtonFocusNode.requestFocus();
+                } else {
+                  _sendButtonFocusNode.unfocus();
+                }
+              },
+              child: SendButtonShortcut(
+                action: () {
+                  // TODO: send data to API
+                  print(
+                    "Send Button Through Enter Shortcut Successfully! ${filePickerState.files.isNotEmpty}",
+                  );
+                },
+                focusNode: _sendButtonFocusNode,
+                child: SizedBox(
+                  height: 52,
+                  width: 52,
+                  child: Icon(Icons.send_rounded),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -332,7 +379,8 @@ class _ListFileWidgetState extends State<ListFileWidget> {
   }
 
   Widget _fileItem(File file) {
-    PreviewImageProvider previewImageProvider = Provider.of<PreviewImageProvider>(context);
+    PreviewImageProvider previewImageProvider =
+        Provider.of<PreviewImageProvider>(context);
     bool isHover = false;
 
     return BlocBuilder<FilePickerBloc, FilePickerState>(
