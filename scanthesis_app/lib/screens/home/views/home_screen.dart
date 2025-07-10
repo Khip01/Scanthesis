@@ -7,8 +7,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:scanthesis_app/provider/theme_provider.dart';
 import 'package:scanthesis_app/screens/home/bloc/file_picker/file_picker_bloc.dart';
+import 'package:scanthesis_app/screens/home/provider/preview_image_provider.dart';
 import 'package:scanthesis_app/screens/home/widgets/floating_input.dart';
 import 'package:scanthesis_app/screens/home/widgets/custom_app_bar.dart';
+import 'package:scanthesis_app/screens/home/widgets/preview_image.dart';
 import 'package:scanthesis_app/utils/style_util.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -90,17 +92,21 @@ class _DropzoneAreaState extends State<DropzoneArea>
 
   @override
   Widget build(BuildContext context) {
+    final PreviewImageProvider previewImageProvider = Provider.of<PreviewImageProvider>(context);
+
     return BlocBuilder<FilePickerBloc, FilePickerState>(
       builder: (filePickerContext, filePickerState) {
         return Expanded(
           child: Stack(
             children: [
               ..._dropzoneMainContent(context),
+              PreviewImage(),
               IgnorePointer(
                 ignoring: true,
                 child: DropTarget(
                   onDragEntered: (_) {
                     ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                    previewImageProvider.closeIsPreviewModeState();
                     _blurController.forward();
                     _opacityController.forward();
                   },

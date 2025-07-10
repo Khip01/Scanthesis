@@ -6,6 +6,7 @@ import 'package:scanthesis_app/provider/theme_provider.dart';
 import 'package:scanthesis_app/screens/home/bloc/file_picker/file_picker_bloc.dart';
 import 'package:scanthesis_app/screens/home/provider/clipboard_provider.dart';
 import 'package:scanthesis_app/screens/home/provider/open_file_provider.dart';
+import 'package:scanthesis_app/screens/home/provider/preview_image_provider.dart';
 import 'package:scanthesis_app/screens/home/provider/screen_capture_provider.dart';
 import 'package:scanthesis_app/screens/home/views/home_screen.dart';
 import 'package:scanthesis_app/utils/theme_util.dart';
@@ -22,6 +23,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => ClipboardImageProvider()),
         ChangeNotifierProvider(create: (_) => ScreenCaptureProvider()),
         ChangeNotifierProvider(create: (_) => OpenFileProvider()),
+        ChangeNotifierProvider(create: (_) => PreviewImageProvider()),
       ],
       child: MyApp(),
     ),

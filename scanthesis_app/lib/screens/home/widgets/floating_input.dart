@@ -10,6 +10,7 @@ import 'package:scanthesis_app/screens/home/handler/clipboard_handler.dart';
 import 'package:scanthesis_app/screens/home/handler/screen_capture_handler.dart';
 import 'package:scanthesis_app/screens/home/provider/clipboard_provider.dart';
 import 'package:scanthesis_app/screens/home/provider/open_file_provider.dart';
+import 'package:scanthesis_app/screens/home/provider/preview_image_provider.dart';
 import 'package:scanthesis_app/screens/home/provider/screen_capture_provider.dart';
 import 'package:scanthesis_app/utils/helper_util.dart';
 import 'package:scanthesis_app/utils/style_util.dart';
@@ -159,7 +160,9 @@ class _FloatingInputState extends State<FloatingInput> {
                                 onPressed:
                                     filePickerState.files.isEmpty
                                         ? null
-                                        : () {},
+                                        : () {
+                                          // TODO: send data to API
+                                        },
                                 style: ElevatedButton.styleFrom(
                                   enableFeedback: false,
                                   padding: EdgeInsets.zero,
@@ -329,6 +332,7 @@ class _ListFileWidgetState extends State<ListFileWidget> {
   }
 
   Widget _fileItem(File file) {
+    PreviewImageProvider previewImageProvider = Provider.of<PreviewImageProvider>(context);
     bool isHover = false;
 
     return BlocBuilder<FilePickerBloc, FilePickerState>(
@@ -344,6 +348,7 @@ class _ListFileWidgetState extends State<ListFileWidget> {
               },
               onTap: () {
                 // TODO: ACTION DIALOG PREVIEW FILE
+                previewImageProvider.setIsPreviewModeState(file);
               },
               child: Tooltip(
                 message: file.path.split('/').last,
