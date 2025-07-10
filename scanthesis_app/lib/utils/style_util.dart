@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class StyleUtil {
   // Primary colors
   static const Color primaryColor = Color(0xFF5C6BC0);      // Indigo Glow
-  static const Color secondaryColor = Color(0xFF9FA8DA);    // Soft Indigo
+  static const Color secondaryColor = Color(0xFF8894E0);    // Soft Indigo
 
   // Dark Theme
   static const Color darkScaffoldBackground = Color(0xFF1E1E1E);

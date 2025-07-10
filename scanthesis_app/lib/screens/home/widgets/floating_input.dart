@@ -5,6 +5,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:scanthesis_app/provider/theme_provider.dart';
 import 'package:scanthesis_app/screens/home/handler/clipboard_handler.dart';
 import 'package:scanthesis_app/screens/home/handler/screen_capture_handler.dart';
 import 'package:scanthesis_app/screens/home/provider/clipboard_provider.dart';
@@ -25,9 +26,12 @@ class FloatingInput extends StatefulWidget {
 class _FloatingInputState extends State<FloatingInput> {
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     final openFileProvider = Provider.of<OpenFileProvider>(context);
     final clipboardImageProvider = Provider.of<ClipboardImageProvider>(context);
     final screenCaptureProvider = Provider.of<ScreenCaptureProvider>(context);
+
+    final ColorScheme themeColorScheme = Theme.of(context).colorScheme;
 
     return Align(
       alignment: Alignment.bottomCenter,
@@ -80,6 +84,11 @@ class _FloatingInputState extends State<FloatingInput> {
                                       ),
                                     )
                                     : Icon(Icons.folder_copy, size: 20),
+                            style: IconButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
                           ),
                         ),
                         Tooltip(
@@ -104,6 +113,11 @@ class _FloatingInputState extends State<FloatingInput> {
                                       ),
                                     )
                                     : Icon(Icons.paste, size: 20),
+                            style: IconButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
                           ),
                         ),
                         Tooltip(
@@ -128,6 +142,39 @@ class _FloatingInputState extends State<FloatingInput> {
                                       ),
                                     )
                                     : Icon(Icons.crop, size: 20),
+                            style: IconButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          ),
+                        ),
+                        IgnorePointer(
+                          ignoring: filePickerState.files.isEmpty,
+                          child: Tooltip(
+                            message: "or press `Enter`",
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 12),
+                              child: ElevatedButton(
+                                onPressed:
+                                    filePickerState.files.isEmpty
+                                        ? null
+                                        : () {},
+                                style: ElevatedButton.styleFrom(
+                                  enableFeedback: false,
+                                  padding: EdgeInsets.zero,
+                                  backgroundColor:
+                                      themeProvider.isDarkMode(context)
+                                          ? themeColorScheme.primary
+                                          : themeColorScheme.secondary,
+                                ),
+                                child: SizedBox(
+                                  height: 52,
+                                  width: 52,
+                                  child: Icon(Icons.send_rounded),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -362,11 +409,17 @@ class _ListFileWidgetState extends State<ListFileWidget> {
   }
 
   Widget _customIcon() {
+    ThemeProvider themeProvider = Provider.of<ThemeProvider>(context);
+    ColorScheme themeColorScheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.only(left: 12, right: 8, top: 8, bottom: 8),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: Color.fromARGB(255, 255, 188, 8),
+          color:
+              themeProvider.isDarkMode(context)
+                  ? themeColorScheme.primary
+                  : themeColorScheme.secondary,
           borderRadius: BorderRadius.all(Radius.circular(4)),
         ),
         child: SizedBox(

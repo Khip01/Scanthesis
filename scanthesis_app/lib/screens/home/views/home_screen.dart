@@ -144,7 +144,7 @@ class _DropzoneAreaState extends State<DropzoneArea>
                           child: child,
                         );
                       },
-                      child: Container(
+                      child: SizedBox(
                         height: double.maxFinite,
                         width: double.maxFinite,
                         child: Center(
@@ -202,11 +202,11 @@ class _DropzoneAreaState extends State<DropzoneArea>
         elevation: 5,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: Theme.of(context).dividerColor, width: 0.3),
+          side: BorderSide(color: Theme.of(context).dividerColor, width: 0.4),
         ),
         behavior: SnackBarBehavior.floating,
         duration: Duration(seconds: 7),
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         content: Row(
           children: [
             Icon(icon, color: iconColor),
@@ -231,6 +231,11 @@ class _DropzoneAreaState extends State<DropzoneArea>
       onPressed: () {
         Provider.of<ThemeProvider>(context, listen: false).toggleTheme();
       },
+      style: IconButton.styleFrom(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
     );
   }
 }
@@ -291,6 +296,11 @@ class _HomeContentState extends State<HomeContent> {
             child: IconButton(
               onPressed: () {},
               icon: Icon(Icons.copy, size: 16),
+              style: IconButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
             ),
           ),
         ],
