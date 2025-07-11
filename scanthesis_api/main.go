@@ -48,29 +48,36 @@ func GeminiHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 1. Read Multipart data from the request 
-	err := r.ParseMultipartForm(10 << 20) // 10 MB limit
+	err := r.ParseMultipartForm(50 << 20) // 50 MB limit total image file
 	if err != nil {
 		http.Error(w, "Failed to parse form: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
+	// // get the file from the form data
+	// file, handler, err := r.FormFile("image")
+	// if err != nil {
+	// 	http.Error(w, "Error retrieving file: "+err.Error(), http.StatusBadRequest)
+	// 	return
+	// }
+	// defer file.Close()
+
+	// fmt.Printf("Received file: %s (%d bytes)\n", handler.Filename, handler.Size)
+
+	// // 2. Reading file to []byte
+	// imgBytes, err := io.ReadAll(file)
+	// if err != nil {
+	// 	http.Error(w, "Error reading image file: "+err.Error(), http.StatusInternalServerError)
+	// 	return
+	// }
+
 	// get the file from the form data
-	file, handler, err := r.FormFile("image")
-	if err != nil {
-		http.Error(w, "Error retrieving file: "+err.Error(), http.StatusBadRequest)
+	files := r.MultipartForm.File["images"]
+	if len(files) == 0 {
+		http.Error(w, "No images provided", http.StatusBadRequest);
 		return
 	}
-	defer file.Close()
-
-	fmt.Printf("Received file: %s (%d bytes)\n", handler.Filename, handler.Size)
-
-	// 2. Reading file to []byte
-	imgBytes, err := io.ReadAll(file)
-	if err != nil {
-		http.Error(w, "Error reading image file: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-
+	
 	// 3. Create gemini client
 	client, err := genai.NewClient(context, option.WithAPIKey(apiKey))
 	if err != nil {
@@ -85,10 +92,34 @@ func GeminiHandler(w http.ResponseWriter, r *http.Request) {
 	// 5. Create prompt and token
 	prompt := "Perform OCR on this image. Extract only the code and comments exactly as seen, without any explanation or additional content. Ensure the code is cleanly formatted and properly indented."
 
+	// check if there is any prompt included on request
+	customPrompt := r.FormValue("prompt")
+	if customPrompt != "" {
+		prompt = customPrompt
+	}
+
 	req := []genai.Part{
 		genai.Text(prompt),
-		genai.ImageData("image/png", imgBytes),
 	}
+
+	// insert all images
+	for _, fileHeader := range files {
+		file, err := fileHeader.Open()
+		if err != nil {
+			http.Error(w, "Failed to open image: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		imgBytes, err := io.ReadAll(file)
+		file.Close()
+		if err != nil {
+			http.Error(w, "Failed to read image: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		req = append(req, genai.ImageData("image/png", imgBytes))
+	}
+
 
 	// 6. Generate content
 	res, err := model.GenerateContent(context, req...)
