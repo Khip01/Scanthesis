@@ -12,6 +12,7 @@ import 'package:scanthesis_app/screens/home/provider/clipboard_provider.dart';
 import 'package:scanthesis_app/screens/home/provider/open_file_provider.dart';
 import 'package:scanthesis_app/screens/home/provider/preview_image_provider.dart';
 import 'package:scanthesis_app/screens/home/provider/screen_capture_provider.dart';
+import 'package:scanthesis_app/screens/home/widgets/custom_prompt_field.dart';
 import 'package:scanthesis_app/screens/home/widgets/send_button_shortcut.dart';
 import 'package:scanthesis_app/utils/helper_util.dart';
 import 'package:scanthesis_app/utils/style_util.dart';
@@ -51,133 +52,152 @@ class _FloatingInputState extends State<FloatingInput> {
 
     return Align(
       alignment: Alignment.bottomCenter,
-      child: Container(
-        margin: EdgeInsets.only(bottom: 30),
-        // height: 80,
-        width: 736,
-        child: Card(
-          clipBehavior: Clip.antiAlias,
-          elevation: 4,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListFileWidget(),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                child: BlocBuilder<FilePickerBloc, FilePickerState>(
-                  builder: (filePickerContext, filePickerState) {
-                    return Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Drop the image file anywhere",
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        Expanded(child: SizedBox()),
-                        Tooltip(
-                          message: "Open File",
-                          child: IconButton(
-                            onPressed:
-                                openFileProvider.isLoading
-                                    ? () {}
-                                    : () async {
-                                      await _actionButtonOpenFile(
-                                        filePickerContext: filePickerContext,
-                                      );
-                                    },
-                            icon:
-                                openFileProvider.isLoading
-                                    ? CircularProgressIndicator(
-                                      constraints: BoxConstraints(
-                                        maxHeight: 20,
-                                        maxWidth: 20,
-                                        minHeight: 20,
-                                        minWidth: 20,
-                                      ),
-                                    )
-                                    : Icon(Icons.folder_copy, size: 20),
-                            style: IconButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Container(
+            margin: EdgeInsets.only(bottom: 30),
+            width: 736,
+            constraints: BoxConstraints(
+              maxHeight: constraints.maxHeight * 1 / 2,
+            ),
+            child: Card(
+              clipBehavior: Clip.antiAlias,
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ListFileWidget(),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 16,
+                      ),
+                      child: BlocBuilder<FilePickerBloc, FilePickerState>(
+                        builder: (filePickerContext, filePickerState) {
+                          return Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Drop the image file anywhere",
+                                style: TextStyle(fontSize: 16),
                               ),
-                            ),
-                          ),
-                        ),
-                        Tooltip(
-                          message: "Paste Copied Image",
-                          child: IconButton(
-                            onPressed:
-                                clipboardImageProvider.isLoading
-                                    ? () {}
-                                    : () async {
-                                      await _actionButtonClipboard(
-                                        filePickerContext: filePickerContext,
-                                      );
-                                    },
-                            icon:
-                                clipboardImageProvider.isLoading
-                                    ? CircularProgressIndicator(
-                                      constraints: BoxConstraints(
-                                        maxHeight: 20,
-                                        maxWidth: 20,
-                                        minHeight: 20,
-                                        minWidth: 20,
-                                      ),
-                                    )
-                                    : Icon(Icons.paste, size: 20),
-                            style: IconButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
+                              Expanded(child: SizedBox()),
+                              Tooltip(
+                                message: "Open File",
+                                child: IconButton(
+                                  onPressed:
+                                      openFileProvider.isLoading
+                                          ? () {}
+                                          : () async {
+                                            await _actionButtonOpenFile(
+                                              filePickerContext:
+                                                  filePickerContext,
+                                            );
+                                          },
+                                  icon:
+                                      openFileProvider.isLoading
+                                          ? CircularProgressIndicator(
+                                            constraints: BoxConstraints(
+                                              maxHeight: 20,
+                                              maxWidth: 20,
+                                              minHeight: 20,
+                                              minWidth: 20,
+                                            ),
+                                          )
+                                          : Icon(Icons.folder_copy, size: 20),
+                                  style: IconButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                        ),
-                        Tooltip(
-                          message: "Capture Screen",
-                          child: IconButton(
-                            onPressed:
-                                screenCaptureProvider.isLoading
-                                    ? () {}
-                                    : () async {
-                                      await _actionButtonTakeScreenshot(
-                                        filePickerContext: filePickerContext,
-                                      );
-                                    },
-                            icon:
-                                screenCaptureProvider.isLoading
-                                    ? CircularProgressIndicator(
-                                      constraints: BoxConstraints(
-                                        maxHeight: 20,
-                                        maxWidth: 20,
-                                        minHeight: 20,
-                                        minWidth: 20,
-                                      ),
-                                    )
-                                    : Icon(Icons.crop, size: 20),
-                            style: IconButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
+                              Tooltip(
+                                message: "Paste Copied Image",
+                                child: IconButton(
+                                  onPressed:
+                                      clipboardImageProvider.isLoading
+                                          ? () {}
+                                          : () async {
+                                            await _actionButtonClipboard(
+                                              filePickerContext:
+                                                  filePickerContext,
+                                            );
+                                          },
+                                  icon:
+                                      clipboardImageProvider.isLoading
+                                          ? CircularProgressIndicator(
+                                            constraints: BoxConstraints(
+                                              maxHeight: 20,
+                                              maxWidth: 20,
+                                              minHeight: 20,
+                                              minWidth: 20,
+                                            ),
+                                          )
+                                          : Icon(Icons.paste, size: 20),
+                                  style: IconButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                        ),
-                        _sendButton(
-                          filePickerState: filePickerState,
-                          themeProvider: themeProvider,
-                          themeColorScheme: themeColorScheme,
-                        ),
-                      ],
-                    );
-                  },
+                              Tooltip(
+                                message: "Capture Screen",
+                                child: IconButton(
+                                  onPressed:
+                                      screenCaptureProvider.isLoading
+                                          ? () {}
+                                          : () async {
+                                            await _actionButtonTakeScreenshot(
+                                              filePickerContext:
+                                                  filePickerContext,
+                                            );
+                                          },
+                                  icon:
+                                      screenCaptureProvider.isLoading
+                                          ? CircularProgressIndicator(
+                                            constraints: BoxConstraints(
+                                              maxHeight: 20,
+                                              maxWidth: 20,
+                                              minHeight: 20,
+                                              minWidth: 20,
+                                            ),
+                                          )
+                                          : Icon(Icons.crop, size: 20),
+                                  style: IconButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 12),
+                              _sendButton(
+                                filePickerState: filePickerState,
+                                themeProvider: themeProvider,
+                                themeColorScheme: themeColorScheme,
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                    CustomPromptField(
+                      sendButtonFocusNode: _sendButtonFocusNode,
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -227,46 +247,43 @@ class _FloatingInputState extends State<FloatingInput> {
     return IgnorePointer(
       ignoring: filePickerState.files.isEmpty,
       child: Tooltip(
-        message: "or press `Enter`",
-        child: Padding(
-          padding: const EdgeInsets.only(left: 12),
-          child: ElevatedButton(
-            onPressed:
-                filePickerState.files.isEmpty
-                    ? null
-                    : () {
-                      // TODO: send data to API
-                      print("Send Button Pressed Successfully!");
-                    },
-            style: ElevatedButton.styleFrom(
-              enableFeedback: false,
-              padding: EdgeInsets.zero,
-              backgroundColor:
-                  themeProvider.isDarkMode(context)
-                      ? themeColorScheme.primary
-                      : themeColorScheme.secondary,
-            ),
-            child: BlocListener<FilePickerBloc, FilePickerState>(
-              listener: (filePickerListenerContext, filePickerListenerState) {
-                if (filePickerListenerState.files.isNotEmpty) {
-                  _sendButtonFocusNode.requestFocus();
-                } else {
-                  _sendButtonFocusNode.unfocus();
-                }
+        message: "or press `Enter` key to send",
+        child: ElevatedButton(
+          onPressed:
+              filePickerState.files.isEmpty
+                  ? null
+                  : () {
+                    // TODO: send data to API
+                    print("Send Button Pressed Successfully!");
+                  },
+          style: ElevatedButton.styleFrom(
+            enableFeedback: false,
+            padding: EdgeInsets.zero,
+            backgroundColor:
+                themeProvider.isDarkMode(context)
+                    ? themeColorScheme.primary
+                    : themeColorScheme.secondary,
+          ),
+          child: BlocListener<FilePickerBloc, FilePickerState>(
+            listener: (filePickerListenerContext, filePickerListenerState) {
+              if (filePickerListenerState.files.isNotEmpty) {
+                _sendButtonFocusNode.requestFocus();
+              } else {
+                _sendButtonFocusNode.unfocus();
+              }
+            },
+            child: SendButtonShortcut(
+              action: () {
+                // TODO: send data to API
+                print(
+                  "Send Button Through Enter Shortcut Successfully! ${filePickerState.files.isNotEmpty}",
+                );
               },
-              child: SendButtonShortcut(
-                action: () {
-                  // TODO: send data to API
-                  print(
-                    "Send Button Through Enter Shortcut Successfully! ${filePickerState.files.isNotEmpty}",
-                  );
-                },
-                focusNode: _sendButtonFocusNode,
-                child: SizedBox(
-                  height: 52,
-                  width: 52,
-                  child: Icon(Icons.send_rounded),
-                ),
+              focusNode: _sendButtonFocusNode,
+              child: SizedBox(
+                height: 52,
+                width: 52,
+                child: Icon(Icons.send_rounded),
               ),
             ),
           ),
@@ -398,60 +415,53 @@ class _ListFileWidgetState extends State<ListFileWidget> {
                 // TODO: ACTION DIALOG PREVIEW FILE
                 previewImageProvider.setIsPreviewModeState(file);
               },
-              child: Tooltip(
-                message: file.path.split('/').last,
-                preferBelow: false,
-                margin: EdgeInsets.only(bottom: 16),
-                constraints: BoxConstraints(maxWidth: 400),
-                waitDuration: Duration(milliseconds: 500),
-                child: Container(
-                  width: 250,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                    border: Border.all(
-                      color: Theme.of(context).dividerColor,
-                      width: 0.3,
-                    ),
+              child: Container(
+                width: 250,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                  border: Border.all(
+                    color: Theme.of(context).dividerColor,
+                    width: 0.3,
                   ),
-                  child: Stack(
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [_customIcon(), _customTitle(file)],
-                      ),
-                      Visibility(
-                        visible: isHover,
-                        child: Align(
-                          alignment: Alignment.topRight,
-                          child: SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: InkWell(
-                              onTap: () async {
-                                await _actionDeleteFile(
-                                  filePickerContext: filePickerContext,
-                                  file: file,
-                                );
-                              },
-                              borderRadius: BorderRadius.circular(4),
-                              child: Ink(
-                                decoration: BoxDecoration(
-                                  color: StyleUtil.windowCloseRedPressed,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Icon(
-                                  Icons.close,
-                                  size: 12,
-                                  color: StyleUtil.iconLight,
-                                ),
+                ),
+                child: Stack(
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [_customIcon(), _customTitle(file)],
+                    ),
+                    Visibility(
+                      visible: isHover,
+                      child: Align(
+                        alignment: Alignment.topRight,
+                        child: SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: InkWell(
+                            onTap: () async {
+                              await _actionDeleteFile(
+                                filePickerContext: filePickerContext,
+                                file: file,
+                              );
+                            },
+                            borderRadius: BorderRadius.circular(4),
+                            child: Ink(
+                              decoration: BoxDecoration(
+                                color: StyleUtil.windowCloseRedPressed,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Icon(
+                                Icons.close,
+                                size: 12,
+                                color: StyleUtil.iconLight,
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             );

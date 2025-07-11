@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:scanthesis_app/provider/theme_provider.dart';
 import 'package:scanthesis_app/screens/home/bloc/file_picker/file_picker_bloc.dart';
 import 'package:scanthesis_app/screens/home/provider/clipboard_provider.dart';
+import 'package:scanthesis_app/screens/home/provider/custom_prompt_provider.dart';
 import 'package:scanthesis_app/screens/home/provider/open_file_provider.dart';
 import 'package:scanthesis_app/screens/home/provider/preview_image_provider.dart';
 import 'package:scanthesis_app/screens/home/provider/screen_capture_provider.dart';
@@ -24,6 +25,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => ScreenCaptureProvider()),
         ChangeNotifierProvider(create: (_) => OpenFileProvider()),
         ChangeNotifierProvider(create: (_) => PreviewImageProvider()),
+        ChangeNotifierProvider(create: (_) => CustomPromptProvider()),
       ],
       child: MyApp(),
     ),
@@ -49,7 +51,17 @@ class MyApp extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return MultiBlocProvider(
-      providers: [BlocProvider(create: (context) => FilePickerBloc())],
+      providers: [
+        BlocProvider(
+          create:
+              (context) => FilePickerBloc(
+                customPromptProvider: Provider.of<CustomPromptProvider>(
+                  context,
+                  listen: false,
+                ),
+              ),
+        ),
+      ],
       child: MaterialApp(
         theme: ThemeUtil.globalLightTheme,
         darkTheme: ThemeUtil.globalDarkTheme,

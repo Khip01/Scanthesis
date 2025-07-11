@@ -95,14 +95,14 @@ class _DropzoneAreaState extends State<DropzoneArea>
     final PreviewImageProvider previewImageProvider =
         Provider.of<PreviewImageProvider>(context);
 
-    return BlocBuilder<FilePickerBloc, FilePickerState>(
-      builder: (filePickerContext, filePickerState) {
-        return Expanded(
-          child: Stack(
-            children: [
-              ..._dropzoneMainContent(context),
-              PreviewImage(),
-              IgnorePointer(
+    return Expanded(
+      child: Stack(
+        children: [
+          ..._dropzoneMainContent(context),
+          PreviewImage(),
+          BlocBuilder<FilePickerBloc, FilePickerState>(
+            builder: (filePickerContext, filePickerState) {
+              return IgnorePointer(
                 ignoring: true,
                 child: DropTarget(
                   onDragEntered: (_) {
@@ -167,11 +167,11 @@ class _DropzoneAreaState extends State<DropzoneArea>
                     ),
                   ),
                 ),
-              ),
-            ],
+              );
+            },
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 
