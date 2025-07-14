@@ -11,6 +11,7 @@ import 'package:scanthesis_app/screens/home/provider/preview_image_provider.dart
 import 'package:scanthesis_app/screens/home/widgets/floating_input.dart';
 import 'package:scanthesis_app/screens/home/widgets/custom_app_bar.dart';
 import 'package:scanthesis_app/screens/home/widgets/preview_image.dart';
+import 'package:scanthesis_app/screens/home/widgets/response_chat.dart';
 import 'package:scanthesis_app/utils/style_util.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -262,67 +263,9 @@ class _HomeContentState extends State<HomeContent> {
         child: SingleChildScrollView(
           padding: EdgeInsets.only(bottom: 28, top: 16),
           child: Center(
-            child: Card(
-              shape: RoundedRectangleBorder(
-                side: BorderSide(
-                  color: Theme.of(context).dividerColor,
-                  width: 0.3,
-                ),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: Container(
-                constraints: BoxConstraints(maxWidth: 680),
-                child: Column(
-                  children: [_codeCardHeader(), _codeCardContent()],
-                ),
-              ),
-            ),
+            child: ResponseChat(),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _codeCardHeader() {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 2, horizontal: 8),
-      width: double.maxFinite,
-      color: Theme.of(context).colorScheme.surface,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0),
-            child: Text("dart"),
-          ),
-          Tooltip(
-            message: "Copy Code",
-            child: IconButton(
-              onPressed: () {},
-              icon: Icon(Icons.copy, size: 16),
-              style: IconButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _codeCardContent() {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 14, horizontal: 18),
-      // height: 900,
-      width: double.maxFinite,
-      color: Theme.of(context).colorScheme.onSecondary,
-      child: Text(
-        "Hello World!",
-        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
       ),
     );
   }

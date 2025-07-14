@@ -42,6 +42,8 @@ dependencies:
   path_provider: ^2.1.5
   screen_capturer: ^0.2.3
   desktop_drop: ^0.6.0
+  gpt_markdown: ^1.1.2
+  google_fonts: ^6.2.1
 
 dev_dependencies:
   flutter_test:

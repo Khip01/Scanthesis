@@ -143,7 +143,7 @@ func GeminiHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Output with JSON
 	result := map[string]string{
-		"code": output,
+		"response": output,
 	}
 	
 	w.Header().Set("Content-Type", "application/json")

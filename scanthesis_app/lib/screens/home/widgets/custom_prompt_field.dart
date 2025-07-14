@@ -96,7 +96,7 @@ class _CustomPromptFieldState extends State<CustomPromptField> {
         enabled: customPromptProvider.isUsingCustomPrompt,
         decoration: InputDecoration(
           fillColor: themeColorScheme.surface,
-          hintText: "Your prompt goes here...",
+          hintText: defaultPlaceholder,
           hintStyle: TextStyle(fontSize: 14, color: Colors.grey),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
