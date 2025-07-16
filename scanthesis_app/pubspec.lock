@@ -145,6 +145,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.3"
+  equatable:
+    dependency: transitive
+    description:
+      name: equatable
+      sha256: "567c64b3cb4cf82397aac55f4f0cbd3ca20d77c6c03bedbc4ceaddc08904aef7"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.7"
   fake_async:
     dependency: transitive
     description:
@@ -198,6 +206,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "9.1.1"
+  flutter_highlighting:
+    dependency: "direct main"
+    description:
+      path: flutter_highlighting
+      ref: text_selection_fixed
+      resolved-ref: "89ca74b437f8cde3fd30a0a142205839f5eba45a"
+      url: "https://github.com/Khip01/dart-highlighting.git"
+    source: git
+    version: "0.9.1+11.8.0"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -256,6 +273,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.2"
+  highlighting:
+    dependency: transitive
+    description:
+      name: highlighting
+      sha256: "196005ed9c98ee559939fcecd466fa941b9e99b3a93394691b86780ad4da50f3"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.9.0+11.8.0"
   http:
     dependency: transitive
     description:

@@ -44,6 +44,11 @@ dependencies:
   desktop_drop: ^0.6.0
   gpt_markdown: ^1.1.2
   google_fonts: ^6.2.1
+  flutter_highlighting:
+    git:
+      url: https://github.com/Khip01/dart-highlighting.git
+      path: flutter_highlighting
+      ref: text_selection_fixed
 
 dev_dependencies:
   flutter_test:

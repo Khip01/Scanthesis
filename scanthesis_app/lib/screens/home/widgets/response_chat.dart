@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_highlighting/flutter_highlighting.dart';
+
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gpt_markdown/gpt_markdown.dart';
+import 'package:provider/provider.dart';
+import 'package:scanthesis_app/provider/theme_provider.dart';
+import 'package:scanthesis_app/utils/code_theme_util.dart';
+
 import 'package:scanthesis_app/utils/style_util.dart';
 
 class ResponseChat extends StatefulWidget {
@@ -16,19 +22,11 @@ class _ResponseChatState extends State<ResponseChat> {
 
   @override
   Widget build(BuildContext context) {
-    print("Theme brightness: ${Theme.of(context).brightness}");
-    print(
-      "GptMarkdown highlight: ${Theme.of(context).extension<GptMarkdownThemeData>()?.highlightColor}",
-    );
+    bool isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode(context);
 
     return Container(
       padding: EdgeInsets.all(12),
       width: 730,
-      // color: Colors.green,
-      // constraints: BoxConstraints(maxWidth: 680),
-      // child: Column(
-      //   children: [_codeCardHeader(), _codeCardContent()],
-      // ),
       child: SelectionArea(
         child: Scrollbar(
           interactive: true,
@@ -38,10 +36,9 @@ class _ResponseChatState extends State<ResponseChat> {
           child: GptMarkdown(
             // key: ValueKey(Provider.of<ThemeProvider>(context).getThemeMode),
             // key: ValueKey(Theme.of(context).brightness),
-            key: UniqueKey(),
+            key: ValueKey(Theme.of(context).colorScheme),
             _markdownWithCodeMix,
             codeBuilder: (context, name, code, closed) {
-              print("AOWKAOWKOAKWOAKWOAKW GA KEREBUILDDD COOOKKK");
               return Card(
                 shape: RoundedRectangleBorder(
                   side: BorderSide(
@@ -58,7 +55,11 @@ class _ResponseChatState extends State<ResponseChat> {
                       _codeCardHeader(languageName: name, codeToCopy: code),
                       SingleChildScrollView(
                         controller: _codeScrollController,
-                        child: _codeCardContent(code: code),
+                        child: _codeCardContent(
+                          languageName: name,
+                          code: code,
+                          isDarkMode: isDarkMode,
+                        ),
                       ),
                     ],
                   ),
@@ -73,10 +74,7 @@ class _ResponseChatState extends State<ResponseChat> {
                   color: StyleUtil.windowButtonGrey.withAlpha(35),
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: Text(
-                  text,
-                  style: GoogleFonts.sourceCodePro(),
-                ),
+                child: Text(text, style: GoogleFonts.sourceCodePro()),
               );
             },
           ),
@@ -149,17 +147,31 @@ class _ResponseChatState extends State<ResponseChat> {
     );
   }
 
-  Widget _codeCardContent({required String code}) {
+  Widget _codeCardContent({
+    required String languageName,
+    required String code,
+    required bool isDarkMode,
+  }) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 14, horizontal: 18),
       // height: 900,
       width: double.maxFinite,
       color: Theme.of(context).colorScheme.onSecondary,
-      child: Text(
+      // child: Text(
+      //   code,
+      //   style: GoogleFonts.sourceCodePro().copyWith(
+      //     color: Theme.of(context).colorScheme.onSurface,
+      //   ),
+      // ),
+      child: HighlightView(
         code,
-        style: GoogleFonts.sourceCodePro().copyWith(
+        languageId: languageName,
+        theme: CodeThemeUtil.darculaTheme,
+        textStyle: GoogleFonts.sourceCodePro().copyWith(
           color: Theme.of(context).colorScheme.onSurface,
         ),
+        selectable: true,
+        selectionColor: StyleUtil.primaryColor.withAlpha(127),
       ),
     );
   }
