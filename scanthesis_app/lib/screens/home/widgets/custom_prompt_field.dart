@@ -4,11 +4,17 @@ import 'package:provider/provider.dart';
 import 'package:scanthesis_app/screens/home/bloc/file_picker/file_picker_bloc.dart';
 import 'package:scanthesis_app/screens/home/provider/custom_prompt_provider.dart';
 import 'package:scanthesis_app/utils/style_util.dart';
+import 'package:scanthesis_app/values/strings.dart';
 
 class CustomPromptField extends StatefulWidget {
   final FocusNode sendButtonFocusNode;
+  final TextEditingController promptController;
 
-  CustomPromptField({super.key, required this.sendButtonFocusNode});
+  const CustomPromptField({
+    super.key,
+    required this.sendButtonFocusNode,
+    required this.promptController,
+  });
 
   @override
   State<CustomPromptField> createState() => _CustomPromptFieldState();
@@ -17,11 +23,9 @@ class CustomPromptField extends StatefulWidget {
 class _CustomPromptFieldState extends State<CustomPromptField> {
   late ColorScheme themeColorScheme;
   late CustomPromptProvider customPromptProvider;
-  final TextEditingController promptController = TextEditingController();
 
-  final String defaultPrompt =
-      "Perform OCR on this image. Extract only the code and comments exactly as seen, without any explanation or additional content. Ensure the code is cleanly formatted and properly indented.";
-  late final String defaultPlaceholder = "Default prompt: $defaultPrompt";
+  late final String defaultPlaceholder =
+      "Default prompt: ${Strings.defaultPrompt}";
 
   @override
   Widget build(BuildContext context) {
@@ -32,10 +36,10 @@ class _CustomPromptFieldState extends State<CustomPromptField> {
       listenable: customPromptProvider,
       builder: (context, child) {
         if (customPromptProvider.isUsingCustomPrompt &&
-            promptController.text == defaultPlaceholder) {
-          promptController.text = defaultPrompt;
+            widget.promptController.text == defaultPlaceholder) {
+          widget.promptController.text = Strings.defaultPrompt;
         } else if (!customPromptProvider.isUsingCustomPrompt) {
-          promptController.text = defaultPlaceholder;
+          widget.promptController.text = defaultPlaceholder;
         }
         return child!;
       },
@@ -91,7 +95,7 @@ class _CustomPromptFieldState extends State<CustomPromptField> {
         }
       },
       child: TextField(
-        controller: promptController,
+        controller: widget.promptController,
         style: TextStyle(fontSize: 14),
         enabled: customPromptProvider.isUsingCustomPrompt,
         decoration: InputDecoration(

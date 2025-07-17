@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:scanthesis_app/provider/theme_provider.dart';
 import 'package:scanthesis_app/screens/home/bloc/file_picker/file_picker_bloc.dart';
+import 'package:scanthesis_app/screens/home/bloc/request/request_bloc.dart';
+import 'package:scanthesis_app/screens/home/bloc/response/response_bloc.dart';
 import 'package:scanthesis_app/screens/home/provider/clipboard_provider.dart';
 import 'package:scanthesis_app/screens/home/provider/custom_prompt_provider.dart';
 import 'package:scanthesis_app/screens/home/provider/open_file_provider.dart';
@@ -61,6 +63,8 @@ class MyApp extends StatelessWidget {
                 ),
               ),
         ),
+        BlocProvider(create: (context) => ResponseBloc()),
+        BlocProvider(create: (context) => RequestBloc()),
       ],
       child: MaterialApp(
         theme: ThemeUtil.globalLightTheme,

@@ -18,3 +18,9 @@ final class FilePickerLoading extends FilePickerState {
 final class FilePickerLoaded extends FilePickerState {
   const FilePickerLoaded({required super.files});
 }
+
+final class FilePickerError extends FilePickerState {
+  final String errorMessage;
+
+  const FilePickerError({required this.errorMessage, required super.files});
+}

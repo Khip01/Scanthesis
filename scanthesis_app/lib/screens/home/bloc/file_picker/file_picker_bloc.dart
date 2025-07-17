@@ -16,11 +16,17 @@ class FilePickerBloc extends Bloc<FilePickerEvent, FilePickerState> {
     on<AddMultipleFileEvent>(_addMultipleFile);
     on<AddSingleFileEvent>(_addSingleFile);
     on<RemoveFileEvent>(_removeFile);
+    on<ResetFilePickerErrorEvent>(_resetFiles);
+    on<ClearFilesEvent>(_clearFiles);
   }
 
   _addMultipleFile(AddMultipleFileEvent event, Emitter<FilePickerState> emit) {
-    state.files.addAll(event.files);
-    emit(FilePickerLoaded(files: state.files));
+    if (state.files.length + event.files.length > 7){
+      emit(FilePickerError(errorMessage: "You can only upload up to 7 images", files: state.files));
+    } else {
+      state.files.addAll(event.files);
+      emit(FilePickerLoaded(files: state.files));
+    }
   }
 
   _addSingleFile(AddSingleFileEvent event, Emitter<FilePickerState> emit) {
@@ -33,6 +39,16 @@ class FilePickerBloc extends Bloc<FilePickerEvent, FilePickerState> {
     if (state.files.isEmpty) {
       customPromptProvider.resetUsingCustomPrompt();
     }
+    emit(FilePickerLoaded(files: state.files));
+  }
+
+  _resetFiles(ResetFilePickerErrorEvent event, Emitter<FilePickerState> emit){
+    emit(FilePickerLoaded(files: state.files));
+  }
+
+  _clearFiles(ClearFilesEvent event, Emitter<FilePickerState> emit) {
+    state.files.clear();
+    customPromptProvider.resetUsingCustomPrompt();
     emit(FilePickerLoaded(files: state.files));
   }
 }

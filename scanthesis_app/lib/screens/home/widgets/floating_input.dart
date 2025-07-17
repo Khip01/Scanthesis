@@ -5,10 +5,13 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:scanthesis_app/models/api_request.dart';
 import 'package:scanthesis_app/provider/theme_provider.dart';
+import 'package:scanthesis_app/screens/home/bloc/request/request_bloc.dart';
 import 'package:scanthesis_app/screens/home/handler/clipboard_handler.dart';
 import 'package:scanthesis_app/screens/home/handler/screen_capture_handler.dart';
 import 'package:scanthesis_app/screens/home/provider/clipboard_provider.dart';
+import 'package:scanthesis_app/screens/home/provider/custom_prompt_provider.dart';
 import 'package:scanthesis_app/screens/home/provider/open_file_provider.dart';
 import 'package:scanthesis_app/screens/home/provider/preview_image_provider.dart';
 import 'package:scanthesis_app/screens/home/provider/screen_capture_provider.dart';
@@ -16,6 +19,7 @@ import 'package:scanthesis_app/screens/home/widgets/custom_prompt_field.dart';
 import 'package:scanthesis_app/screens/home/widgets/send_button_shortcut.dart';
 import 'package:scanthesis_app/utils/helper_util.dart';
 import 'package:scanthesis_app/utils/style_util.dart';
+import 'package:scanthesis_app/values/strings.dart';
 
 import '../bloc/file_picker/file_picker_bloc.dart';
 
@@ -28,6 +32,7 @@ class FloatingInput extends StatefulWidget {
 
 class _FloatingInputState extends State<FloatingInput> {
   late FocusNode _sendButtonFocusNode;
+  final TextEditingController promptController = TextEditingController();
 
   @override
   void initState() {
@@ -180,6 +185,7 @@ class _FloatingInputState extends State<FloatingInput> {
                               ),
                               SizedBox(width: 12),
                               _sendButton(
+                                filePickerContext: filePickerContext,
                                 filePickerState: filePickerState,
                                 themeProvider: themeProvider,
                                 themeColorScheme: themeColorScheme,
@@ -191,6 +197,7 @@ class _FloatingInputState extends State<FloatingInput> {
                     ),
                     CustomPromptField(
                       sendButtonFocusNode: _sendButtonFocusNode,
+                      promptController: promptController,
                     ),
                   ],
                 ),
@@ -240,6 +247,7 @@ class _FloatingInputState extends State<FloatingInput> {
 
   // TODO: WIDGET
   Widget _sendButton({
+    required BuildContext filePickerContext,
     required FilePickerState filePickerState,
     required ThemeProvider themeProvider,
     required ColorScheme themeColorScheme,
@@ -248,48 +256,79 @@ class _FloatingInputState extends State<FloatingInput> {
       ignoring: filePickerState.files.isEmpty,
       child: Tooltip(
         message: "or press `Enter` key to send",
-        child: ElevatedButton(
-          onPressed:
-              filePickerState.files.isEmpty
-                  ? null
-                  : () {
-                    // TODO: send data to API
-                    print("Send Button Pressed Successfully!");
-                  },
-          style: ElevatedButton.styleFrom(
-            enableFeedback: false,
-            padding: EdgeInsets.zero,
-            backgroundColor:
-                themeProvider.isDarkMode(context)
-                    ? themeColorScheme.primary
-                    : themeColorScheme.secondary,
-          ),
-          child: BlocListener<FilePickerBloc, FilePickerState>(
-            listener: (filePickerListenerContext, filePickerListenerState) {
-              if (filePickerListenerState.files.isNotEmpty) {
-                _sendButtonFocusNode.requestFocus();
-              } else {
-                _sendButtonFocusNode.unfocus();
-              }
-            },
-            child: SendButtonShortcut(
-              action: () {
-                // TODO: send data to API
-                print(
-                  "Send Button Through Enter Shortcut Successfully! ${filePickerState.files.isNotEmpty}",
-                );
-              },
-              focusNode: _sendButtonFocusNode,
-              child: SizedBox(
-                height: 52,
-                width: 52,
-                child: Icon(Icons.send_rounded),
+        child: BlocBuilder<RequestBloc, RequestState>(
+          builder: (requestContext, requestState) {
+            return ElevatedButton(
+              onPressed:
+                  filePickerState.files.isEmpty
+                      ? null
+                      : () {
+                        _actionSendButton(
+                          requestContext: requestContext,
+                          filePickerContext: filePickerContext,
+                          files: filePickerState.files,
+                          prompt: promptController.text,
+                        );
+                      },
+              style: ElevatedButton.styleFrom(
+                enableFeedback: false,
+                padding: EdgeInsets.zero,
+                backgroundColor:
+                    themeProvider.isDarkMode(context)
+                        ? themeColorScheme.primary
+                        : themeColorScheme.secondary,
               ),
-            ),
-          ),
+              child: BlocListener<FilePickerBloc, FilePickerState>(
+                listener: (filePickerListenerContext, filePickerListenerState) {
+                  if (filePickerListenerState.files.isNotEmpty) {
+                    _sendButtonFocusNode.requestFocus();
+                  } else {
+                    _sendButtonFocusNode.unfocus();
+                  }
+                },
+                child: SendButtonShortcut(
+                  action: () {
+                    _actionSendButton(
+                      requestContext: requestContext,
+                      filePickerContext: filePickerContext,
+                      files: filePickerState.files,
+                      prompt: promptController.text,
+                    );
+                  },
+                  focusNode: _sendButtonFocusNode,
+                  child: SizedBox(
+                    height: 52,
+                    width: 52,
+                    child: Icon(Icons.send_rounded),
+                  ),
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
+  }
+
+  // TODO: Button actions
+  _actionSendButton({
+    required BuildContext requestContext,
+    required BuildContext filePickerContext,
+    required List<File> files,
+    required String prompt,
+  }) {
+    final isCustom =
+        Provider.of<CustomPromptProvider>(
+          context,
+          listen: false,
+        ).isUsingCustomPrompt;
+
+    final ApiRequest request = ApiRequest(
+      files: List<File>.from(files),
+      prompt: isCustom ? prompt : Strings.defaultPrompt,
+    );
+    requestContext.read<RequestBloc>().add(AddRequestEvent(request: request));
+    filePickerContext.read<FilePickerBloc>().add(ClearFilesEvent());
   }
 
   // Other Functions
@@ -343,7 +382,19 @@ class _ListFileWidgetState extends State<ListFileWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<FilePickerBloc, FilePickerState>(
+    return BlocConsumer<FilePickerBloc, FilePickerState>(
+      listener: (filePickerContext, filePickerState) {
+        if (filePickerState is FilePickerError) {
+          HelperUtil.showErrorDialog(
+            title: "Maximum file limit reached",
+            message: filePickerState.errorMessage,
+            context: context,
+          );
+
+          // Reset to FilePickerLoaded
+          context.read<FilePickerBloc>().add(ResetFilePickerErrorEvent());
+        }
+      },
       builder: (filePickerContext, filePickerState) {
         if (filePickerState is FilePickerLoading) {
           return Container(
@@ -439,8 +490,8 @@ class _ListFileWidgetState extends State<ListFileWidget> {
                           height: 20,
                           width: 20,
                           child: InkWell(
-                            onTap: () async {
-                              await _actionDeleteFile(
+                            onTap: () {
+                              _actionDeleteFile(
                                 filePickerContext: filePickerContext,
                                 file: file,
                               );
@@ -519,10 +570,10 @@ class _ListFileWidgetState extends State<ListFileWidget> {
   }
 
   // TODO: Button actions
-  Future _actionDeleteFile({
+  _actionDeleteFile({
     required BuildContext filePickerContext,
     required File file,
-  }) async {
+  }) {
     filePickerContext.read<FilePickerBloc>().add(RemoveFileEvent(file: file));
   }
 }

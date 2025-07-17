@@ -49,6 +49,7 @@ dependencies:
       url: https://github.com/Khip01/dart-highlighting.git
       path: flutter_highlighting
       ref: text_selection_fixed
+  dio: ^5.8.0+1
 
 dev_dependencies:
   flutter_test:

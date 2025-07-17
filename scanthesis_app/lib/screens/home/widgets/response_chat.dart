@@ -5,13 +5,16 @@ import 'package:flutter_highlighting/flutter_highlighting.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:provider/provider.dart';
+import 'package:scanthesis_app/models/api_response.dart';
 import 'package:scanthesis_app/provider/theme_provider.dart';
 import 'package:scanthesis_app/utils/code_theme_util.dart';
 
 import 'package:scanthesis_app/utils/style_util.dart';
 
 class ResponseChat extends StatefulWidget {
-  const ResponseChat({super.key});
+  final ApiResponse response;
+
+  const ResponseChat({super.key, required this.response});
 
   @override
   State<ResponseChat> createState() => _ResponseChatState();
@@ -27,57 +30,55 @@ class _ResponseChatState extends State<ResponseChat> {
     return Container(
       padding: EdgeInsets.all(12),
       width: 730,
-      child: SelectionArea(
-        child: Scrollbar(
-          interactive: true,
-          thumbVisibility: true,
-          trackVisibility: true,
-          controller: _codeScrollController,
-          child: GptMarkdown(
-            // key: ValueKey(Provider.of<ThemeProvider>(context).getThemeMode),
-            // key: ValueKey(Theme.of(context).brightness),
-            key: ValueKey(Theme.of(context).colorScheme),
-            _markdownWithCodeMix,
-            codeBuilder: (context, name, code, closed) {
-              return Card(
-                shape: RoundedRectangleBorder(
-                  side: BorderSide(
-                    color: Theme.of(context).dividerColor,
-                    width: 0.3,
-                  ),
-                  borderRadius: BorderRadius.circular(8),
+      child: Scrollbar(
+        interactive: true,
+        thumbVisibility: true,
+        trackVisibility: true,
+        controller: _codeScrollController,
+        child: GptMarkdown(
+          // key: ValueKey(Provider.of<ThemeProvider>(context).getThemeMode),
+          // key: ValueKey(Theme.of(context).brightness),
+          key: ValueKey(Theme.of(context).colorScheme),
+          widget.response.text,
+          codeBuilder: (context, name, code, closed) {
+            return Card(
+              shape: RoundedRectangleBorder(
+                side: BorderSide(
+                  color: Theme.of(context).dividerColor,
+                  width: 0.3,
                 ),
-                clipBehavior: Clip.antiAlias,
-                child: Container(
-                  constraints: BoxConstraints(maxWidth: 680),
-                  child: Column(
-                    children: [
-                      _codeCardHeader(languageName: name, codeToCopy: code),
-                      SingleChildScrollView(
-                        controller: _codeScrollController,
-                        child: _codeCardContent(
-                          languageName: name,
-                          code: code,
-                          isDarkMode: isDarkMode,
-                        ),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Container(
+                constraints: BoxConstraints(maxWidth: 730),
+                child: Column(
+                  children: [
+                    _codeCardHeader(languageName: name, codeToCopy: code),
+                    SingleChildScrollView(
+                      controller: _codeScrollController,
+                      child: _codeCardContent(
+                        languageName: name,
+                        code: code,
+                        isDarkMode: isDarkMode,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              );
-            },
-            style: GoogleFonts.nunito().copyWith(fontSize: 18),
-            highlightBuilder: (context, text, style) {
-              return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: StyleUtil.windowButtonGrey.withAlpha(35),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(text, style: GoogleFonts.sourceCodePro()),
-              );
-            },
-          ),
+              ),
+            );
+          },
+          style: GoogleFonts.nunito().copyWith(fontSize: 18),
+          highlightBuilder: (context, text, style) {
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: StyleUtil.windowButtonGrey.withAlpha(35),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(text, style: GoogleFonts.sourceCodePro()),
+            );
+          },
         ),
       ),
     );

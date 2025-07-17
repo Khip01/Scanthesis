@@ -20,3 +20,7 @@ class RemoveFileEvent extends FilePickerEvent {
 
   RemoveFileEvent({required this.file});
 }
+
+class ClearFilesEvent extends FilePickerEvent {}
+
+class ResetFilePickerErrorEvent extends FilePickerEvent {}

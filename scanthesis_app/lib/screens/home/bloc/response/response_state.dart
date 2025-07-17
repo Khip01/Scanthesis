@@ -1,12 +1,26 @@
 part of 'response_bloc.dart';
 
 @immutable
-sealed class ResponseState {}
+sealed class ResponseState {
+  final ApiResponse response;
 
-final class ResponseInitial extends ResponseState {}
+  const ResponseState({required this.response});
+}
 
-final class ResponseLoading extends ResponseState {}
+final class ResponseInitial extends ResponseState {
+  ResponseInitial() : super(response: ApiResponse());
+}
 
-final class ResponseSuccess extends ResponseState {}
+final class ResponseLoading extends ResponseState {
+  ResponseLoading() : super(response: ApiResponse());
+}
 
-final class ResponseError extends ResponseState {}
+final class ResponseSuccess extends ResponseState {
+  const ResponseSuccess({required super.response});
+}
+
+final class ResponseError extends ResponseState {
+  final String errorMessage;
+
+  const ResponseError({required this.errorMessage, required super.response});
+}

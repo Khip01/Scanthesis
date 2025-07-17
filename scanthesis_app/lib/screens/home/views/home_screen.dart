@@ -7,10 +7,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:scanthesis_app/provider/theme_provider.dart';
 import 'package:scanthesis_app/screens/home/bloc/file_picker/file_picker_bloc.dart';
+import 'package:scanthesis_app/screens/home/bloc/request/request_bloc.dart';
+import 'package:scanthesis_app/screens/home/bloc/response/response_bloc.dart';
 import 'package:scanthesis_app/screens/home/provider/preview_image_provider.dart';
 import 'package:scanthesis_app/screens/home/widgets/floating_input.dart';
 import 'package:scanthesis_app/screens/home/widgets/custom_app_bar.dart';
 import 'package:scanthesis_app/screens/home/widgets/preview_image.dart';
+import 'package:scanthesis_app/screens/home/widgets/request_chat.dart';
 import 'package:scanthesis_app/screens/home/widgets/response_chat.dart';
 import 'package:scanthesis_app/utils/style_util.dart';
 
@@ -260,10 +263,41 @@ class _HomeContentState extends State<HomeContent> {
     return Expanded(
       child: SizedBox(
         width: double.maxFinite,
-        child: SingleChildScrollView(
-          padding: EdgeInsets.only(bottom: 28, top: 16),
-          child: Center(
-            child: ResponseChat(),
+        child: SelectionArea(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.only(bottom: 28, top: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                BlocBuilder<RequestBloc, RequestState>(
+                  builder: (requestBlocContext, requestBlocState) {
+                    if (requestBlocState is RequestInitial) {
+                      return SizedBox.shrink();
+                    } else if (requestBlocState is RequestSuccess && requestBlocState.request != null) {
+                      return RequestChat(request: requestBlocState.request!,);
+                    } else {
+                      return SizedBox.shrink();
+                    }
+                  },
+                ),
+                BlocBuilder<ResponseBloc, ResponseState>(
+                  builder: (responseBlocContext, responseBlocState) {
+                    if (responseBlocState is ResponseLoading) {
+                      return CircularProgressIndicator();
+                    } else if (responseBlocState is ResponseError) {
+                      return Text("Error: ${responseBlocState.errorMessage}");
+                    } else if (responseBlocState is ResponseInitial) {
+                      return Text("Try to upload and send something");
+                    } else if (responseBlocState is ResponseSuccess &&
+                        responseBlocState.response.isCreated) {
+                      return ResponseChat(response: responseBlocState.response);
+                    } else {
+                      return Text("Something went wrong");
+                    }
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
