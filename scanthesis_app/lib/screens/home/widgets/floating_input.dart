@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:scanthesis_app/models/api_request.dart';
 import 'package:scanthesis_app/provider/theme_provider.dart';
 import 'package:scanthesis_app/screens/home/bloc/request/request_bloc.dart';
+import 'package:scanthesis_app/screens/home/bloc/response/response_bloc.dart';
 import 'package:scanthesis_app/screens/home/handler/clipboard_handler.dart';
 import 'package:scanthesis_app/screens/home/handler/screen_capture_handler.dart';
 import 'package:scanthesis_app/screens/home/provider/clipboard_provider.dart';
@@ -53,7 +54,9 @@ class _FloatingInputState extends State<FloatingInput> {
     final clipboardImageProvider = Provider.of<ClipboardImageProvider>(context);
     final screenCaptureProvider = Provider.of<ScreenCaptureProvider>(context);
 
-    final ColorScheme themeColorScheme = Theme.of(context).colorScheme;
+    final ColorScheme themeColorScheme = Theme
+        .of(context)
+        .colorScheme;
 
     return Align(
       alignment: Alignment.bottomCenter,
@@ -97,25 +100,25 @@ class _FloatingInputState extends State<FloatingInput> {
                                 message: "Open File",
                                 child: IconButton(
                                   onPressed:
-                                      openFileProvider.isLoading
-                                          ? () {}
-                                          : () async {
-                                            await _actionButtonOpenFile(
-                                              filePickerContext:
-                                                  filePickerContext,
-                                            );
-                                          },
+                                  openFileProvider.isLoading
+                                      ? () {}
+                                      : () async {
+                                    await _actionButtonOpenFile(
+                                      filePickerContext:
+                                      filePickerContext,
+                                    );
+                                  },
                                   icon:
-                                      openFileProvider.isLoading
-                                          ? CircularProgressIndicator(
-                                            constraints: BoxConstraints(
-                                              maxHeight: 20,
-                                              maxWidth: 20,
-                                              minHeight: 20,
-                                              minWidth: 20,
-                                            ),
-                                          )
-                                          : Icon(Icons.folder_copy, size: 20),
+                                  openFileProvider.isLoading
+                                      ? CircularProgressIndicator(
+                                    constraints: BoxConstraints(
+                                      maxHeight: 20,
+                                      maxWidth: 20,
+                                      minHeight: 20,
+                                      minWidth: 20,
+                                    ),
+                                  )
+                                      : Icon(Icons.folder_copy, size: 20),
                                   style: IconButton.styleFrom(
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
@@ -127,25 +130,25 @@ class _FloatingInputState extends State<FloatingInput> {
                                 message: "Paste Copied Image",
                                 child: IconButton(
                                   onPressed:
-                                      clipboardImageProvider.isLoading
-                                          ? () {}
-                                          : () async {
-                                            await _actionButtonClipboard(
-                                              filePickerContext:
-                                                  filePickerContext,
-                                            );
-                                          },
+                                  clipboardImageProvider.isLoading
+                                      ? () {}
+                                      : () async {
+                                    await _actionButtonClipboard(
+                                      filePickerContext:
+                                      filePickerContext,
+                                    );
+                                  },
                                   icon:
-                                      clipboardImageProvider.isLoading
-                                          ? CircularProgressIndicator(
-                                            constraints: BoxConstraints(
-                                              maxHeight: 20,
-                                              maxWidth: 20,
-                                              minHeight: 20,
-                                              minWidth: 20,
-                                            ),
-                                          )
-                                          : Icon(Icons.paste, size: 20),
+                                  clipboardImageProvider.isLoading
+                                      ? CircularProgressIndicator(
+                                    constraints: BoxConstraints(
+                                      maxHeight: 20,
+                                      maxWidth: 20,
+                                      minHeight: 20,
+                                      minWidth: 20,
+                                    ),
+                                  )
+                                      : Icon(Icons.paste, size: 20),
                                   style: IconButton.styleFrom(
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
@@ -157,25 +160,25 @@ class _FloatingInputState extends State<FloatingInput> {
                                 message: "Capture Screen",
                                 child: IconButton(
                                   onPressed:
-                                      screenCaptureProvider.isLoading
-                                          ? () {}
-                                          : () async {
-                                            await _actionButtonTakeScreenshot(
-                                              filePickerContext:
-                                                  filePickerContext,
-                                            );
-                                          },
+                                  screenCaptureProvider.isLoading
+                                      ? () {}
+                                      : () async {
+                                    await _actionButtonTakeScreenshot(
+                                      filePickerContext:
+                                      filePickerContext,
+                                    );
+                                  },
                                   icon:
-                                      screenCaptureProvider.isLoading
-                                          ? CircularProgressIndicator(
-                                            constraints: BoxConstraints(
-                                              maxHeight: 20,
-                                              maxWidth: 20,
-                                              minHeight: 20,
-                                              minWidth: 20,
-                                            ),
-                                          )
-                                          : Icon(Icons.crop, size: 20),
+                                  screenCaptureProvider.isLoading
+                                      ? CircularProgressIndicator(
+                                    constraints: BoxConstraints(
+                                      maxHeight: 20,
+                                      maxWidth: 20,
+                                      minHeight: 20,
+                                      minWidth: 20,
+                                    ),
+                                  )
+                                      : Icon(Icons.crop, size: 20),
                                   style: IconButton.styleFrom(
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
@@ -256,53 +259,60 @@ class _FloatingInputState extends State<FloatingInput> {
       ignoring: filePickerState.files.isEmpty,
       child: Tooltip(
         message: "or press `Enter` key to send",
-        child: BlocBuilder<RequestBloc, RequestState>(
-          builder: (requestContext, requestState) {
-            return ElevatedButton(
-              onPressed:
+        child: BlocBuilder<ResponseBloc, ResponseState>(
+          builder: (responseContext, responseState) {
+            return BlocBuilder<RequestBloc, RequestState>(
+              builder: (requestContext, requestState) {
+                return ElevatedButton(
+                  onPressed:
                   filePickerState.files.isEmpty
                       ? null
                       : () {
-                        _actionSendButton(
-                          requestContext: requestContext,
-                          filePickerContext: filePickerContext,
-                          files: filePickerState.files,
-                          prompt: promptController.text,
-                        );
-                      },
-              style: ElevatedButton.styleFrom(
-                enableFeedback: false,
-                padding: EdgeInsets.zero,
-                backgroundColor:
-                    themeProvider.isDarkMode(context)
-                        ? themeColorScheme.primary
-                        : themeColorScheme.secondary,
-              ),
-              child: BlocListener<FilePickerBloc, FilePickerState>(
-                listener: (filePickerListenerContext, filePickerListenerState) {
-                  if (filePickerListenerState.files.isNotEmpty) {
-                    _sendButtonFocusNode.requestFocus();
-                  } else {
-                    _sendButtonFocusNode.unfocus();
-                  }
-                },
-                child: SendButtonShortcut(
-                  action: () {
                     _actionSendButton(
                       requestContext: requestContext,
                       filePickerContext: filePickerContext,
+                      responseContext: responseContext,
                       files: filePickerState.files,
                       prompt: promptController.text,
                     );
                   },
-                  focusNode: _sendButtonFocusNode,
-                  child: SizedBox(
-                    height: 52,
-                    width: 52,
-                    child: Icon(Icons.send_rounded),
+                  style: ElevatedButton.styleFrom(
+                    enableFeedback: false,
+                    padding: EdgeInsets.zero,
+                    backgroundColor:
+                    themeProvider.isDarkMode(context)
+                        ? themeColorScheme.primary
+                        : themeColorScheme.secondary,
                   ),
-                ),
-              ),
+                  child: BlocListener<FilePickerBloc, FilePickerState>(
+                    listener: (filePickerListenerContext,
+                        filePickerListenerState) {
+                      if (filePickerListenerState.files.isNotEmpty) {
+                        _sendButtonFocusNode.requestFocus();
+                      } else {
+                        _sendButtonFocusNode.unfocus();
+                      }
+                    },
+                    child: SendButtonShortcut(
+                      action: () {
+                        _actionSendButton(
+                          requestContext: requestContext,
+                          filePickerContext: filePickerContext,
+                          responseContext: responseContext,
+                          files: filePickerState.files,
+                          prompt: promptController.text,
+                        );
+                      },
+                      focusNode: _sendButtonFocusNode,
+                      child: SizedBox(
+                        height: 52,
+                        width: 52,
+                        child: Icon(Icons.send_rounded),
+                      ),
+                    ),
+                  ),
+                );
+              },
             );
           },
         ),
@@ -314,21 +324,29 @@ class _FloatingInputState extends State<FloatingInput> {
   _actionSendButton({
     required BuildContext requestContext,
     required BuildContext filePickerContext,
+    required BuildContext responseContext,
     required List<File> files,
     required String prompt,
   }) {
     final isCustom =
-        Provider.of<CustomPromptProvider>(
+        Provider
+            .of<CustomPromptProvider>(
           context,
           listen: false,
-        ).isUsingCustomPrompt;
+        )
+            .isUsingCustomPrompt;
 
     final ApiRequest request = ApiRequest(
       files: List<File>.from(files),
       prompt: isCustom ? prompt : Strings.defaultPrompt,
     );
-    requestContext.read<RequestBloc>().add(AddRequestEvent(request: request));
     filePickerContext.read<FilePickerBloc>().add(ClearFilesEvent());
+
+    // Bloc Request
+    requestContext.read<RequestBloc>().add(AddRequestEvent(request: request));
+    // Bloc Response
+    responseContext.read<ResponseBloc>().add(
+        AddResponseEvent(request: request));
   }
 
   // Other Functions
@@ -353,7 +371,9 @@ class _FloatingInputState extends State<FloatingInput> {
         HelperUtil.showErrorDialog(
           title: "Unexpected Error",
           message:
-              "We encountered an error while accessing your clipboard: ${e.toString().split('\n')[0]}",
+          "We encountered an error while accessing your clipboard: ${e
+              .toString()
+              .split('\n')[0]}",
           context: context,
         );
       }
@@ -448,7 +468,7 @@ class _ListFileWidgetState extends State<ListFileWidget> {
 
   Widget _fileItem(File file) {
     PreviewImageProvider previewImageProvider =
-        Provider.of<PreviewImageProvider>(context);
+    Provider.of<PreviewImageProvider>(context);
     bool isHover = false;
 
     return BlocBuilder<FilePickerBloc, FilePickerState>(
@@ -471,7 +491,9 @@ class _ListFileWidgetState extends State<ListFileWidget> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(12)),
                   border: Border.all(
-                    color: Theme.of(context).dividerColor,
+                    color: Theme
+                        .of(context)
+                        .dividerColor,
                     width: 0.3,
                   ),
                 ),
@@ -524,16 +546,18 @@ class _ListFileWidgetState extends State<ListFileWidget> {
 
   Widget _customIcon() {
     ThemeProvider themeProvider = Provider.of<ThemeProvider>(context);
-    ColorScheme themeColorScheme = Theme.of(context).colorScheme;
+    ColorScheme themeColorScheme = Theme
+        .of(context)
+        .colorScheme;
 
     return Padding(
       padding: const EdgeInsets.only(left: 12, right: 8, top: 8, bottom: 8),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color:
-              themeProvider.isDarkMode(context)
-                  ? themeColorScheme.primary
-                  : themeColorScheme.secondary,
+          themeProvider.isDarkMode(context)
+              ? themeColorScheme.primary
+              : themeColorScheme.secondary,
           borderRadius: BorderRadius.all(Radius.circular(4)),
         ),
         child: SizedBox(
@@ -555,14 +579,22 @@ class _ListFileWidgetState extends State<ListFileWidget> {
           // mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              file.path.split('/').last,
+              file.path
+                  .split('/')
+                  .last,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 16,
-                color: Theme.of(context).colorScheme.onSurface,
+                color: Theme
+                    .of(context)
+                    .colorScheme
+                    .onSurface,
               ),
             ),
-            Text(file.path.split('.').last.toUpperCase()),
+            Text(file.path
+                .split('.')
+                .last
+                .toUpperCase()),
           ],
         ),
       ),
