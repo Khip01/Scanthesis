@@ -5,6 +5,7 @@ import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:scanthesis_app/provider/drawer_provider.dart';
 import 'package:scanthesis_app/provider/theme_provider.dart';
 import 'package:scanthesis_app/screens/home/bloc/file_picker/file_picker_bloc.dart';
 import 'package:scanthesis_app/screens/home/bloc/request/request_bloc.dart';
@@ -96,86 +97,147 @@ class _DropzoneAreaState extends State<DropzoneArea>
 
   @override
   Widget build(BuildContext context) {
-    final PreviewImageProvider previewImageProvider =
-        Provider.of<PreviewImageProvider>(context);
+    final ThemeData themeData = Theme.of(context);
+    final DrawerProvider drawerProvider = Provider.of<DrawerProvider>(context);
+    final Duration drawerDuration = Duration(milliseconds: 400);
 
     return Expanded(
       child: Stack(
         children: [
-          ..._dropzoneMainContent(context),
-          PreviewImage(),
-          BlocBuilder<FilePickerBloc, FilePickerState>(
-            builder: (filePickerContext, filePickerState) {
-              return IgnorePointer(
-                ignoring: true,
-                child: DropTarget(
-                  onDragEntered: (_) {
-                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                    previewImageProvider.closeIsPreviewModeState();
-                    _blurController.forward();
-                    _opacityController.forward();
-                  },
-                  onDragExited: (_) {
-                    _blurController.reverse();
-                    _opacityController.reverse();
-                  },
-                  onDragDone: (details) {
-                    var (listItem, isWarning) = _getImageFileFromDropzone(
-                      dropItems: details.files,
-                      allowedExtensions: ['jpg', 'jpeg', 'png'],
-                    );
-                    filePickerContext.read<FilePickerBloc>().add(
-                      AddMultipleFileEvent(files: listItem),
-                    );
+          AnimatedContainer(
+            transform: Matrix4.translationValues(
+              drawerProvider.xAxisTranslateContent,
+              0,
+              0,
+            ),
+            curve: Curves.easeOutQuart,
+            duration: drawerDuration,
+            child: _animatedTranslatedContent(),
+          ),
+          IgnorePointer(
+            ignoring: !drawerProvider.isOpen,
+            child: GestureDetector(
+              onTap: () {
+                drawerProvider.toggleDrawer();
+              },
+              child: AnimatedContainer(
+                duration: drawerDuration,
+                color:
+                    drawerProvider.isOpen
+                        ? Colors.black.withAlpha(160)
+                        : Colors.transparent,
+                curve: Curves.easeOutQuart,
+              ),
+            ),
+          ),
+          AnimatedContainer(
+            transform: Matrix4.translationValues(
+              drawerProvider.xAxisTranslateDrawer,
+              0,
+              0,
+            ),
+            duration: drawerDuration,
+            curve: Curves.easeOutQuart,
+            width: 300,
+            color: themeData.scaffoldBackgroundColor,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 16),
+            child: SizedBox(
+              height: 56,
+              width: 44,
+              child: AppBar(
+                scrolledUnderElevation: 0,
+                leading: _toggleSideTabIcon(),
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-                    if (isWarning) {
-                      if (isWarning && listItem.isEmpty) {
-                        _showSnackBar(showError: true);
-                      } else {
-                        _showSnackBar(showError: false);
-                      }
+  Widget _animatedTranslatedContent() {
+    final PreviewImageProvider previewImageProvider =
+        Provider.of<PreviewImageProvider>(context);
+
+    return Stack(
+      children: [
+        ..._dropzoneMainContent(context),
+        PreviewImage(),
+        BlocBuilder<FilePickerBloc, FilePickerState>(
+          builder: (filePickerContext, filePickerState) {
+            return IgnorePointer(
+              ignoring: true,
+              child: DropTarget(
+                onDragEntered: (_) {
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  previewImageProvider.closeIsPreviewModeState();
+                  _blurController.forward();
+                  _opacityController.forward();
+                },
+                onDragExited: (_) {
+                  _blurController.reverse();
+                  _opacityController.reverse();
+                },
+                onDragDone: (details) {
+                  var (listItem, isWarning) = _getImageFileFromDropzone(
+                    dropItems: details.files,
+                    allowedExtensions: ['jpg', 'jpeg', 'png'],
+                  );
+                  filePickerContext.read<FilePickerBloc>().add(
+                    AddMultipleFileEvent(files: listItem),
+                  );
+
+                  if (isWarning) {
+                    if (isWarning && listItem.isEmpty) {
+                      _showSnackBar(showError: true);
+                    } else {
+                      _showSnackBar(showError: false);
                     }
+                  }
+                },
+                child: AnimatedBuilder(
+                  animation: _opacityAnimation,
+                  builder: (context, child) {
+                    return Opacity(
+                      opacity: _opacityAnimation.value,
+                      child: child,
+                    );
                   },
                   child: AnimatedBuilder(
-                    animation: _opacityAnimation,
+                    animation: _blurAnimation,
                     builder: (context, child) {
-                      return Opacity(
-                        opacity: _opacityAnimation.value,
+                      return BackdropFilter(
+                        filter: ImageFilter.blur(
+                          sigmaX: _blurAnimation.value,
+                          sigmaY: _blurAnimation.value,
+                        ),
                         child: child,
                       );
                     },
-                    child: AnimatedBuilder(
-                      animation: _blurAnimation,
-                      builder: (context, child) {
-                        return BackdropFilter(
-                          filter: ImageFilter.blur(
-                            sigmaX: _blurAnimation.value,
-                            sigmaY: _blurAnimation.value,
-                          ),
-                          child: child,
-                        );
-                      },
-                      child: SizedBox(
-                        height: double.maxFinite,
-                        width: double.maxFinite,
-                        child: Center(
-                          child: Text(
-                            "Drop Image Files Only",
-                            style: TextStyle(
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
-                            ),
+                    child: SizedBox(
+                      height: double.maxFinite,
+                      width: double.maxFinite,
+                      child: Center(
+                        child: Text(
+                          "Drop Image Files Only",
+                          style: TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              );
-            },
-          ),
-        ],
-      ),
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 
@@ -185,10 +247,7 @@ class _DropzoneAreaState extends State<DropzoneArea>
         children: [
           AppBar(
             scrolledUnderElevation: 0,
-            actions: [
-              _toggleThemeIcon(context: context),
-              const SizedBox(width: 16),
-            ],
+            actions: [_toggleThemeIcon(), const SizedBox(width: 16)],
             backgroundColor: Colors.transparent,
             elevation: 0,
           ),
@@ -233,7 +292,25 @@ class _DropzoneAreaState extends State<DropzoneArea>
     );
   }
 
-  Widget _toggleThemeIcon({required BuildContext context}) {
+  Widget _toggleSideTabIcon() {
+    Color? buttonColor = IconTheme.of(context).color;
+    DrawerProvider drawerState = Provider.of<DrawerProvider>(context);
+
+    return IconButton(
+      icon: RotatedBox(
+        quarterTurns: !drawerState.isOpen ? 0 : 2,
+        child: Icon(Icons.keyboard_tab, color: buttonColor),
+      ),
+      onPressed: () {
+        drawerState.toggleDrawer();
+      },
+      style: IconButton.styleFrom(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+  }
+
+  Widget _toggleThemeIcon() {
     Color? buttonColor = IconTheme.of(context).color;
     ThemeProvider theme = Provider.of<ThemeProvider>(context);
     final isDark = theme.isDarkMode(context);
@@ -273,8 +350,9 @@ class _HomeContentState extends State<HomeContent> {
                   builder: (requestBlocContext, requestBlocState) {
                     if (requestBlocState is RequestInitial) {
                       return SizedBox.shrink();
-                    } else if (requestBlocState is RequestSuccess && requestBlocState.request != null) {
-                      return RequestChat(request: requestBlocState.request!,);
+                    } else if (requestBlocState is RequestSuccess &&
+                        requestBlocState.request != null) {
+                      return RequestChat(request: requestBlocState.request!);
                     } else {
                       return SizedBox.shrink();
                     }
@@ -310,6 +388,18 @@ class HomeFooterSpacer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(height: 100, width: double.maxFinite);
+    return BlocBuilder<FilePickerBloc, FilePickerState>(
+      builder: (filePickerContext, filePickerState) {
+        return Container(
+          constraints: BoxConstraints(
+            maxHeight:
+                filePickerState.files.isNotEmpty
+                    ? (MediaQuery.sizeOf(context).height * 1 / 2)
+                    : 100,
+          ),
+          width: double.maxFinite,
+        );
+      },
+    );
   }
 }

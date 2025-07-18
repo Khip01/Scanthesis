@@ -2,6 +2,7 @@ import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:scanthesis_app/provider/drawer_provider.dart';
 import 'package:scanthesis_app/provider/theme_provider.dart';
 import 'package:scanthesis_app/screens/home/bloc/file_picker/file_picker_bloc.dart';
 import 'package:scanthesis_app/screens/home/bloc/request/request_bloc.dart';
@@ -28,6 +29,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => OpenFileProvider()),
         ChangeNotifierProvider(create: (_) => PreviewImageProvider()),
         ChangeNotifierProvider(create: (_) => CustomPromptProvider()),
+        ChangeNotifierProvider(create: (_) => DrawerProvider()),
       ],
       child: MyApp(),
     ),
