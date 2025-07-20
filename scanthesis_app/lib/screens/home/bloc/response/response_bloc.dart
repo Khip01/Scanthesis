@@ -12,6 +12,7 @@ class ResponseBloc extends Bloc<ResponseEvent, ResponseState> {
   ResponseBloc() : super(ResponseInitial()) {
     on<AddResponseEvent>(_addResponse);
     on<ClearResponseEvent>(_clearResponse);
+    on<AddResponseSuccessEvent>(_addResponseSuccess);
   }
 
   _addResponse(AddResponseEvent event, Emitter<ResponseState> emit) async {
@@ -29,5 +30,10 @@ class ResponseBloc extends Bloc<ResponseEvent, ResponseState> {
 
   _clearResponse(ClearResponseEvent event, Emitter<ResponseState> emit) {
     emit(ResponseInitial());
+  }
+
+  _addResponseSuccess(AddResponseSuccessEvent event, Emitter<ResponseState> emit){
+    event.response.setFromHistory(true);
+    emit(ResponseSuccess(response: event.response));
   }
 }

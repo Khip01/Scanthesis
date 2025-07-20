@@ -5,8 +5,10 @@ import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:scanthesis_app/models/chat.dart';
 import 'package:scanthesis_app/provider/drawer_provider.dart';
 import 'package:scanthesis_app/provider/theme_provider.dart';
+import 'package:scanthesis_app/screens/home/bloc/chats/chats_bloc.dart';
 import 'package:scanthesis_app/screens/home/bloc/file_picker/file_picker_bloc.dart';
 import 'package:scanthesis_app/screens/home/bloc/request/request_bloc.dart';
 import 'package:scanthesis_app/screens/home/bloc/response/response_bloc.dart';
@@ -385,8 +387,26 @@ class _HomeContentState extends State<HomeContent> {
                       }
                     },
                   ),
-                  BlocBuilder<ResponseBloc, ResponseState>(
-                    buildWhen: (previous, current) => previous != current,
+                  BlocConsumer<ResponseBloc, ResponseState>(
+                    listener: (responseBlocContext, responseBlocState) {
+                      if (responseBlocState is ResponseSuccess &&
+                          responseBlocState.response.isCreated &&
+                          !responseBlocState.response.isFromHistory) {
+                        final requestBlocState =
+                            context.read<RequestBloc>().state;
+                        if (requestBlocState is RequestSuccess &&
+                            requestBlocState.request != null) {
+                          final req = requestBlocState.request!;
+                          final res = responseBlocState.response;
+
+                          context.read<ChatsBloc>().add(
+                            AddChatEvent(
+                              chat: Chat(request: req, response: res),
+                            ),
+                          );
+                        }
+                      }
+                    },
                     builder: (responseBlocContext, responseBlocState) {
                       if (responseBlocState is ResponseLoading) {
                         return CircularProgressIndicator();

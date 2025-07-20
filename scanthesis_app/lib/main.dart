@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:scanthesis_app/provider/drawer_provider.dart';
 import 'package:scanthesis_app/provider/theme_provider.dart';
+import 'package:scanthesis_app/screens/home/bloc/chats/chats_bloc.dart';
 import 'package:scanthesis_app/screens/home/bloc/file_picker/file_picker_bloc.dart';
 import 'package:scanthesis_app/screens/home/bloc/request/request_bloc.dart';
 import 'package:scanthesis_app/screens/home/bloc/response/response_bloc.dart';
@@ -65,8 +66,9 @@ class MyApp extends StatelessWidget {
                 ),
               ),
         ),
-        BlocProvider(create: (context) => ResponseBloc()),
-        BlocProvider(create: (context) => RequestBloc()),
+        BlocProvider(create: (_) => ResponseBloc()),
+        BlocProvider(create: (_) => RequestBloc()),
+        BlocProvider(create: (_) => ChatsBloc()),
       ],
       child: MaterialApp(
         theme: ThemeUtil.globalLightTheme,

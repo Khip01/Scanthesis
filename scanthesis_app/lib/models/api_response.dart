@@ -1,7 +1,9 @@
 class ApiResponse {
   String? _response;
+  bool _isFromHistory;
 
   bool get isCreated => _response != null;
+  bool get isFromHistory => _isFromHistory;
 
   String get text {
     if (isCreated) {
@@ -14,7 +16,11 @@ class ApiResponse {
     _response = text;
   }
 
-  ApiResponse([this._response]);
+  void setFromHistory(bool isFromHistory){
+    _isFromHistory = isFromHistory;
+  }
+
+  ApiResponse([this._response, this._isFromHistory = false]);
 
   factory ApiResponse.fromJson(Map<String, dynamic> json) {
     return ApiResponse(json["response"]);

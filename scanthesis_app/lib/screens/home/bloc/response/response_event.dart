@@ -12,3 +12,9 @@ class AddResponseEvent extends ResponseEvent {
 class ClearResponseEvent extends ResponseEvent {
   ClearResponseEvent();
 }
+
+class AddResponseSuccessEvent extends ResponseEvent {
+  final ApiResponse response;
+
+  AddResponseSuccessEvent({required this.response});
+}
