@@ -11,6 +11,7 @@ import 'package:scanthesis_app/screens/home/bloc/file_picker/file_picker_bloc.da
 import 'package:scanthesis_app/screens/home/bloc/request/request_bloc.dart';
 import 'package:scanthesis_app/screens/home/bloc/response/response_bloc.dart';
 import 'package:scanthesis_app/screens/home/provider/preview_image_provider.dart';
+import 'package:scanthesis_app/screens/home/widgets/custom_drawer.dart';
 import 'package:scanthesis_app/screens/home/widgets/floating_input.dart';
 import 'package:scanthesis_app/screens/home/widgets/custom_app_bar.dart';
 import 'package:scanthesis_app/screens/home/widgets/preview_image.dart';
@@ -52,6 +53,7 @@ class _DropzoneAreaState extends State<DropzoneArea>
     with TickerProviderStateMixin {
   late AnimationController _blurController, _opacityController;
   late Animation<double> _blurAnimation, _opacityAnimation;
+  late FocusNode _sendButtonFocusNode;
 
   @override
   void initState() {
@@ -72,7 +74,16 @@ class _DropzoneAreaState extends State<DropzoneArea>
     _opacityAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _opacityController, curve: Curves.linear),
     );
+
+    // TODO: global send button focus node
+    _sendButtonFocusNode = FocusNode();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _sendButtonFocusNode.dispose();
+    super.dispose();
   }
 
   (List<File>, bool) _getImageFileFromDropzone({
@@ -95,9 +106,16 @@ class _DropzoneAreaState extends State<DropzoneArea>
     return (files, isWarning);
   }
 
+  void updateFocusBasedOnStates(FilePickerState state, bool isDrawerOpen) {
+    if (state.files.isNotEmpty && !isDrawerOpen) {
+      _sendButtonFocusNode.requestFocus();
+    } else {
+      _sendButtonFocusNode.unfocus();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final ThemeData themeData = Theme.of(context);
     final DrawerProvider drawerProvider = Provider.of<DrawerProvider>(context);
     final Duration drawerDuration = Duration(milliseconds: 400);
 
@@ -130,17 +148,7 @@ class _DropzoneAreaState extends State<DropzoneArea>
               ),
             ),
           ),
-          AnimatedContainer(
-            transform: Matrix4.translationValues(
-              drawerProvider.xAxisTranslateDrawer,
-              0,
-              0,
-            ),
-            duration: drawerDuration,
-            curve: Curves.easeOutQuart,
-            width: 300,
-            color: themeData.scaffoldBackgroundColor,
-          ),
+          CustomDrawer(duration: drawerDuration),
           Padding(
             padding: const EdgeInsets.only(left: 16),
             child: SizedBox(
@@ -162,6 +170,7 @@ class _DropzoneAreaState extends State<DropzoneArea>
   Widget _animatedTranslatedContent() {
     final PreviewImageProvider previewImageProvider =
         Provider.of<PreviewImageProvider>(context);
+    final DrawerProvider drawerProvider = Provider.of<DrawerProvider>(context);
 
     return Stack(
       children: [
@@ -172,6 +181,7 @@ class _DropzoneAreaState extends State<DropzoneArea>
             return IgnorePointer(
               ignoring: true,
               child: DropTarget(
+                enable: !drawerProvider.isOpen,
                 onDragEntered: (_) {
                   ScaffoldMessenger.of(context).hideCurrentSnackBar();
                   previewImageProvider.closeIsPreviewModeState();
@@ -251,11 +261,14 @@ class _DropzoneAreaState extends State<DropzoneArea>
             backgroundColor: Colors.transparent,
             elevation: 0,
           ),
-          HomeContent(),
+          HomeContent(sendButtonFocusNode: _sendButtonFocusNode),
           HomeFooterSpacer(),
         ],
       ),
-      FloatingInput(),
+      FloatingInput(
+        sendButtonFocusNode: _sendButtonFocusNode,
+        updateSendButtonFocusBasedOnStates: updateFocusBasedOnStates,
+      ),
     ];
   }
 
@@ -328,53 +341,71 @@ class _DropzoneAreaState extends State<DropzoneArea>
 }
 
 class HomeContent extends StatefulWidget {
-  const HomeContent({super.key});
+  final FocusNode sendButtonFocusNode;
+
+  const HomeContent({super.key, required this.sendButtonFocusNode});
 
   @override
   State<HomeContent> createState() => _HomeContentState();
 }
 
 class _HomeContentState extends State<HomeContent> {
+  ScrollController contentScrollController = ScrollController();
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: SizedBox(
         width: double.maxFinite,
         child: SelectionArea(
-          child: SingleChildScrollView(
-            padding: EdgeInsets.only(bottom: 28, top: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                BlocBuilder<RequestBloc, RequestState>(
-                  builder: (requestBlocContext, requestBlocState) {
-                    if (requestBlocState is RequestInitial) {
-                      return SizedBox.shrink();
-                    } else if (requestBlocState is RequestSuccess &&
-                        requestBlocState.request != null) {
-                      return RequestChat(request: requestBlocState.request!);
-                    } else {
-                      return SizedBox.shrink();
-                    }
-                  },
-                ),
-                BlocBuilder<ResponseBloc, ResponseState>(
-                  builder: (responseBlocContext, responseBlocState) {
-                    if (responseBlocState is ResponseLoading) {
-                      return CircularProgressIndicator();
-                    } else if (responseBlocState is ResponseError) {
-                      return Text("Error: ${responseBlocState.errorMessage}");
-                    } else if (responseBlocState is ResponseInitial) {
-                      return Text("Try to upload and send something");
-                    } else if (responseBlocState is ResponseSuccess &&
-                        responseBlocState.response.isCreated) {
-                      return ResponseChat(response: responseBlocState.response);
-                    } else {
-                      return Text("Something went wrong");
-                    }
-                  },
-                ),
-              ],
+          onSelectionChanged: (value) {
+            if (value == null || value.plainText.isEmpty) {
+              widget.sendButtonFocusNode.requestFocus();
+            }
+          },
+          child: Scrollbar(
+            thumbVisibility: true,
+            trackVisibility: true,
+            controller: contentScrollController,
+            child: SingleChildScrollView(
+              controller: contentScrollController,
+              padding: EdgeInsets.only(bottom: 28, top: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  BlocBuilder<RequestBloc, RequestState>(
+                    builder: (requestBlocContext, requestBlocState) {
+                      if (requestBlocState is RequestInitial) {
+                        return SizedBox.shrink();
+                      } else if (requestBlocState is RequestSuccess &&
+                          requestBlocState.request != null) {
+                        return RequestChat(request: requestBlocState.request!);
+                      } else {
+                        return SizedBox.shrink();
+                      }
+                    },
+                  ),
+                  BlocBuilder<ResponseBloc, ResponseState>(
+                    buildWhen: (previous, current) => previous != current,
+                    builder: (responseBlocContext, responseBlocState) {
+                      if (responseBlocState is ResponseLoading) {
+                        return CircularProgressIndicator();
+                      } else if (responseBlocState is ResponseError) {
+                        return Text("Error: ${responseBlocState.errorMessage}");
+                      } else if (responseBlocState is ResponseInitial) {
+                        return Text("Try to drop and send something");
+                      } else if (responseBlocState is ResponseSuccess &&
+                          responseBlocState.response.isCreated) {
+                        return ResponseChat(
+                          response: responseBlocState.response,
+                        );
+                      } else {
+                        return Text("Something went wrong");
+                      }
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),

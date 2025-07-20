@@ -116,6 +116,8 @@ class _RequestChatState extends State<RequestChat> {
     required ThemeData themeData,
     required BoxConstraints constraints,
   }) {
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       constraints: BoxConstraints(maxWidth: constraints.maxWidth * 2 / 3),
       decoration: BoxDecoration(
@@ -131,7 +133,10 @@ class _RequestChatState extends State<RequestChat> {
       padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       child: Text(
         widget.request.prompt,
-        style: GoogleFonts.nunito().copyWith(fontSize: 18),
+        style: GoogleFonts.nunito().copyWith(
+          fontSize: 18,
+          color: colorScheme.onSurface,
+        ),
       ),
     );
   }

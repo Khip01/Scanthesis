@@ -22,7 +22,7 @@ class FilePickerBloc extends Bloc<FilePickerEvent, FilePickerState> {
 
   _addMultipleFile(AddMultipleFileEvent event, Emitter<FilePickerState> emit) {
     if (state.files.length + event.files.length > 7){
-      emit(FilePickerError(errorMessage: "You can only upload up to 7 images", files: state.files));
+      emit(FilePickerError(errorMessage: "You can only attach up to 7 images", files: state.files));
     } else {
       state.files.addAll(event.files);
       emit(FilePickerLoaded(files: state.files));

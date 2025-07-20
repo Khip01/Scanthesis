@@ -26,27 +26,34 @@ import 'package:scanthesis_app/values/strings.dart';
 import '../bloc/file_picker/file_picker_bloc.dart';
 
 class FloatingInput extends StatefulWidget {
-  const FloatingInput({super.key});
+  final FocusNode sendButtonFocusNode;
+  final Function(FilePickerState state, bool isDrawerOpen)
+  updateSendButtonFocusBasedOnStates;
+
+  const FloatingInput({
+    super.key,
+    required this.sendButtonFocusNode,
+    required this.updateSendButtonFocusBasedOnStates,
+  });
 
   @override
   State<FloatingInput> createState() => _FloatingInputState();
 }
 
 class _FloatingInputState extends State<FloatingInput> {
-  late FocusNode _sendButtonFocusNode;
   final TextEditingController promptController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    _sendButtonFocusNode = FocusNode();
-  }
-
-  @override
-  void dispose() {
-    _sendButtonFocusNode.dispose();
-    super.dispose();
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _sendButtonFocusNode = FocusNode();
+  // }
+  //
+  // @override
+  // void dispose() {
+  //   _sendButtonFocusNode.dispose();
+  //   super.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -193,6 +200,8 @@ class _FloatingInputState extends State<FloatingInput> {
                                 themeProvider: themeProvider,
                                 themeColorScheme: themeColorScheme,
                                 drawerProvider: drawerProvider,
+                                updateFocusBasedOnStates:
+                                    widget.updateSendButtonFocusBasedOnStates,
                               ),
                             ],
                           );
@@ -200,7 +209,7 @@ class _FloatingInputState extends State<FloatingInput> {
                       ),
                     ),
                     CustomPromptField(
-                      sendButtonFocusNode: _sendButtonFocusNode,
+                      sendButtonFocusNode: widget.sendButtonFocusNode,
                       promptController: promptController,
                     ),
                   ],
@@ -256,15 +265,17 @@ class _FloatingInputState extends State<FloatingInput> {
     required ThemeProvider themeProvider,
     required ColorScheme themeColorScheme,
     required DrawerProvider drawerProvider,
+    required Function(FilePickerState state, bool isDrawerOpen)
+    updateFocusBasedOnStates,
   }) {
-
-    void updateFocusBasedOnStates(FilePickerState state, bool isDrawerOpen) {
-      if (state.files.isNotEmpty && !isDrawerOpen) {
-        _sendButtonFocusNode.requestFocus();
-      } else {
-        _sendButtonFocusNode.unfocus();
-      }
-    }
+    // This Function Moved to HomeScreen
+    // void updateFocusBasedOnStates(FilePickerState state, bool isDrawerOpen) {
+    //   if (state.files.isNotEmpty && !isDrawerOpen) {
+    //     widget.sendButtonFocusNode.requestFocus();
+    //   } else {
+    //     widget.sendButtonFocusNode.unfocus();
+    //   }
+    // }
 
     return IgnorePointer(
       ignoring: filePickerState.files.isEmpty,
@@ -298,13 +309,19 @@ class _FloatingInputState extends State<FloatingInput> {
                   child: ListenableBuilder(
                     listenable: drawerProvider,
                     builder: (context, child) {
-                      updateFocusBasedOnStates(filePickerState, drawerProvider.isOpen);
+                      updateFocusBasedOnStates(
+                        filePickerState,
+                        drawerProvider.isOpen,
+                      );
                       return BlocListener<FilePickerBloc, FilePickerState>(
                         listener: (
-                            filePickerListenerContext,
+                          filePickerListenerContext,
+                          filePickerListenerState,
+                        ) {
+                          updateFocusBasedOnStates(
                             filePickerListenerState,
-                            ) {
-                          updateFocusBasedOnStates(filePickerListenerState, drawerProvider.isOpen);
+                            drawerProvider.isOpen,
+                          );
                         },
                         child: SendButtonShortcut(
                           action: () {
@@ -316,7 +333,7 @@ class _FloatingInputState extends State<FloatingInput> {
                               prompt: promptController.text,
                             );
                           },
-                          focusNode: _sendButtonFocusNode,
+                          focusNode: widget.sendButtonFocusNode,
                           child: SizedBox(
                             height: 52,
                             width: 52,
@@ -324,7 +341,7 @@ class _FloatingInputState extends State<FloatingInput> {
                           ),
                         ),
                       );
-                    }
+                    },
                   ),
                 );
               },
@@ -359,7 +376,8 @@ class _FloatingInputState extends State<FloatingInput> {
     requestContext.read<RequestBloc>().add(AddRequestEvent(request: request));
     // Bloc Response
     responseContext.read<ResponseBloc>().add(
-        AddResponseEvent(request: request));
+      AddResponseEvent(request: request),
+    );
   }
 
   // Other Functions

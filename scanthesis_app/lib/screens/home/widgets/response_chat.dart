@@ -26,6 +26,7 @@ class _ResponseChatState extends State<ResponseChat> {
   @override
   Widget build(BuildContext context) {
     bool isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode(context);
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       padding: EdgeInsets.all(12),
@@ -40,6 +41,7 @@ class _ResponseChatState extends State<ResponseChat> {
           // key: ValueKey(Theme.of(context).brightness),
           key: ValueKey(Theme.of(context).colorScheme),
           widget.response.text,
+          // _markdownWithCodeMix,
           codeBuilder: (context, name, code, closed) {
             return Card(
               shape: RoundedRectangleBorder(
@@ -68,7 +70,10 @@ class _ResponseChatState extends State<ResponseChat> {
               ),
             );
           },
-          style: GoogleFonts.nunito().copyWith(fontSize: 18),
+          style: GoogleFonts.nunito().copyWith(
+            fontSize: 18,
+            color: colorScheme.onSurface,
+          ),
           highlightBuilder: (context, text, style) {
             return Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
