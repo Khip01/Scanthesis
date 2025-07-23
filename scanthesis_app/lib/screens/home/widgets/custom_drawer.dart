@@ -89,6 +89,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     // TODO: Create New Chat
                     context.read<RequestBloc>().add(ClearRequestEvent());
                     context.read<ResponseBloc>().add(ClearResponseEvent());
+                    context.read<DrawerProvider>().toggleDrawer();
                   },
                   useDeleteAction: false,
                 ),
