@@ -1,4 +1,6 @@
 import 'package:bloc/bloc.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:scanthesis_app/models/api_request.dart';
 import 'package:scanthesis_app/models/api_response.dart';
@@ -9,22 +11,26 @@ part 'response_event.dart';
 part 'response_state.dart';
 
 class ResponseBloc extends Bloc<ResponseEvent, ResponseState> {
-  ResponseBloc() : super(ResponseInitial()) {
+  final String baseUrl;
+
+  ResponseBloc({required this.baseUrl}) : super(ResponseInitial()) {
     on<AddResponseEvent>(_addResponse);
     on<ClearResponseEvent>(_clearResponse);
     on<AddResponseSuccessEvent>(_addResponseSuccess);
   }
 
   _addResponse(AddResponseEvent event, Emitter<ResponseState> emit) async {
-    try {
-      emit(ResponseLoading());
-      final ApiResponse response = await ApiRepository().sendRequest(
-        event.request,
-      );
+    emit(ResponseLoading());
+    final ApiResponse response = await ApiRepository(
+      baseUrl: baseUrl,
+    ).sendRequest(event.request);
 
+    if (response.isError) {
+      emit(
+        ResponseError(errorMessage: response.errorMessage!, response: response),
+      );
+    } else {
       emit(ResponseSuccess(response: response));
-    } catch (error) {
-      emit(ResponseError(errorMessage: error.toString(), response: ApiResponse()));
     }
   }
 
@@ -32,8 +38,12 @@ class ResponseBloc extends Bloc<ResponseEvent, ResponseState> {
     emit(ResponseInitial());
   }
 
-  _addResponseSuccess(AddResponseSuccessEvent event, Emitter<ResponseState> emit){
-    event.response.setFromHistory(true);
-    emit(ResponseSuccess(response: event.response));
+  _addResponseSuccess(
+    AddResponseSuccessEvent event,
+    Emitter<ResponseState> emit,
+  ) {
+    emit(
+      ResponseSuccess(response: event.response.copyWith(isFromHistory: true)),
+    );
   }
 }

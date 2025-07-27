@@ -16,17 +16,24 @@ class DrawerProvider with ChangeNotifier {
 
   void toggleDrawer() {
     if (!_isDrawerOpen) {
-      // drawer closed
+      // drawer is closed
       _isDrawerOpen = !_isDrawerOpen;
       _xAxisTranslateContentInitial = _contentBodyTranslateTo;
       _xAxisTranslateDrawerInitial = _drawerTranslateTo;
       PreviewImageProvider().closeIsPreviewModeState();
     } else {
-      // drawer opened
+      // drawer is opened
       _isDrawerOpen = !_isDrawerOpen;
       _xAxisTranslateContentInitial = 0;
       _xAxisTranslateDrawerInitial = -300;
     }
+    notifyListeners();
+  }
+
+  void setDrawerState(bool value){
+    _isDrawerOpen = value;
+    _xAxisTranslateContentInitial = 0;
+    _xAxisTranslateDrawerInitial = -300;
     notifyListeners();
   }
 }

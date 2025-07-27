@@ -1,28 +1,73 @@
 class ApiResponse {
-  String? _response;
-  bool _isFromHistory;
+  final String body;
+  final Map<String, dynamic>? json;
+  final int? statusCode;
+  final bool isFromHistory;
+  final String? errorMessage;
 
-  bool get isCreated => _response != null;
-  bool get isFromHistory => _isFromHistory;
-
+  bool get isError => errorMessage != null;
+  String? get parsedText => json?["response"];
   String get text {
-    if (isCreated) {
-      return _response!;
+    if (parsedText != null) return parsedText!;
+    if (body.isNotEmpty) return body;
+    if (errorMessage != null) return errorMessage!;
+    return '';
+  }
+  bool get isCreated => body.isNotEmpty;
+
+
+  ApiResponse.success({
+    required this.body,
+    this.json,
+    this.statusCode,
+    this.isFromHistory = false,
+  }) : errorMessage = null;
+
+  ApiResponse.failure({
+    required this.errorMessage,
+    this.statusCode,
+    this.body = '',
+    this.json,
+    this.isFromHistory = false,
+  });
+
+  factory ApiResponse.fromJson(Map<String, dynamic> json, {int? statusCode}) {
+    return ApiResponse.success(
+      body: json.toString(),
+      json: json,
+      statusCode: statusCode,
+    );
+  }
+
+  factory ApiResponse.fromPlainText(String text, {int? statusCode}) {
+    return ApiResponse.success(
+      body: text,
+      statusCode: statusCode,
+    );
+  }
+
+  ApiResponse copyWith({
+    String? body,
+    Map<String, dynamic>? json,
+    int? statusCode,
+    bool? isFromHistory,
+    String? errorMessage,
+  }) {
+    if (isError) {
+      return ApiResponse.failure(
+        errorMessage: errorMessage ?? this.errorMessage!,
+        body: body ?? this.body,
+        json: json ?? this.json,
+        statusCode: statusCode ?? this.statusCode,
+        isFromHistory: isFromHistory ?? this.isFromHistory,
+      );
     }
-    throw Exception("Response is not yet created");
+    return ApiResponse.success(
+      body: body ?? this.body,
+      json: json ?? this.json,
+      statusCode: statusCode ?? this.statusCode,
+      isFromHistory: isFromHistory ?? this.isFromHistory,
+    );
   }
 
-  void setValue(String text){
-    _response = text;
-  }
-
-  void setFromHistory(bool isFromHistory){
-    _isFromHistory = isFromHistory;
-  }
-
-  ApiResponse([this._response, this._isFromHistory = false]);
-
-  factory ApiResponse.fromJson(Map<String, dynamic> json) {
-    return ApiResponse(json["response"]);
-  }
 }

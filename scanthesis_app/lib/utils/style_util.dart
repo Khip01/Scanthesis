@@ -22,7 +22,7 @@ class StyleUtil {
   static const Color inputFillLight = Color(0xFFE0E0E0);
 
   static const Color dividerDark = Colors.white24;
-  static const Color dividerLight = Colors.black12;
+  static const Color dividerLight = Colors.black26;
 
   static const Color iconLight = Colors.white70;
   static const Color iconDark = Colors.black54;// Window Button Colors

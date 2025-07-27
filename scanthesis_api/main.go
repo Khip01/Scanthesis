@@ -31,7 +31,7 @@ func main() {
 
 	// Endpoint
 	http.HandleFunc("/api/ocr", GeminiHandler)
-	http.HandleFunc("/api/", APICheck)
+	http.HandleFunc("/api/check", APICheck)
 
 	// Listening
 	fmt.Println("Server started on " + os.Getenv("ENDPOINT") + "/ ...")

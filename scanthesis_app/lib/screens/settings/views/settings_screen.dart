@@ -1,0 +1,913 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:gpt_markdown/gpt_markdown.dart';
+import 'package:provider/provider.dart';
+import 'package:scanthesis_app/provider/theme_provider.dart';
+import 'package:scanthesis_app/screens/settings/provider/SettingsProvider.dart';
+import 'package:scanthesis_app/utils/style_util.dart';
+import 'package:scanthesis_app/values/strings.dart';
+
+class SettingsScreen extends StatefulWidget {
+  const SettingsScreen({super.key});
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  final ScrollController settingsContentScrollController = ScrollController();
+  final ScrollController connectionTestScrollController = ScrollController();
+  final TextEditingController defaultBrowseDirectoryController =
+      TextEditingController();
+  final TextEditingController defaultImageStorageDirectoryController =
+      TextEditingController();
+  final TextEditingController apiEndpointController = TextEditingController();
+  final TextEditingController testApiConnectionController =
+      TextEditingController();
+  late final String _initialBaseUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    final SettingsProvider settingsProvider = Provider.of<SettingsProvider>(
+      context,
+      listen: false,
+    );
+    _initialBaseUrl = settingsProvider.getBaseUrlEndpoint;
+
+    if (apiEndpointController.text.isEmpty) {
+      apiEndpointController.text = _initialBaseUrl;
+    }
+  }
+
+  @override
+  void dispose() {
+    apiEndpointController.text = _initialBaseUrl;
+
+    settingsContentScrollController.dispose();
+    connectionTestScrollController.dispose();
+    defaultBrowseDirectoryController.dispose();
+    defaultImageStorageDirectoryController.dispose();
+    apiEndpointController.dispose();
+    testApiConnectionController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void deactivate() {
+    final settingsProvider = Provider.of<SettingsProvider>(
+      context,
+      listen: false,
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      settingsProvider.setBaseUrlState(false);
+      settingsProvider.resetConnectionTest();
+    });
+    super.deactivate();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Settings"),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        scrolledUnderElevation: 0,
+      ),
+      body: Align(
+        alignment: Alignment.topCenter,
+        child: Container(
+          width: 730,
+          padding: EdgeInsets.symmetric(horizontal: 8),
+          child: Scrollbar(
+            trackVisibility: true,
+            thumbVisibility: true,
+            interactive: true,
+            controller: settingsContentScrollController,
+            child: SingleChildScrollView(
+              controller: settingsContentScrollController,
+              padding: EdgeInsets.only(right: 28, top: 8, bottom: 8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SectionWidget(
+                    sectionTitle: "Preferences",
+                    children: [
+                      SubSectionWidget(
+                        subSectionTitle: "Theme Mode",
+                        subSectionDescHead:
+                            "Set the application's visual appearance.",
+                        subSectionDescBody:
+                            "Choose between Light, Dark, or follow the system default for a consistent look across platforms.",
+                        child: themeModeChild(),
+                      ),
+                    ],
+                  ),
+                  SectionWidget(
+                    sectionTitle: "Chat Settings",
+                    children: [
+                      SubSectionWidget(
+                        subSectionTitle: "Default Browse Directory",
+                        subSectionDescHead:
+                            "Initial folder when opening the file picker.",
+                        subSectionDescBody:
+                            "Specifies the starting directory when users browse files, reducing navigation effort.",
+                        child: defaultBrowseDirectoryChild(),
+                      ),
+                      SubSectionWidget(
+                        subSectionTitle: "Chat History",
+                        subSectionDescHead: "Enable local chat storage.",
+                        subSectionDescBody:
+                            "Automatically save conversations locally for future reference after app restarts.",
+                        trailing: chatHistoryTrailing(),
+                        onTap: () {
+                          Provider.of<SettingsProvider>(
+                            context,
+                            listen: false,
+                          ).toggleUseChatHistoryState();
+                        },
+                        child: SizedBox.shrink(),
+                      ),
+                      Consumer<SettingsProvider>(
+                        builder: (context, settings, _) {
+                          final isEnabled = settings.getIsUseChatHistory;
+
+                          return TooltipVisibility(
+                            visible: !isEnabled,
+                            child: Tooltip(
+                              message:
+                                  "This feature is disabled and will not affect your settings.",
+                              verticalOffset: 80,
+                              child: AbsorbPointer(
+                                absorbing: !isEnabled,
+                                child: Opacity(
+                                  opacity: isEnabled ? 1.0 : 0.4,
+                                  child: SubSectionWidget(
+                                    subSectionTitle: "Image Storage Directory",
+                                    subSectionDescHead:
+                                        "Organized media management.",
+                                    subSectionDescBody:
+                                        "Define a folder where all chat-related images are saved to keep media files easily accessible.",
+                                    child: defaultImageStorageDirectoryChild(),
+                                    // child: SizedBox.shrink(),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                  SectionWidget(
+                    sectionTitle: "AI Integration",
+                    children: [
+                      SubSectionWidget(
+                        subSectionTitle: "API Endpoint",
+                        subSectionDescHead: "Configure your AI backend.",
+                        subSectionDescBody:
+                            "Provide the base URL endpoint to connect with the AI service or model used by the app.",
+                        child: apiEndpointChild(),
+                      ),
+                      SubSectionWidget(
+                        subSectionTitle: "Connection Test",
+                        subSectionDescHead: "Verify your API configuration.",
+                        subSectionDescBody:
+                            "Run a connectivity check to ensure the AI service is reachable and properly set up.",
+                        child: connectionTestChild(),
+                      ),
+                    ],
+                  ),
+                  SectionWidget(
+                    sectionTitle: "About",
+                    children: [
+                      SubSectionWidget(
+                        subSectionTitle: "About This Application",
+                        subSectionDescHead:
+                            "Extract code, prompt AI responses.",
+                        subSectionDescBody:
+                            "Instantly scan code from images and chat with your own AI - beautifully rendered in Markdown and fully customizable with your own prompts and API.",
+                        child: SizedBox.shrink(),
+                        onTap: () => aboutThisAppOnTap(context),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget themeModeChild() {
+    ThemeProvider themeProvider = Provider.of<ThemeProvider>(context);
+
+    return Container(
+      width: double.maxFinite,
+      margin: EdgeInsets.only(top: 8),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: DropdownButton<ThemeMode>(
+        dropdownColor: Theme.of(context).colorScheme.surface,
+        onChanged: (value) {
+          themeProvider.setTheme(value!);
+        },
+        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        borderRadius: BorderRadius.circular(12),
+        isExpanded: true,
+        underline: SizedBox.shrink(),
+        value: themeProvider.getThemeMode,
+        items: [
+          for (ThemeMode value in ThemeMode.values)
+            DropdownMenuItem(value: value, child: Text(value.name)),
+        ],
+      ),
+    );
+  }
+
+  Widget defaultBrowseDirectoryChild() {
+    final SettingsProvider settingsProvider = Provider.of<SettingsProvider>(
+      context,
+    );
+    final String dirPath =
+        settingsProvider.getDefaultBrowseDirectory.path.toString();
+    final ThemeData themeData = Theme.of(context);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (defaultBrowseDirectoryController.text != dirPath) {
+        defaultBrowseDirectoryController.text = dirPath;
+      }
+    });
+
+    return Container(
+      width: double.maxFinite,
+      margin: EdgeInsets.only(top: 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: defaultBrowseDirectoryController,
+              enabled: false,
+              decoration: InputDecoration(
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 20,
+                ),
+                disabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(12),
+                    bottomLeft: Radius.circular(12),
+                    topRight: Radius.circular(0),
+                    bottomRight: Radius.circular(0),
+                  ),
+                  borderSide: BorderSide(color: Colors.transparent),
+                ),
+              ),
+            ),
+          ),
+          FilledButton(
+            onPressed: () async {
+              String? path = await FilePicker.platform.getDirectoryPath(
+                dialogTitle: "Pick a folder",
+                initialDirectory:
+                    settingsProvider.getDefaultBrowseDirectory.path,
+              );
+              if (path != null) {
+                settingsProvider.setDefaultBrowseDirectory(Directory(path));
+              }
+            },
+            style: FilledButton.styleFrom(
+              elevation: 0,
+              backgroundColor: themeData.colorScheme.surface,
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 24),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadiusGeometry.only(
+                  topLeft: Radius.circular(0),
+                  bottomLeft: Radius.circular(0),
+                  topRight: Radius.circular(12),
+                  bottomRight: Radius.circular(12),
+                ),
+              ),
+              overlayColor: themeData.colorScheme.onSurface,
+            ),
+            child: Center(
+              child: Icon(
+                Icons.folder_open,
+                size: 24,
+                color: themeData.iconTheme.color,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget chatHistoryTrailing() {
+    final SettingsProvider settingsProvider = Provider.of<SettingsProvider>(
+      context,
+    );
+
+    return Switch(
+      onChanged: (value) {
+        settingsProvider.setChatHistoryState(value);
+      },
+      trackOutlineColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return null;
+        } else {
+          return Theme.of(context).iconTheme.color;
+        }
+      }),
+      thumbColor: WidgetStatePropertyAll(
+        Theme.of(context).colorScheme.secondary,
+      ),
+      value: settingsProvider.getIsUseChatHistory,
+    );
+  }
+
+  Widget defaultImageStorageDirectoryChild() {
+    final SettingsProvider settingsProvider = Provider.of<SettingsProvider>(
+      context,
+    );
+    final String dirPath =
+        settingsProvider.getDefaultImageDirectory.path.toString();
+    final ThemeData themeData = Theme.of(context);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (defaultImageStorageDirectoryController.text != dirPath) {
+        defaultImageStorageDirectoryController.text = dirPath;
+      }
+    });
+
+    return Container(
+      width: double.maxFinite,
+      margin: EdgeInsets.only(top: 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: defaultImageStorageDirectoryController,
+              enabled: false,
+              decoration: InputDecoration(
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 20,
+                ),
+                disabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(12),
+                    bottomLeft: Radius.circular(12),
+                    topRight: Radius.circular(0),
+                    bottomRight: Radius.circular(0),
+                  ),
+                  borderSide: BorderSide(color: Colors.transparent),
+                ),
+              ),
+            ),
+          ),
+          FilledButton(
+            onPressed: () async {
+              String? path = await FilePicker.platform.getDirectoryPath(
+                dialogTitle: "Pick a folder",
+                initialDirectory:
+                    settingsProvider.getDefaultImageDirectory.path,
+              );
+              if (path != null) {
+                settingsProvider.setDefaultImageStoreDirectory(Directory(path));
+              }
+            },
+            style: FilledButton.styleFrom(
+              elevation: 0,
+              backgroundColor: themeData.colorScheme.surface,
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 24),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadiusGeometry.only(
+                  topLeft: Radius.circular(0),
+                  bottomLeft: Radius.circular(0),
+                  topRight: Radius.circular(12),
+                  bottomRight: Radius.circular(12),
+                ),
+              ),
+              overlayColor: themeData.colorScheme.onSurface,
+            ),
+            child: Center(
+              child: Icon(
+                Icons.folder_open,
+                size: 24,
+                color: themeData.iconTheme.color,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget apiEndpointChild() {
+    final SettingsProvider settingsProvider = Provider.of<SettingsProvider>(
+      context,
+    );
+    final String baseUrl = settingsProvider.getBaseUrlEndpoint;
+    final ThemeData themeData = Theme.of(context);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!settingsProvider.getBaseUrlIsUnsaved &&
+          apiEndpointController.text != baseUrl) {
+        apiEndpointController.text = baseUrl;
+      }
+    });
+
+    return Container(
+      width: double.maxFinite,
+      margin: EdgeInsets.only(top: 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: apiEndpointController,
+              onChanged: (value) {
+                if (settingsProvider.getIsBaseUrlUnsaved(value)) {
+                  settingsProvider.setBaseUrlState(true);
+                } else {
+                  settingsProvider.setBaseUrlState(false);
+                }
+              },
+              decoration: InputDecoration(
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 20,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(12),
+                    bottomLeft: Radius.circular(12),
+                    topRight: Radius.circular(
+                      settingsProvider.getBaseUrlIsUnsaved ? 0 : 12,
+                    ),
+                    bottomRight: Radius.circular(
+                      settingsProvider.getBaseUrlIsUnsaved ? 0 : 12,
+                    ),
+                  ),
+                  borderSide: BorderSide(color: Colors.transparent),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(12),
+                    bottomLeft: Radius.circular(12),
+                    topRight: Radius.circular(
+                      settingsProvider.getBaseUrlIsUnsaved ? 0 : 12,
+                    ),
+                    bottomRight: Radius.circular(
+                      settingsProvider.getBaseUrlIsUnsaved ? 0 : 12,
+                    ),
+                  ),
+                  // borderSide: BorderSide(color: Colors.transparent),
+                  borderSide: BorderSide(color: themeData.colorScheme.primary),
+                ),
+              ),
+            ),
+          ),
+          Visibility(
+            visible: settingsProvider.getBaseUrlIsUnsaved,
+            child: Tooltip(
+              message: "Save changes",
+              child: FilledButton(
+                onPressed: () {
+                  settingsProvider.setBaseUrlEndpoint(
+                    apiEndpointController.text,
+                  );
+                  settingsProvider.setBaseUrlState(false);
+                },
+                style: FilledButton.styleFrom(
+                  elevation: 0,
+                  backgroundColor: Colors.green,
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 24),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadiusGeometry.only(
+                      topLeft: Radius.circular(0),
+                      bottomLeft: Radius.circular(0),
+                      topRight: Radius.circular(12),
+                      bottomRight: Radius.circular(12),
+                    ),
+                  ),
+                  overlayColor: themeData.colorScheme.onSurface,
+                ),
+                child: Center(
+                  child: Icon(
+                    Icons.check,
+                    size: 24,
+                    color: themeData.iconTheme.color,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget connectionTestChild() {
+    final SettingsProvider settingsProvider = Provider.of<SettingsProvider>(
+      context,
+    );
+    final String baseUrl = settingsProvider.getBaseUrlEndpoint;
+    final String testUrl = settingsProvider.getConnectionTestUrl;
+    final ThemeData themeData = Theme.of(context);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!settingsProvider.getBaseUrlIsUnsaved &&
+          testApiConnectionController.text != testUrl) {
+        testApiConnectionController.text = testUrl;
+      }
+    });
+
+    return Container(
+      width: double.maxFinite,
+      margin: EdgeInsets.only(top: 8),
+      child: Stack(
+        children: [
+          Positioned(
+            child: Consumer<SettingsProvider>(
+              builder: (context, settingsProvider, _) {
+                final state = settingsProvider.getConnTestState;
+
+                if (state == ConnectionTestState.init ||
+                    state == ConnectionTestState.loading) {
+                  return SizedBox.shrink();
+                }
+
+                final statusCode =
+                    settingsProvider.getLastStatusCode;
+                final statusText = Strings.httpStatusDescription(statusCode);
+                final responseText =
+                    settingsProvider.getLastResponseText ?? "No response.";
+
+                return Container(
+                  padding: EdgeInsets.only(
+                    left: 16,
+                    right: 16,
+                    top: 60,
+                    bottom: 16,
+                  ),
+                  decoration: BoxDecoration(
+                    color: themeData.colorScheme.surface,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Header
+                      SizedBox(
+                        height: 40,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Container(
+                              // color: Colors.green,
+                              alignment: Alignment.centerLeft,
+                              width: 104,
+                              height: double.maxFinite,
+                              child: Text(
+                                "Code",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Expanded(
+                              child: Container(
+                                alignment: Alignment.centerLeft,
+                                height: double.maxFinite,
+                                child: Text(
+                                  "Description",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Divider(thickness: 0.3),
+
+                      // Body
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(width: 104, child: Text("$statusCode ($statusText)")),
+                          Expanded(
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(maxHeight: 200),
+                              child: SelectionArea(
+                                child: Scrollbar(
+                                  controller: connectionTestScrollController,
+                                  thumbVisibility: true,
+                                  trackVisibility: true,
+                                  interactive: true,
+                                  child: SingleChildScrollView(
+                                    controller: connectionTestScrollController,
+                                    child: Padding(
+                                      padding: EdgeInsetsGeometry.only(
+                                        right: 20,
+                                      ),
+                                      child: GptMarkdown(responseText),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+          IntrinsicHeight(
+            child: Row(
+              children: [
+                Tooltip(
+                  message: baseUrl,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: themeData.colorScheme.surface,
+                      // color: Colors.green,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(12),
+                        bottomLeft: Radius.circular(12),
+                        topRight: Radius.circular(0),
+                        bottomRight: Radius.circular(0),
+                      ),
+                      // border: Border.all(width: 0.0001, color: Colors.transparent),
+                    ),
+                    child: Center(
+                      child: Text("{BASE URL}", textAlign: TextAlign.center),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: TextField(
+                    onChanged: (value) {
+                      settingsProvider.setConnectionTestUrl(value);
+                    },
+                    controller: testApiConnectionController,
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 20,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(0),
+                          bottomLeft: Radius.circular(0),
+                          topRight: Radius.circular(0),
+                          bottomRight: Radius.circular(0),
+                        ),
+                        borderSide: BorderSide(color: Colors.transparent),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(0),
+                          bottomLeft: Radius.circular(0),
+                          topRight: Radius.circular(0),
+                          bottomRight: Radius.circular(0),
+                        ),
+                        borderSide: BorderSide(
+                          color: themeData.colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Consumer<SettingsProvider>(
+                  builder: (context, settingsProvider, _) {
+                    final isLoading =
+                        settingsProvider.getConnTestState ==
+                        ConnectionTestState.loading;
+
+                    return FilledButton(
+                      onPressed:
+                          isLoading
+                              ? null
+                              : () async {
+                                try {
+                                  await settingsProvider.getApiTest(
+                                    baseUrl:
+                                        settingsProvider.getBaseUrlEndpoint,
+                                    urlPath:
+                                        settingsProvider.getConnectionTestUrl,
+                                  );
+                                } catch (e) {
+                                  debugPrint("❌ Failed: $e");
+                                }
+                              },
+                      style: FilledButton.styleFrom(
+                        elevation: 0,
+                        backgroundColor: themeData.colorScheme.surface,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 24,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadiusGeometry.only(
+                            topLeft: Radius.circular(0),
+                            bottomLeft: Radius.circular(0),
+                            topRight: Radius.circular(12),
+                            bottomRight: Radius.circular(12),
+                          ),
+                        ),
+                        overlayColor: themeData.colorScheme.onSurface,
+                      ),
+                      child: Center(
+                        child:
+                            isLoading
+                                ? SizedBox(
+                                  height: 16,
+                                  width: 16,
+                                  child: CircularProgressIndicator(),
+                                )
+                                : Text(
+                                  "GET",
+                                  style: TextStyle(
+                                    color: themeData.iconTheme.color,
+                                  ),
+                                ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void aboutThisAppOnTap(BuildContext context) {
+    final ThemeData themeData = Theme.of(context);
+    final ColorScheme colorScheme = themeData.colorScheme;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          insetPadding: EdgeInsets.symmetric(vertical: 12),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 730),
+            child: AboutDialog(
+              applicationName: 'Scanthesis',
+              applicationVersion: '0.0.1',
+              applicationIcon: const FlutterLogo(),
+              children: [
+                SizedBox(
+                  width: double.maxFinite,
+                  height: MediaQuery.sizeOf(context).height - 260,
+                  child: SelectionArea(
+                    child: SingleChildScrollView(
+                      child: GptMarkdown(
+                        Strings.aboutApp,
+                        style: GoogleFonts.nunito().copyWith(
+                          fontSize: 18,
+                          color: colorScheme.onSurface,
+                        ),
+                        highlightBuilder: (context, text, style) {
+                          return Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: StyleUtil.windowButtonGrey.withAlpha(35),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              text,
+                              style: GoogleFonts.sourceCodePro(),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class SectionWidget extends StatelessWidget {
+  final String sectionTitle;
+  final List<Widget> children;
+
+  const SectionWidget({
+    super.key,
+    required this.sectionTitle,
+    required this.children,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    Color textTitleColor = Theme.of(context).colorScheme.onSurface;
+
+    return Container(
+      padding: EdgeInsets.only(bottom: 16),
+      width: double.maxFinite,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            sectionTitle,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: textTitleColor,
+            ),
+          ),
+          Divider(thickness: 0.3),
+          ...children,
+        ],
+      ),
+    );
+  }
+}
+
+class SubSectionWidget extends StatelessWidget {
+  final String subSectionTitle, subSectionDescHead, subSectionDescBody;
+  final Widget child;
+  final Widget? trailing;
+  final Function()? onTap;
+
+  const SubSectionWidget({
+    super.key,
+    required this.subSectionTitle,
+    required this.subSectionDescHead,
+    required this.subSectionDescBody,
+    required this.child,
+    this.trailing,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    Color textTitleColor = Theme.of(context).colorScheme.onSurface;
+
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        width: double.maxFinite,
+        padding: EdgeInsets.symmetric(vertical: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: Text(
+                          subSectionTitle,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: textTitleColor,
+                          ),
+                        ),
+                      ),
+                      Text(subSectionDescHead),
+                      Text(subSectionDescBody),
+                    ],
+                  ),
+                ),
+                trailing ?? SizedBox.shrink(),
+              ],
+            ),
+            child,
+          ],
+        ),
+      ),
+    );
+  }
+}

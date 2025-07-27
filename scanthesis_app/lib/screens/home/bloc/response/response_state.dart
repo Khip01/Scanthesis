@@ -8,11 +8,11 @@ sealed class ResponseState {
 }
 
 final class ResponseInitial extends ResponseState {
-  ResponseInitial() : super(response: ApiResponse());
+  ResponseInitial() : super(response: ApiResponse.success(body: ""));
 }
 
 final class ResponseLoading extends ResponseState {
-  ResponseLoading() : super(response: ApiResponse());
+  ResponseLoading() : super(response: ApiResponse.success(body: ""));
 }
 
 final class ResponseSuccess extends ResponseState {

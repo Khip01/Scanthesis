@@ -105,5 +105,6 @@ class ThemeUtil {
       ),
     ),
     iconTheme: const IconThemeData(color: StyleUtil.iconDark),
+    dividerTheme: const DividerThemeData(color: StyleUtil.dividerLight),
   );
 }

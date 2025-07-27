@@ -13,10 +13,17 @@ import 'package:scanthesis_app/screens/home/provider/custom_prompt_provider.dart
 import 'package:scanthesis_app/screens/home/provider/open_file_provider.dart';
 import 'package:scanthesis_app/screens/home/provider/preview_image_provider.dart';
 import 'package:scanthesis_app/screens/home/provider/screen_capture_provider.dart';
-import 'package:scanthesis_app/screens/home/views/home_screen.dart';
+import 'package:scanthesis_app/screens/router.dart';
+import 'package:scanthesis_app/screens/settings/provider/SettingsProvider.dart';
+import 'package:scanthesis_app/utils/init_value_util.dart';
 import 'package:scanthesis_app/utils/theme_util.dart';
 
-void main() {
+void main() async {
+  // init changenotifier value
+  WidgetsFlutterBinding.ensureInitialized();
+  SettingsProvider settingsProvider =
+      await InitValueUtil.initSettingsProvider();
+
   runApp(
     // ChangeNotifierProvider(
     //   create: (_) => ThemeProvider(),
@@ -31,6 +38,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => PreviewImageProvider()),
         ChangeNotifierProvider(create: (_) => CustomPromptProvider()),
         ChangeNotifierProvider(create: (_) => DrawerProvider()),
+        ChangeNotifierProvider.value(value: settingsProvider),
       ],
       child: MyApp(),
     ),
@@ -58,24 +66,28 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create:
-              (context) => FilePickerBloc(
-                customPromptProvider: Provider.of<CustomPromptProvider>(
-                  context,
-                  listen: false,
-                ),
-              ),
+          create: (context) {
+            final CustomPromptProvider customPromptProvider =
+                Provider.of<CustomPromptProvider>(context, listen: false);
+            return FilePickerBloc(customPromptProvider: customPromptProvider);
+          },
         ),
-        BlocProvider(create: (_) => ResponseBloc()),
+        BlocProvider(
+          create: (context) {
+            final SettingsProvider settingsProvider =
+                Provider.of<SettingsProvider>(context, listen: false);
+            return ResponseBloc(baseUrl: settingsProvider.getBaseUrlEndpoint);
+          },
+        ),
         BlocProvider(create: (_) => RequestBloc()),
         BlocProvider(create: (_) => ChatsBloc()),
       ],
-      child: MaterialApp(
+      child: MaterialApp.router(
         theme: ThemeUtil.globalLightTheme,
         darkTheme: ThemeUtil.globalDarkTheme,
         themeMode: themeProvider.getThemeMode,
         title: "Scanthesis App",
-        home: const HomeScreen(),
+        routerConfig: router,
         debugShowCheckedModeBanner: false,
       ),
     );

@@ -5,10 +5,10 @@ class ThemeProvider with ChangeNotifier {
 
   ThemeMode get getThemeMode => _themeMode;
 
-  // void setTheme(ThemeMode theme) {
-  //   _themeMode = theme;
-  //   notifyListeners();
-  // }
+  void setTheme(ThemeMode theme) {
+    _themeMode = theme;
+    notifyListeners();
+  }
 
   void toggleTheme() {
     if (_themeMode == ThemeMode.light) {
@@ -26,4 +26,17 @@ class ThemeProvider with ChangeNotifier {
     return _themeMode == ThemeMode.dark;
   }
 
+}
+
+extension ThemeModeName on ThemeMode {
+  String get name {
+    switch (this) {
+      case ThemeMode.system:
+        return 'Default System';
+      case ThemeMode.light:
+        return 'Light Mode';
+      case ThemeMode.dark:
+        return 'Dark Mode';
+    }
+  }
 }
