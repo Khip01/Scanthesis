@@ -19,6 +19,7 @@ import 'package:scanthesis_app/screens/home/widgets/custom_app_bar.dart';
 import 'package:scanthesis_app/screens/home/widgets/preview_image.dart';
 import 'package:scanthesis_app/screens/home/widgets/request_chat.dart';
 import 'package:scanthesis_app/screens/home/widgets/response_chat.dart';
+import 'package:scanthesis_app/screens/settings/provider/SettingsProvider.dart';
 import 'package:scanthesis_app/utils/style_util.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -394,8 +395,13 @@ class _HomeContentState extends State<HomeContent> {
                           !responseBlocState.response.isFromHistory) {
                         final requestBlocState =
                             context.read<RequestBloc>().state;
+                        final isUseChatHistory =
+                            responseBlocContext
+                                .read<SettingsProvider>()
+                                .getIsUseChatHistory;
                         if (requestBlocState is RequestSuccess &&
-                            requestBlocState.request != null) {
+                            requestBlocState.request != null &&
+                            isUseChatHistory) {
                           final req = requestBlocState.request!;
                           final res = responseBlocState.response;
 
@@ -409,7 +415,10 @@ class _HomeContentState extends State<HomeContent> {
                     },
                     builder: (responseBlocContext, responseBlocState) {
                       if (responseBlocState is ResponseLoading) {
-                        return CircularProgressIndicator();
+                        return CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Theme.of(context).iconTheme.color,
+                        );
                       } else if (responseBlocState is ResponseError) {
                         return Text("Error: ${responseBlocState.errorMessage}");
                       } else if (responseBlocState is ResponseInitial) {

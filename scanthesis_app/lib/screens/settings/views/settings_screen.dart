@@ -139,7 +139,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             visible: !isEnabled,
                             child: Tooltip(
                               message:
-                                  "This feature is disabled and will not affect your settings.",
+                                  "This feature is now disabled and will not affect your settings.",
                               verticalOffset: 80,
                               child: AbsorbPointer(
                                 absorbing: !isEnabled,
@@ -233,6 +233,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget defaultBrowseDirectoryChild() {
+    bool isLoadingState = false;
     final SettingsProvider settingsProvider = Provider.of<SettingsProvider>(
       context,
     );
@@ -246,67 +247,92 @@ class _SettingsScreenState extends State<SettingsScreen> {
       }
     });
 
-    return Container(
-      width: double.maxFinite,
-      margin: EdgeInsets.only(top: 8),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: defaultBrowseDirectoryController,
-              enabled: false,
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 20,
-                ),
-                disabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                    bottomLeft: Radius.circular(12),
-                    topRight: Radius.circular(0),
-                    bottomRight: Radius.circular(0),
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return Container(
+          width: double.maxFinite,
+          margin: EdgeInsets.only(top: 8),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: defaultBrowseDirectoryController,
+                  enabled: false,
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 20,
+                    ),
+                    disabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(12),
+                        bottomLeft: Radius.circular(12),
+                        topRight: Radius.circular(0),
+                        bottomRight: Radius.circular(0),
+                      ),
+                      borderSide: BorderSide(color: Colors.transparent),
+                    ),
                   ),
-                  borderSide: BorderSide(color: Colors.transparent),
                 ),
               ),
-            ),
-          ),
-          FilledButton(
-            onPressed: () async {
-              String? path = await FilePicker.platform.getDirectoryPath(
-                dialogTitle: "Pick a folder",
-                initialDirectory:
-                    settingsProvider.getDefaultBrowseDirectory.path,
-              );
-              if (path != null) {
-                settingsProvider.setDefaultBrowseDirectory(Directory(path));
-              }
-            },
-            style: FilledButton.styleFrom(
-              elevation: 0,
-              backgroundColor: themeData.colorScheme.surface,
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 24),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadiusGeometry.only(
-                  topLeft: Radius.circular(0),
-                  bottomLeft: Radius.circular(0),
-                  topRight: Radius.circular(12),
-                  bottomRight: Radius.circular(12),
+              FilledButton(
+                onPressed:
+                    isLoadingState
+                        ? null
+                        : () async {
+                          setState(() => isLoadingState = true);
+
+                          String? path = await FilePicker.platform
+                              .getDirectoryPath(
+                                dialogTitle: "Pick a folder",
+                                initialDirectory:
+                                    settingsProvider
+                                        .getDefaultBrowseDirectory
+                                        .path,
+                              );
+                          if (path != null) {
+                            settingsProvider.setDefaultBrowseDirectory(
+                              Directory(path),
+                            );
+                          }
+                          setState(() => isLoadingState = false);
+                        },
+                style: FilledButton.styleFrom(
+                  elevation: 0,
+                  backgroundColor: themeData.colorScheme.surface,
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 24),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadiusGeometry.only(
+                      topLeft: Radius.circular(0),
+                      bottomLeft: Radius.circular(0),
+                      topRight: Radius.circular(12),
+                      bottomRight: Radius.circular(12),
+                    ),
+                  ),
+                  overlayColor: themeData.colorScheme.onSurface,
+                ),
+                child: Center(
+                  child:
+                      isLoadingState
+                          ? SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: themeData.iconTheme.color,
+                            ),
+                          )
+                          : Icon(
+                            Icons.folder_open,
+                            size: 24,
+                            color: themeData.iconTheme.color,
+                          ),
                 ),
               ),
-              overlayColor: themeData.colorScheme.onSurface,
-            ),
-            child: Center(
-              child: Icon(
-                Icons.folder_open,
-                size: 24,
-                color: themeData.iconTheme.color,
-              ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -334,6 +360,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget defaultImageStorageDirectoryChild() {
+    bool isLoadingState = false;
     final SettingsProvider settingsProvider = Provider.of<SettingsProvider>(
       context,
     );
@@ -347,67 +374,93 @@ class _SettingsScreenState extends State<SettingsScreen> {
       }
     });
 
-    return Container(
-      width: double.maxFinite,
-      margin: EdgeInsets.only(top: 8),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: defaultImageStorageDirectoryController,
-              enabled: false,
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 20,
-                ),
-                disabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                    bottomLeft: Radius.circular(12),
-                    topRight: Radius.circular(0),
-                    bottomRight: Radius.circular(0),
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return Container(
+          width: double.maxFinite,
+          margin: EdgeInsets.only(top: 8),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: defaultImageStorageDirectoryController,
+                  enabled: false,
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 20,
+                    ),
+                    disabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(12),
+                        bottomLeft: Radius.circular(12),
+                        topRight: Radius.circular(0),
+                        bottomRight: Radius.circular(0),
+                      ),
+                      borderSide: BorderSide(color: Colors.transparent),
+                    ),
                   ),
-                  borderSide: BorderSide(color: Colors.transparent),
                 ),
               ),
-            ),
-          ),
-          FilledButton(
-            onPressed: () async {
-              String? path = await FilePicker.platform.getDirectoryPath(
-                dialogTitle: "Pick a folder",
-                initialDirectory:
-                    settingsProvider.getDefaultImageDirectory.path,
-              );
-              if (path != null) {
-                settingsProvider.setDefaultImageStoreDirectory(Directory(path));
-              }
-            },
-            style: FilledButton.styleFrom(
-              elevation: 0,
-              backgroundColor: themeData.colorScheme.surface,
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 24),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadiusGeometry.only(
-                  topLeft: Radius.circular(0),
-                  bottomLeft: Radius.circular(0),
-                  topRight: Radius.circular(12),
-                  bottomRight: Radius.circular(12),
+              FilledButton(
+                onPressed:
+                    isLoadingState
+                        ? null
+                        : () async {
+                          setState(() => isLoadingState = true);
+
+                          String? path = await FilePicker.platform
+                              .getDirectoryPath(
+                                dialogTitle: "Pick a folder",
+                                initialDirectory:
+                                    settingsProvider
+                                        .getDefaultImageDirectory
+                                        .path,
+                              );
+                          if (path != null) {
+                            settingsProvider.setDefaultImageStoreDirectory(
+                              Directory(path),
+                            );
+                          }
+
+                          setState(() => isLoadingState = false);
+                        },
+                style: FilledButton.styleFrom(
+                  elevation: 0,
+                  backgroundColor: themeData.colorScheme.surface,
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 24),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadiusGeometry.only(
+                      topLeft: Radius.circular(0),
+                      bottomLeft: Radius.circular(0),
+                      topRight: Radius.circular(12),
+                      bottomRight: Radius.circular(12),
+                    ),
+                  ),
+                  overlayColor: themeData.colorScheme.onSurface,
+                ),
+                child: Center(
+                  child:
+                      isLoadingState
+                          ? SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: themeData.iconTheme.color,
+                            ),
+                          )
+                          : Icon(
+                            Icons.folder_open,
+                            size: 24,
+                            color: themeData.iconTheme.color,
+                          ),
                 ),
               ),
-              overlayColor: themeData.colorScheme.onSurface,
-            ),
-            child: Center(
-              child: Icon(
-                Icons.folder_open,
-                size: 24,
-                color: themeData.iconTheme.color,
-              ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -545,8 +598,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   return SizedBox.shrink();
                 }
 
-                final statusCode =
-                    settingsProvider.getLastStatusCode;
+                final statusCode = settingsProvider.getLastStatusCode;
                 final statusText = Strings.httpStatusDescription(statusCode);
                 final responseText =
                     settingsProvider.getLastResponseText ?? "No response.";
@@ -600,7 +652,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(width: 104, child: Text("$statusCode ($statusText)")),
+                          SizedBox(
+                            width: 104,
+                            child: Text("$statusCode ($statusText)"),
+                          ),
                           Expanded(
                             child: ConstrainedBox(
                               constraints: BoxConstraints(maxHeight: 200),
@@ -733,7 +788,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 ? SizedBox(
                                   height: 16,
                                   width: 16,
-                                  child: CircularProgressIndicator(),
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: themeData.iconTheme.color,
+                                  ),
                                 )
                                 : Text(
                                   "GET",

@@ -9,7 +9,7 @@ class SettingsProvider extends ChangeNotifier {
   Directory defaultBrowseDirectory, defaultImageStoreDirectory;
 
   // Chat History
-  bool _isUseChatHistory = false;
+  bool _isUseChatHistory = true;
 
   // API Endpoint
   String _baseUrlEndpoint = "http://127.0.0.1:8080/api";

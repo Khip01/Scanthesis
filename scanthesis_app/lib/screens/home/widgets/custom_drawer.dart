@@ -298,7 +298,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
       return BlocBuilder<ChatsBloc, ChatsState>(
         builder: (chatsContext, chatsState) {
           if (chatsState is ChatsLoading) {
-            return CircularProgressIndicator();
+            return CircularProgressIndicator(
+              strokeWidth: 2,
+              color: Theme.of(context).iconTheme.color,
+            );
           } else if (chatsState is ChatsInitial) {
             return Padding(
               padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),

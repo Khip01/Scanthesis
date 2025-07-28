@@ -80,7 +80,11 @@ class MyApp extends StatelessWidget {
           },
         ),
         BlocProvider(create: (_) => RequestBloc()),
-        BlocProvider(create: (_) => ChatsBloc()),
+        BlocProvider(create: (context) {
+          final SettingsProvider settingsProvider =
+              Provider.of<SettingsProvider>(context, listen: false);
+          return ChatsBloc(settingsProvider: settingsProvider);
+        }),
       ],
       child: MaterialApp.router(
         theme: ThemeUtil.globalLightTheme,

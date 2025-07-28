@@ -6,4 +6,11 @@ class Chat {
   final ApiResponse response;
 
   Chat({required this.request, required this.response});
+
+  Chat copyWith({ApiRequest? request, ApiResponse? response}) {
+    return Chat(
+      request: request ?? this.request,
+      response: response ?? this.response,
+    );
+  }
 }

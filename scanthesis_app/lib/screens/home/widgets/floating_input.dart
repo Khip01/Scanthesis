@@ -19,6 +19,7 @@ import 'package:scanthesis_app/screens/home/provider/preview_image_provider.dart
 import 'package:scanthesis_app/screens/home/provider/screen_capture_provider.dart';
 import 'package:scanthesis_app/screens/home/widgets/custom_prompt_field.dart';
 import 'package:scanthesis_app/screens/home/widgets/send_button_shortcut.dart';
+import 'package:scanthesis_app/screens/settings/provider/SettingsProvider.dart';
 import 'package:scanthesis_app/utils/helper_util.dart';
 import 'package:scanthesis_app/utils/style_util.dart';
 import 'package:scanthesis_app/values/strings.dart';
@@ -118,6 +119,11 @@ class _FloatingInputState extends State<FloatingInput> {
                                   icon:
                                       openFileProvider.isLoading
                                           ? CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color:
+                                                Theme.of(
+                                                  context,
+                                                ).iconTheme.color,
                                             constraints: BoxConstraints(
                                               maxHeight: 20,
                                               maxWidth: 20,
@@ -148,6 +154,11 @@ class _FloatingInputState extends State<FloatingInput> {
                                   icon:
                                       clipboardImageProvider.isLoading
                                           ? CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color:
+                                                Theme.of(
+                                                  context,
+                                                ).iconTheme.color,
                                             constraints: BoxConstraints(
                                               maxHeight: 20,
                                               maxWidth: 20,
@@ -178,6 +189,11 @@ class _FloatingInputState extends State<FloatingInput> {
                                   icon:
                                       screenCaptureProvider.isLoading
                                           ? CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color:
+                                                Theme.of(
+                                                  context,
+                                                ).iconTheme.color,
                                             constraints: BoxConstraints(
                                               maxHeight: 20,
                                               maxWidth: 20,
@@ -384,9 +400,15 @@ class _FloatingInputState extends State<FloatingInput> {
   Future<List<File>> _getFiles() async {
     // change state to loading
     Provider.of<OpenFileProvider>(context, listen: false).setLoadingState(true);
+    Directory defaultBrowseDir =
+        Provider.of<SettingsProvider>(
+          context,
+          listen: false,
+        ).getDefaultBrowseDirectory;
 
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
+        initialDirectory: defaultBrowseDir.path,
         allowMultiple: true,
         type: FileType.custom,
         allowedExtensions: ['jpg', 'jpeg', 'png'],
@@ -450,7 +472,14 @@ class _ListFileWidgetState extends State<ListFileWidget> {
             height: 80,
             width: double.maxFinite,
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: ListView(children: [CircularProgressIndicator()]),
+            child: ListView(
+              children: [
+                CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Theme.of(context).iconTheme.color,
+                ),
+              ],
+            ),
           );
         } else if (filePickerState is FilePickerLoaded &&
             filePickerState.files.isNotEmpty) {

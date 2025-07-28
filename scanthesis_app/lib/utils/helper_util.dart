@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 
 class HelperUtil {
   // TODO: byte -> file helper
@@ -14,10 +15,52 @@ class HelperUtil {
     // creating file with path
     final filePath = path.join(directory.path, fileName);
 
-    // creating temporary file
+    // creating file to directory path
     final file = File(filePath);
     await file.writeAsBytes(imageBytes);
     return file;
+  }
+
+  static Future<List<File>> moveFileToDirectory({
+    required List<File> files,
+    required String targetDirectoryPath,
+  }) async {
+    final tempDir = await getTemporaryDirectory();
+
+    return Future.wait(
+      files.map((sourceFile) async {
+        String fileName = path.basename(sourceFile.path);
+        String newFilePath = path.join(targetDirectoryPath, fileName);
+
+        final isTemporaryFile = sourceFile.path.startsWith(tempDir.path);
+
+        try {
+          // use manual method (copy then delete) because to avoid this error:
+          /*
+          FileSystemException: Cannot rename file to
+          '/home/khip/Documents/Scanthesis App - Image Chat History/file_image.png',
+          path = '/tmp/file_image.png'
+          (OS Error: Invalid cross-device link, errno = 18)
+        */
+          if (isTemporaryFile) {
+            final copiedFile = await sourceFile.copy(newFilePath);
+            await sourceFile.delete();
+            return copiedFile;
+          } else {
+            return await sourceFile.copy(newFilePath);
+          }
+        } catch (_) {
+          return await sourceFile.copy(newFilePath);
+        }
+      }),
+    );
+  }
+
+  static Future deleteFiles(List<File> files) async {
+    for (var file in files) {
+      if (!(await file.exists())) continue;
+      await file.delete();
+    }
   }
 
   static String formatedFileName(String fileName) {

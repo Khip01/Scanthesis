@@ -21,8 +21,6 @@ class ResponseChat extends StatefulWidget {
 }
 
 class _ResponseChatState extends State<ResponseChat> {
-  final ScrollController _codeScrollController = ScrollController();
-
   @override
   Widget build(BuildContext context) {
     bool isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode(context);
@@ -31,60 +29,63 @@ class _ResponseChatState extends State<ResponseChat> {
     return Container(
       padding: EdgeInsets.all(12),
       width: 730,
-      child: Scrollbar(
-        interactive: true,
-        thumbVisibility: true,
-        trackVisibility: true,
-        controller: _codeScrollController,
-        child: GptMarkdown(
-          // key: ValueKey(Provider.of<ThemeProvider>(context).getThemeMode),
-          // key: ValueKey(Theme.of(context).brightness),
-          key: ValueKey(Theme.of(context).colorScheme),
-          widget.response.text,
-          // _markdownWithCodeMix,
-          codeBuilder: (context, name, code, closed) {
-            return Card(
-              shape: RoundedRectangleBorder(
-                side: BorderSide(
-                  color: Theme.of(context).dividerColor,
-                  width: 0.3,
-                ),
-                borderRadius: BorderRadius.circular(8),
+      child: GptMarkdown(
+        // key: ValueKey(Provider.of<ThemeProvider>(context).getThemeMode),
+        // key: ValueKey(Theme.of(context).brightness),
+        key: ValueKey(Theme.of(context).colorScheme),
+        widget.response.text,
+        // _markdownWithCodeMix,
+        codeBuilder: (context, name, code, closed) {
+          final ScrollController codeScrollController = ScrollController();
+
+          return Card(
+            shape: RoundedRectangleBorder(
+              side: BorderSide(
+                color: Theme.of(context).dividerColor,
+                width: 0.3,
               ),
-              clipBehavior: Clip.antiAlias,
-              child: Container(
-                constraints: BoxConstraints(maxWidth: 730),
-                child: Column(
-                  children: [
-                    _codeCardHeader(languageName: name, codeToCopy: code),
-                    SingleChildScrollView(
-                      controller: _codeScrollController,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Container(
+              constraints: BoxConstraints(maxWidth: 730),
+              child: Column(
+                children: [
+                  _codeCardHeader(languageName: name, codeToCopy: code),
+                  Scrollbar(
+                    interactive: true,
+                    thumbVisibility: true,
+                    trackVisibility: true,
+                    controller: codeScrollController,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      controller: codeScrollController,
                       child: _codeCardContent(
                         languageName: name,
                         code: code,
                         isDarkMode: isDarkMode,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            );
-          },
-          style: GoogleFonts.nunito().copyWith(
-            fontSize: 18,
-            color: colorScheme.onSurface,
-          ),
-          highlightBuilder: (context, text, style) {
-            return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: StyleUtil.windowButtonGrey.withAlpha(35),
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(text, style: GoogleFonts.sourceCodePro()),
-            );
-          },
+            ),
+          );
+        },
+        style: GoogleFonts.nunito().copyWith(
+          fontSize: 18,
+          color: colorScheme.onSurface,
         ),
+        highlightBuilder: (context, text, style) {
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: StyleUtil.windowButtonGrey.withAlpha(35),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(text, style: GoogleFonts.sourceCodePro()),
+          );
+        },
       ),
     );
   }
@@ -106,7 +107,7 @@ class _ResponseChatState extends State<ResponseChat> {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
-            child: Text(languageName),
+            child: Text(languageName.isEmpty ? "plaintext" : languageName),
           ),
           StatefulBuilder(
             builder: (context, setState) {
@@ -158,10 +159,13 @@ class _ResponseChatState extends State<ResponseChat> {
     required String code,
     required bool isDarkMode,
   }) {
+    if (languageName.isEmpty) {
+      languageName = "plaintext";
+    }
+
     return Container(
       padding: EdgeInsets.symmetric(vertical: 14, horizontal: 18),
       // height: 900,
-      width: double.maxFinite,
       color: Theme.of(context).colorScheme.onSecondary,
       // child: Text(
       //   code,
