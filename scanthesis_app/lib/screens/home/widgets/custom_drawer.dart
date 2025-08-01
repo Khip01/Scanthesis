@@ -25,17 +25,17 @@ class _CustomDrawerState extends State<CustomDrawer> {
   final ScrollController scrollController = ScrollController();
 
   //TODO: load chats history
-  loadChatHistory(BuildContext context) {
-    context.read<ChatsBloc>().add(
-      LoadChatHistoryEvent(chats: ChatsDummy.chats),
-    );
-  }
+  // loadChatHistory(BuildContext context) {
+  //   context.read<ChatsBloc>().add(
+  //     LoadChatHistoryEvent(chats: ChatsDummy.chats),
+  //   );
+  // }
 
-  @override
-  void initState() {
-    loadChatHistory(context);
-    super.initState();
-  }
+  // @override
+  // void initState() {
+  //   loadChatHistory(context);
+  //   super.initState();
+  // }
 
   @override
   void dispose() {

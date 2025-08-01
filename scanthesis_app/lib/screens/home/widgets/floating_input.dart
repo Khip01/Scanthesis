@@ -19,7 +19,7 @@ import 'package:scanthesis_app/screens/home/provider/preview_image_provider.dart
 import 'package:scanthesis_app/screens/home/provider/screen_capture_provider.dart';
 import 'package:scanthesis_app/screens/home/widgets/custom_prompt_field.dart';
 import 'package:scanthesis_app/screens/home/widgets/send_button_shortcut.dart';
-import 'package:scanthesis_app/screens/settings/provider/SettingsProvider.dart';
+import 'package:scanthesis_app/screens/settings/provider/settings_provider.dart';
 import 'package:scanthesis_app/utils/helper_util.dart';
 import 'package:scanthesis_app/utils/style_util.dart';
 import 'package:scanthesis_app/values/strings.dart';

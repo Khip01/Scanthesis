@@ -6,7 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:provider/provider.dart';
 import 'package:scanthesis_app/provider/theme_provider.dart';
-import 'package:scanthesis_app/screens/settings/provider/SettingsProvider.dart';
+import 'package:scanthesis_app/screens/settings/provider/settings_provider.dart';
+import 'package:scanthesis_app/utils/storage_service.dart';
 import 'package:scanthesis_app/utils/style_util.dart';
 import 'package:scanthesis_app/values/strings.dart';
 
@@ -28,6 +29,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final TextEditingController testApiConnectionController =
       TextEditingController();
   late final String _initialBaseUrl;
+  late final StorageService storage;
 
   @override
   void initState() {
@@ -41,6 +43,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (apiEndpointController.text.isEmpty) {
       apiEndpointController.text = _initialBaseUrl;
     }
+    _initStorage();
   }
 
   @override
@@ -67,6 +70,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       settingsProvider.resetConnectionTest();
     });
     super.deactivate();
+  }
+
+  Future<void> _initStorage() async {
+    storage = await StorageService.init();
   }
 
   @override
@@ -123,11 +130,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         subSectionDescBody:
                             "Automatically save conversations locally for future reference after app restarts.",
                         trailing: chatHistoryTrailing(),
-                        onTap: () {
-                          Provider.of<SettingsProvider>(
+                        onTap: () async {
+                          final settingProvider = Provider.of<SettingsProvider>(
                             context,
                             listen: false,
-                          ).toggleUseChatHistoryState();
+                          );
+
+                          settingProvider.toggleUseChatHistoryState();
+                          await storage.saveChatHistoryState(
+                            settingProvider.getIsUseChatHistory,
+                          );
                         },
                         child: SizedBox.shrink(),
                       ),
@@ -216,8 +228,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       child: DropdownButton<ThemeMode>(
         dropdownColor: Theme.of(context).colorScheme.surface,
-        onChanged: (value) {
-          themeProvider.setTheme(value!);
+        onChanged: (value) async {
+          if (value != null) {
+            themeProvider.setTheme(value);
+            await storage.saveThemeMode(value);
+          }
         },
         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         borderRadius: BorderRadius.circular(12),
@@ -294,6 +309,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             settingsProvider.setDefaultBrowseDirectory(
                               Directory(path),
                             );
+                            await storage.saveBrowseDirectory(path);
                           }
                           setState(() => isLoadingState = false);
                         },
@@ -342,8 +358,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
 
     return Switch(
-      onChanged: (value) {
+      onChanged: (value) async {
         settingsProvider.setChatHistoryState(value);
+        await storage.saveChatHistoryState(value);
       },
       trackOutlineColor: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
@@ -421,6 +438,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             settingsProvider.setDefaultImageStoreDirectory(
                               Directory(path),
                             );
+                            await storage.saveImageDirectory(path);
                           }
 
                           setState(() => isLoadingState = false);
@@ -533,11 +551,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Tooltip(
               message: "Save changes",
               child: FilledButton(
-                onPressed: () {
+                onPressed: () async {
                   settingsProvider.setBaseUrlEndpoint(
                     apiEndpointController.text,
                   );
                   settingsProvider.setBaseUrlState(false);
+                  await storage.saveBaseUrl(apiEndpointController.text);
                 },
                 style: FilledButton.styleFrom(
                   elevation: 0,
@@ -760,6 +779,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                         settingsProvider.getBaseUrlEndpoint,
                                     urlPath:
                                         settingsProvider.getConnectionTestUrl,
+                                  );
+                                  await storage.saveConnectionTestUrl(
+                                    settingsProvider.getConnectionTestUrl,
                                   );
                                 } catch (e) {
                                   debugPrint("❌ Failed: $e");

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
-import 'package:scanthesis_app/screens/settings/provider/SettingsProvider.dart';
+import 'package:scanthesis_app/screens/settings/provider/settings_provider.dart';
 
 class InitValueUtil {
   static Future<SettingsProvider> initSettingsProvider() async {

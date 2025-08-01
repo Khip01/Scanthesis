@@ -14,15 +14,23 @@ import 'package:scanthesis_app/screens/home/provider/open_file_provider.dart';
 import 'package:scanthesis_app/screens/home/provider/preview_image_provider.dart';
 import 'package:scanthesis_app/screens/home/provider/screen_capture_provider.dart';
 import 'package:scanthesis_app/screens/router.dart';
-import 'package:scanthesis_app/screens/settings/provider/SettingsProvider.dart';
+import 'package:scanthesis_app/screens/settings/provider/settings_provider.dart';
 import 'package:scanthesis_app/utils/init_value_util.dart';
+import 'package:scanthesis_app/utils/storage_service.dart';
 import 'package:scanthesis_app/utils/theme_util.dart';
 
 void main() async {
   // init changenotifier value
   WidgetsFlutterBinding.ensureInitialized();
-  SettingsProvider settingsProvider =
+  final SettingsProvider settingsProvider =
       await InitValueUtil.initSettingsProvider();
+  final ThemeProvider themeProvider = ThemeProvider();
+
+  final StorageService storageService = await StorageService.init();
+  storageService.loadSettingsState(
+    settingsProvider: settingsProvider,
+    themeProvider: themeProvider,
+  );
 
   runApp(
     // ChangeNotifierProvider(
@@ -31,7 +39,7 @@ void main() async {
     // ),
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider.value(value: themeProvider),
         ChangeNotifierProvider(create: (_) => ClipboardImageProvider()),
         ChangeNotifierProvider(create: (_) => ScreenCaptureProvider()),
         ChangeNotifierProvider(create: (_) => OpenFileProvider()),
@@ -76,15 +84,17 @@ class MyApp extends StatelessWidget {
           create: (context) {
             final SettingsProvider settingsProvider =
                 Provider.of<SettingsProvider>(context, listen: false);
-            return ResponseBloc(baseUrl: settingsProvider.getBaseUrlEndpoint);
+            return ResponseBloc(settingsProvider: settingsProvider);
           },
         ),
         BlocProvider(create: (_) => RequestBloc()),
-        BlocProvider(create: (context) {
-          final SettingsProvider settingsProvider =
-              Provider.of<SettingsProvider>(context, listen: false);
-          return ChatsBloc(settingsProvider: settingsProvider);
-        }),
+        BlocProvider(
+          create: (context) {
+            final SettingsProvider settingsProvider =
+                Provider.of<SettingsProvider>(context, listen: false);
+            return ChatsBloc(settingsProvider: settingsProvider);
+          },
+        ),
       ],
       child: MaterialApp.router(
         theme: ThemeUtil.globalLightTheme,

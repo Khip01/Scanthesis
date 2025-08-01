@@ -11,7 +11,7 @@ class SettingsProvider extends ChangeNotifier {
   // Chat History
   bool _isUseChatHistory = true;
 
-  // API Endpoint
+  // Base URL Endpoint
   String _baseUrlEndpoint = "http://127.0.0.1:8080/api";
   bool _baseUrlIsUnsaved = false;
 
@@ -36,7 +36,7 @@ class SettingsProvider extends ChangeNotifier {
   // Default Image Store Directory
   Directory get getDefaultImageDirectory => defaultImageStoreDirectory;
 
-  // API Endpoint
+  // Base URL Endpoint
   String get getBaseUrlEndpoint => _baseUrlEndpoint;
 
   bool get getBaseUrlIsUnsaved => _baseUrlIsUnsaved;
@@ -50,7 +50,7 @@ class SettingsProvider extends ChangeNotifier {
 
   String? get getLastResponseText => _lastResponseText;
 
-  // SETTER
+  // TODO: SETTER
   // Default Browse Directory
   setDefaultBrowseDirectory(Directory directory) {
     defaultBrowseDirectory = directory;
@@ -74,7 +74,7 @@ class SettingsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // API Endpoint
+  // BASE URL Endpoint
   setBaseUrlEndpoint(String url) {
     _baseUrlEndpoint = url;
     notifyListeners();
@@ -102,6 +102,7 @@ class SettingsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // TODO: Other Function
   Future<ApiResponse> getApiTest({
     required String baseUrl,
     required String urlPath,
@@ -115,7 +116,7 @@ class SettingsProvider extends ChangeNotifier {
 
       _lastStatusCode = apiResponse.statusCode;
       _lastResponseText = apiResponse.text;
-      if (apiResponse.isError){
+      if (apiResponse.isError) {
         _connectionTestState = ConnectionTestState.failure;
       } else {
         _connectionTestState = ConnectionTestState.success;

@@ -19,7 +19,8 @@ import 'package:scanthesis_app/screens/home/widgets/custom_app_bar.dart';
 import 'package:scanthesis_app/screens/home/widgets/preview_image.dart';
 import 'package:scanthesis_app/screens/home/widgets/request_chat.dart';
 import 'package:scanthesis_app/screens/home/widgets/response_chat.dart';
-import 'package:scanthesis_app/screens/settings/provider/SettingsProvider.dart';
+import 'package:scanthesis_app/screens/settings/provider/settings_provider.dart';
+import 'package:scanthesis_app/utils/storage_service.dart';
 import 'package:scanthesis_app/utils/style_util.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -57,6 +58,7 @@ class _DropzoneAreaState extends State<DropzoneArea>
   late AnimationController _blurController, _opacityController;
   late Animation<double> _blurAnimation, _opacityAnimation;
   late FocusNode _sendButtonFocusNode;
+  late final StorageService storage;
 
   @override
   void initState() {
@@ -80,6 +82,9 @@ class _DropzoneAreaState extends State<DropzoneArea>
 
     // TODO: global send button focus node
     _sendButtonFocusNode = FocusNode();
+
+    // TODO: Init shared preferences
+    _initStorage();
     super.initState();
   }
 
@@ -115,6 +120,10 @@ class _DropzoneAreaState extends State<DropzoneArea>
     } else {
       _sendButtonFocusNode.unfocus();
     }
+  }
+
+  Future _initStorage() async {
+    storage = await StorageService.init();
   }
 
   @override
@@ -333,8 +342,9 @@ class _DropzoneAreaState extends State<DropzoneArea>
 
     return IconButton(
       icon: Icon(isDark ? Icons.sunny : Icons.nights_stay, color: buttonColor),
-      onPressed: () {
+      onPressed: () async {
         Provider.of<ThemeProvider>(context, listen: false).toggleTheme();
+        await storage.saveThemeMode(theme.getThemeMode);
       },
       style: IconButton.styleFrom(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -395,13 +405,12 @@ class _HomeContentState extends State<HomeContent> {
                           !responseBlocState.response.isFromHistory) {
                         final requestBlocState =
                             context.read<RequestBloc>().state;
-                        final isUseChatHistory =
+                        final settingsProvider =
                             responseBlocContext
-                                .read<SettingsProvider>()
-                                .getIsUseChatHistory;
+                                .read<SettingsProvider>();
                         if (requestBlocState is RequestSuccess &&
                             requestBlocState.request != null &&
-                            isUseChatHistory) {
+                            settingsProvider.getIsUseChatHistory) {
                           final req = requestBlocState.request!;
                           final res = responseBlocState.response;
 

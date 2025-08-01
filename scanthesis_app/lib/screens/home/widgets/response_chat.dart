@@ -166,6 +166,7 @@ class _ResponseChatState extends State<ResponseChat> {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 14, horizontal: 18),
       // height: 900,
+      constraints: BoxConstraints(minWidth: 730),
       color: Theme.of(context).colorScheme.onSecondary,
       // child: Text(
       //   code,
