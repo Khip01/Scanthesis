@@ -20,14 +20,15 @@ import 'package:scanthesis_app/utils/storage_service.dart';
 import 'package:scanthesis_app/utils/theme_util.dart';
 
 void main() async {
-  // init changenotifier value
   WidgetsFlutterBinding.ensureInitialized();
   final SettingsProvider settingsProvider =
       await InitValueUtil.initSettingsProvider();
   final ThemeProvider themeProvider = ThemeProvider();
+  final ChatsBloc chatsBloc = ChatsBloc(settingsProvider: settingsProvider);
 
   final StorageService storageService = await StorageService.init();
   storageService.loadSettingsState(
+    chatsBloc: chatsBloc,
     settingsProvider: settingsProvider,
     themeProvider: themeProvider,
   );
@@ -48,7 +49,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => DrawerProvider()),
         ChangeNotifierProvider.value(value: settingsProvider),
       ],
-      child: MyApp(),
+      child: MyApp(initedChatsBloc: chatsBloc),
     ),
   );
 
@@ -65,7 +66,9 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final ChatsBloc initedChatsBloc;
+
+  const MyApp({super.key, required this.initedChatsBloc});
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +95,7 @@ class MyApp extends StatelessWidget {
           create: (context) {
             final SettingsProvider settingsProvider =
                 Provider.of<SettingsProvider>(context, listen: false);
-            return ChatsBloc(settingsProvider: settingsProvider);
+            return initedChatsBloc;
           },
         ),
       ],

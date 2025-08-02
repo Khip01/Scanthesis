@@ -1,6 +1,27 @@
+/*
+  Different between body and json. For Example,
+  ------------------------
+  This is "body"/plaintext response:
+  ```
+  You good to go!
+  ```
+
+  ------------------------
+  This is "json" response:
+  ```
+  {
+    "response": "This is key value response!"
+  }
+  ```
+
+  So, it's will automatically detect the response type, with the default value being “body”,
+  json exists if you call the correct key value (i.e "response" key)
+ */
+
+
 class ApiResponse {
-  final String body;
-  final Map<String, dynamic>? json;
+  final String body;                  // body is the plaintext version from response without map
+  final Map<String, dynamic>? json;   // json is the Map version from response
   final int? statusCode;
   final bool isFromHistory;
   final String? errorMessage;
@@ -15,6 +36,17 @@ class ApiResponse {
   }
   bool get isCreated => body.isNotEmpty;
 
+  Map<String, dynamic> toJson() {
+    return {"response": text};
+  }
+
+  factory ApiResponse.fromJson(Map<String, dynamic> json, {int? statusCode}) {
+    return ApiResponse.success(
+      body: json.toString(),
+      json: json,
+      statusCode: statusCode,
+    );
+  }
 
   ApiResponse.success({
     required this.body,
@@ -30,14 +62,6 @@ class ApiResponse {
     this.json,
     this.isFromHistory = false,
   });
-
-  factory ApiResponse.fromJson(Map<String, dynamic> json, {int? statusCode}) {
-    return ApiResponse.success(
-      body: json.toString(),
-      json: json,
-      statusCode: statusCode,
-    );
-  }
 
   factory ApiResponse.fromPlainText(String text, {int? statusCode}) {
     return ApiResponse.success(

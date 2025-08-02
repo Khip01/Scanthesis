@@ -29,8 +29,8 @@ class HelperUtil {
 
     return Future.wait(
       files.map((sourceFile) async {
-        String fileName = path.basename(sourceFile.path);
-        String newFilePath = path.join(targetDirectoryPath, fileName);
+        String originalFileName = path.basename(sourceFile.path);
+        String newFilePath = await getUniqueFilePath(targetDirectoryPath, originalFileName);
 
         final isTemporaryFile = sourceFile.path.startsWith(tempDir.path);
 
@@ -54,6 +54,20 @@ class HelperUtil {
         }
       }),
     );
+  }
+
+  static Future<String> getUniqueFilePath(String dirPath, String filename) async {
+    String baseName = path.basenameWithoutExtension(filename);
+    String extension = path.extension(filename);
+    String candidate = path.join(dirPath, filename);
+    int counter = 1;
+
+    while (await File(candidate).exists()) {
+      candidate = path.join(dirPath, "$baseName ($counter)$extension");
+      counter++;
+    }
+
+    return candidate;
   }
 
   static Future deleteFiles(List<File> files) async {

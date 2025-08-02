@@ -13,4 +13,14 @@ class Chat {
       response: response ?? this.response,
     );
   }
+
+  Map<String, dynamic> toJson () => {
+    "request": request.toJson(),
+    "response": response.toJson(),
+  };
+
+  factory Chat.fromJson(Map<String, dynamic> json) => Chat(
+    request: ApiRequest.fromJson(json["request"]),
+    response: ApiResponse.fromJson(json["response"]),
+  );
 }

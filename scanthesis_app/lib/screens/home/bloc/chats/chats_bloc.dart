@@ -5,6 +5,7 @@ import 'package:meta/meta.dart';
 import 'package:scanthesis_app/models/chat.dart';
 import 'package:scanthesis_app/screens/settings/provider/settings_provider.dart';
 import 'package:scanthesis_app/utils/helper_util.dart';
+import 'package:scanthesis_app/utils/storage_service.dart';
 
 part 'chats_event.dart';
 
@@ -24,6 +25,8 @@ class ChatsBloc extends Bloc<ChatsEvent, ChatsState> {
   }
 
    _addChat(AddChatEvent event, Emitter<ChatsState> emit) async {
+    final List<Chat> previousChats = List.from(state.chats);
+
     emit(ChatsLoading());
     Chat chat = event.chat;
 
@@ -37,13 +40,17 @@ class ChatsBloc extends Bloc<ChatsEvent, ChatsState> {
       );
 
       chat = chat.copyWith(request: chat.request.copyWith(files: movedFiles));
+
+      // save to SharedPreferences
+      final storage = await StorageService.init();
+      await storage.saveChatHistory(chat);
     }
 
-    state.chats.add(chat);
-    emit(ChatsLoaded(chats: state.chats, selectedChats: []));
+    previousChats.add(chat);
+    emit(ChatsLoaded(chats: previousChats, selectedChats: []));
   }
 
-   _removeMultipleChat(RemoveMultipleChatEvent event, Emitter<ChatsState> emit) async {
+  _removeMultipleChat(RemoveMultipleChatEvent event, Emitter<ChatsState> emit) async {
     final remainingChats = <Chat>[];
 
     for (var chat in state.chats) {
@@ -53,6 +60,10 @@ class ChatsBloc extends Bloc<ChatsEvent, ChatsState> {
         remainingChats.add(chat);
       }
     }
+
+    // remove from SharedPreferences
+    final storage = await StorageService.init();
+    await storage.removeMultipleChatHistory(event.chats);
 
     if (remainingChats.isEmpty) {
       emit(ChatsInitial());
