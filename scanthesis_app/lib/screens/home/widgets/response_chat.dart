@@ -56,6 +56,7 @@ class _ResponseChatState extends State<ResponseChat> {
                     interactive: true,
                     thumbVisibility: true,
                     trackVisibility: true,
+                    radius: Radius.circular(2),
                     controller: codeScrollController,
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,

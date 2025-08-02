@@ -8,6 +8,11 @@ class SettingsProvider extends ChangeNotifier {
   // Default Browse Directory
   Directory defaultBrowseDirectory, defaultImageStoreDirectory;
 
+  // Custom Prompt
+  String _defaultCustomPrompt =
+      "Perform OCR on this image. Extract only the code and comments exactly as seen, without any explanation or additional content. Ensure the code is cleanly formatted and properly indented.";
+  bool _defaultCustomPromptIsUnsaved = false;
+
   // Chat History
   bool _isUseChatHistory = true;
 
@@ -30,6 +35,15 @@ class SettingsProvider extends ChangeNotifier {
   // Default Browse Directory
   Directory get getDefaultBrowseDirectory => defaultBrowseDirectory;
 
+  // Custom Prompt
+  String get getDefaultCustomPrompt => _defaultCustomPrompt;
+
+  bool get getCustomPromptIsUnsaved => _defaultCustomPromptIsUnsaved;
+
+  bool checkIsCustomPromptUnsaved(String input) {
+    return _defaultCustomPrompt != input;
+  }
+
   // Chat History
   bool get getIsUseChatHistory => _isUseChatHistory;
 
@@ -40,6 +54,10 @@ class SettingsProvider extends ChangeNotifier {
   String get getBaseUrlEndpoint => _baseUrlEndpoint;
 
   bool get getBaseUrlIsUnsaved => _baseUrlIsUnsaved;
+
+  bool checkIsBaseUrlUnsaved(String input) {
+    return _baseUrlEndpoint != input;
+  }
 
   // Connection Test URL
   String get getConnectionTestUrl => _connectionTestUrl;
@@ -54,6 +72,21 @@ class SettingsProvider extends ChangeNotifier {
   // Default Browse Directory
   setDefaultBrowseDirectory(Directory directory) {
     defaultBrowseDirectory = directory;
+    notifyListeners();
+  }
+
+  // Custom Prompt
+  setDefaultCustomPrompt(String prompt) {
+    _defaultCustomPrompt = prompt;
+    notifyListeners();
+  }
+
+  bool setIsCustomPromptUnsaved(String prompt) {
+    return _defaultCustomPrompt != prompt;
+  }
+
+  setDefaultCustomPromptState(bool unsaved) {
+    _defaultCustomPromptIsUnsaved = unsaved;
     notifyListeners();
   }
 
@@ -78,10 +111,6 @@ class SettingsProvider extends ChangeNotifier {
   setBaseUrlEndpoint(String url) {
     _baseUrlEndpoint = url;
     notifyListeners();
-  }
-
-  bool getIsBaseUrlUnsaved(String input) {
-    return _baseUrlEndpoint != input;
   }
 
   setBaseUrlState(bool unsaved) {

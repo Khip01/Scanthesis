@@ -379,6 +379,7 @@ class _HomeContentState extends State<HomeContent> {
           child: Scrollbar(
             thumbVisibility: true,
             trackVisibility: true,
+            radius: Radius.circular(2),
             controller: contentScrollController,
             child: SingleChildScrollView(
               controller: contentScrollController,

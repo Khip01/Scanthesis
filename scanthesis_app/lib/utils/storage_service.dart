@@ -9,6 +9,7 @@ import 'package:scanthesis_app/screens/settings/provider/settings_provider.dart'
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StorageService {
+  static const String _keyCustomPrompt = 'settings_custom_prompt';
   static const String _keyBaseUrl = 'settings_base_url';
   static const String _keyChatHistoryState = 'settings_chat_history_state';
   static const String _keyBrowseDir = 'settings_browse_dir';
@@ -33,8 +34,9 @@ class StorageService {
   }) async {
     final ThemeMode? themeMode = getThemeMode();
     final String? browseDir = getBrowseDirectory();
-    final String? imageDir = getImageDirectory();
+    final String? customPrompt = getCustomPrompt();
     final bool? historyState = getChatHistoryState();
+    final String? imageDir = getImageDirectory();
     final String? baseUrl = getBaseUrl();
     final String? testUrl = getConnectionTestUrl();
     final List<Chat>? chats = getAllChatHistory();
@@ -47,12 +49,16 @@ class StorageService {
       settingsProvider.setDefaultBrowseDirectory(Directory(browseDir));
     }
 
-    if (imageDir != null) {
-      settingsProvider.setDefaultImageStoreDirectory(Directory(imageDir));
+    if (customPrompt != null) {
+      settingsProvider.setDefaultCustomPrompt(customPrompt);
     }
 
     if (historyState != null) {
       settingsProvider.setChatHistoryState(historyState);
+    }
+
+    if (imageDir != null) {
+      settingsProvider.setDefaultImageStoreDirectory(Directory(imageDir));
     }
 
     if (baseUrl != null) {
@@ -96,13 +102,13 @@ class StorageService {
     return prefs.getString(_keyBrowseDir);
   }
 
-  // TODO: DEFAULT IMAGE HISTORY DIRECTORY
-  Future saveImageDirectory(String path) async {
-    await prefs.setString(_keyImageDir, path);
+  // TODO: CUSTOM PROMPT
+  Future saveCustomPrompt(String prompt) async {
+    await prefs.setString(_keyCustomPrompt, prompt);
   }
 
-  String? getImageDirectory() {
-    return prefs.getString(_keyImageDir);
+  String? getCustomPrompt() {
+    return prefs.getString(_keyCustomPrompt);
   }
 
   // TODO: CHAT HISTORY STATE
@@ -112,6 +118,15 @@ class StorageService {
 
   bool? getChatHistoryState() {
     return prefs.getBool(_keyChatHistoryState);
+  }
+
+  // TODO: DEFAULT IMAGE HISTORY DIRECTORY
+  Future saveImageDirectory(String path) async {
+    await prefs.setString(_keyImageDir, path);
+  }
+
+  String? getImageDirectory() {
+    return prefs.getString(_keyImageDir);
   }
 
   // TODO: BASE URL ENDPOINT

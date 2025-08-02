@@ -74,7 +74,13 @@ class ChatsBloc extends Bloc<ChatsEvent, ChatsState> {
 
   _loadChatHistory(LoadChatHistoryEvent event, Emitter<ChatsState> emit) {
     state.chats.addAll(event.chats);
-    emit(ChatsLoaded(chats: state.chats, selectedChats: []));
+
+    if (state.chats.isEmpty) {
+      emit(ChatsInitial());
+    } else {
+      emit(ChatsLoaded(chats: state.chats, selectedChats: []));
+    }
+
   }
 
   _clearSelectedChats(ClearSelectedChatsEvent event, Emitter<ChatsState> emit) {

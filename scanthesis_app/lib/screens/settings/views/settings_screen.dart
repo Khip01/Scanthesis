@@ -23,11 +23,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final ScrollController connectionTestScrollController = ScrollController();
   final TextEditingController defaultBrowseDirectoryController =
       TextEditingController();
+  final TextEditingController defaultCustomPromptController =
+      TextEditingController();
   final TextEditingController defaultImageStorageDirectoryController =
       TextEditingController();
   final TextEditingController apiEndpointController = TextEditingController();
   final TextEditingController testApiConnectionController =
       TextEditingController();
+  late final String _initialCustomPrompt;
   late final String _initialBaseUrl;
   late final StorageService storage;
 
@@ -39,9 +42,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
       listen: false,
     );
     _initialBaseUrl = settingsProvider.getBaseUrlEndpoint;
-
     if (apiEndpointController.text.isEmpty) {
       apiEndpointController.text = _initialBaseUrl;
+    }
+
+    _initialCustomPrompt = settingsProvider.getDefaultCustomPrompt;
+    if (defaultCustomPromptController.text.isEmpty) {
+      defaultCustomPromptController.text = _initialCustomPrompt;
     }
     _initStorage();
   }
@@ -53,6 +60,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     settingsContentScrollController.dispose();
     connectionTestScrollController.dispose();
     defaultBrowseDirectoryController.dispose();
+    defaultCustomPromptController.dispose();
     defaultImageStorageDirectoryController.dispose();
     apiEndpointController.dispose();
     testApiConnectionController.dispose();
@@ -66,6 +74,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       listen: false,
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      settingsProvider.setDefaultCustomPromptState(false);
       settingsProvider.setBaseUrlState(false);
       settingsProvider.resetConnectionTest();
     });
@@ -90,10 +99,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           width: 730,
           padding: EdgeInsets.symmetric(horizontal: 8),
           child: Scrollbar(
+            controller: settingsContentScrollController,
             trackVisibility: true,
             thumbVisibility: true,
             interactive: true,
-            controller: settingsContentScrollController,
+            radius: Radius.circular(2),
             child: SingleChildScrollView(
               controller: settingsContentScrollController,
               padding: EdgeInsets.only(right: 28, top: 8, bottom: 8),
@@ -123,6 +133,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         subSectionDescBody:
                             "Specifies the starting directory when users browse files, reducing navigation effort.",
                         child: defaultBrowseDirectoryChild(),
+                      ),
+                      SubSectionWidget(
+                        subSectionTitle: "Default Custom Prompt",
+                        subSectionDescHead:
+                            "Set a default prompt for AI responses",
+                        subSectionDescBody:
+                            "Change your default prompt so that AI can generate more accurate and appropriate OCR text responses.",
+                        child: customPromptChild(),
                       ),
                       SubSectionWidget(
                         subSectionTitle: "Chat History",
@@ -352,6 +370,120 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  Widget customPromptChild() {
+    final SettingsProvider settingsProvider = Provider.of<SettingsProvider>(
+      context,
+    );
+    final String customPrompt = settingsProvider.getDefaultCustomPrompt;
+    final ThemeData themeData = Theme.of(context);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!settingsProvider.getCustomPromptIsUnsaved &&
+          defaultCustomPromptController.text != customPrompt) {
+        defaultCustomPromptController.text = customPrompt;
+      }
+    });
+
+    return Container(
+      width: double.maxFinite,
+      margin: EdgeInsets.only(top: 8),
+      child: IntrinsicHeight(
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: defaultCustomPromptController,
+                onChanged: (value) {
+                  if (settingsProvider.checkIsCustomPromptUnsaved(value)) {
+                    settingsProvider.setDefaultCustomPromptState(true);
+                  } else {
+                    settingsProvider.setDefaultCustomPromptState(false);
+                  }
+                },
+                minLines: 3,
+                maxLines: 4,
+                decoration: InputDecoration(
+                  contentPadding: EdgeInsets.only(
+                    left: 16,
+                    top: 20,
+                    bottom: 20,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(12),
+                      bottomLeft: Radius.circular(12),
+                      topRight: Radius.circular(
+                        settingsProvider.getCustomPromptIsUnsaved ? 0 : 12,
+                      ),
+                      bottomRight: Radius.circular(
+                        settingsProvider.getCustomPromptIsUnsaved ? 0 : 12,
+                      ),
+                    ),
+                    borderSide: BorderSide(color: Colors.transparent),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(12),
+                      bottomLeft: Radius.circular(12),
+                      topRight: Radius.circular(
+                        settingsProvider.getCustomPromptIsUnsaved ? 0 : 12,
+                      ),
+                      bottomRight: Radius.circular(
+                        settingsProvider.getCustomPromptIsUnsaved ? 0 : 12,
+                      ),
+                    ),
+                    // borderSide: BorderSide(color: Colors.transparent),
+                    borderSide: BorderSide(
+                      color: themeData.colorScheme.primary,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Visibility(
+              visible: settingsProvider.getCustomPromptIsUnsaved,
+              child: Tooltip(
+                message: "Save changes",
+                child: FilledButton(
+                  onPressed: () async {
+                    settingsProvider.setDefaultCustomPrompt(
+                      defaultCustomPromptController.text,
+                    );
+                    settingsProvider.setDefaultCustomPromptState(false);
+                    await storage.saveCustomPrompt(
+                      defaultCustomPromptController.text,
+                    );
+                  },
+                  style: FilledButton.styleFrom(
+                    elevation: 0,
+                    backgroundColor: Colors.green,
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 24),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadiusGeometry.only(
+                        topLeft: Radius.circular(0),
+                        bottomLeft: Radius.circular(0),
+                        topRight: Radius.circular(12),
+                        bottomRight: Radius.circular(12),
+                      ),
+                    ),
+                    overlayColor: themeData.colorScheme.onSurface,
+                  ),
+                  child: Center(
+                    child: Icon(
+                      Icons.check,
+                      size: 24,
+                      color: themeData.iconTheme.color,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget chatHistoryTrailing() {
     final SettingsProvider settingsProvider = Provider.of<SettingsProvider>(
       context,
@@ -505,7 +637,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: TextField(
               controller: apiEndpointController,
               onChanged: (value) {
-                if (settingsProvider.getIsBaseUrlUnsaved(value)) {
+                if (settingsProvider.checkIsBaseUrlUnsaved(value)) {
                   settingsProvider.setBaseUrlState(true);
                 } else {
                   settingsProvider.setBaseUrlState(false);
@@ -684,6 +816,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   thumbVisibility: true,
                                   trackVisibility: true,
                                   interactive: true,
+                                  radius: Radius.circular(2),
                                   child: SingleChildScrollView(
                                     controller: connectionTestScrollController,
                                     child: Padding(

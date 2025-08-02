@@ -1,5 +1,4 @@
 class Strings {
-  static const String defaultPrompt = "Perform OCR on this image. Extract only the code and comments exactly as seen, without any explanation or additional content. Ensure the code is cleanly formatted and properly indented.";
   static const String aboutApp = """
 # 🚀 Scanthesis App
 

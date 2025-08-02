@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:scanthesis_app/screens/home/bloc/file_picker/file_picker_bloc.dart';
 import 'package:scanthesis_app/screens/home/provider/custom_prompt_provider.dart';
+import 'package:scanthesis_app/screens/settings/provider/settings_provider.dart';
 import 'package:scanthesis_app/utils/style_util.dart';
 import 'package:scanthesis_app/values/strings.dart';
 
@@ -23,21 +24,25 @@ class CustomPromptField extends StatefulWidget {
 class _CustomPromptFieldState extends State<CustomPromptField> {
   late ColorScheme themeColorScheme;
   late CustomPromptProvider customPromptProvider;
-
-  late final String defaultPlaceholder =
-      "Default prompt: ${Strings.defaultPrompt}";
+  late SettingsProvider settingsProvider;
+  late String defaultPrompt;
+  late String defaultPlaceholder;
 
   @override
   Widget build(BuildContext context) {
     themeColorScheme = Theme.of(context).colorScheme;
     customPromptProvider = Provider.of<CustomPromptProvider>(context);
+    settingsProvider = Provider.of<SettingsProvider>(context);
+
+    defaultPrompt = settingsProvider.getDefaultCustomPrompt;
+    defaultPlaceholder = "Default prompt: $defaultPrompt";
 
     return ListenableBuilder(
       listenable: customPromptProvider,
       builder: (context, child) {
         if (customPromptProvider.isUsingCustomPrompt &&
             widget.promptController.text == defaultPlaceholder) {
-          widget.promptController.text = Strings.defaultPrompt;
+          widget.promptController.text = defaultPrompt;
         } else if (!customPromptProvider.isUsingCustomPrompt) {
           widget.promptController.text = defaultPlaceholder;
         }

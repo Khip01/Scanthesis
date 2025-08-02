@@ -187,6 +187,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     child: Scrollbar(
                       controller: scrollController,
                       thumbVisibility: true,
+                      radius: Radius.circular(2),
                       child: LayoutBuilder(
                         builder: (context, constraints) {
                           return ListView.builder(
@@ -319,7 +320,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               ),
             );
           } else if (chatsState is ChatsLoaded && chatsState.chats.isNotEmpty) {
-            return drawerHistory(chatsState.chats);
+            return drawerHistory(chatsState.chats.reversed.toList());
           } else {
             return Padding(
               padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),

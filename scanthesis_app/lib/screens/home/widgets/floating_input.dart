@@ -381,10 +381,15 @@ class _FloatingInputState extends State<FloatingInput> {
           context,
           listen: false,
         ).isUsingCustomPrompt;
+    final String defaultPrompt =
+        Provider.of<SettingsProvider>(
+          context,
+          listen: false,
+        ).getDefaultCustomPrompt;
 
     final ApiRequest request = ApiRequest(
       files: List<File>.from(files),
-      prompt: isCustom ? prompt : Strings.defaultPrompt,
+      prompt: isCustom ? prompt : defaultPrompt,
     );
     filePickerContext.read<FilePickerBloc>().add(ClearFilesEvent());
 
@@ -504,6 +509,7 @@ class _ListFileWidgetState extends State<ListFileWidget> {
               },
               child: Scrollbar(
                 controller: _listFileScrollController,
+                radius: Radius.circular(2),
                 child: ListView.separated(
                   padding: EdgeInsets.only(bottom: 16),
                   controller: _listFileScrollController,
