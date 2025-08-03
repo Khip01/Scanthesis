@@ -402,7 +402,7 @@ class _HomeContentState extends State<HomeContent> {
                   BlocConsumer<ResponseBloc, ResponseState>(
                     listener: (responseBlocContext, responseBlocState) {
                       if (responseBlocState is ResponseSuccess &&
-                          responseBlocState.response.isCreated &&
+                          responseBlocState.response.rawBody.isNotEmpty &&
                           !responseBlocState.response.isFromHistory) {
                         final requestBlocState =
                             context.read<RequestBloc>().state;
@@ -434,7 +434,7 @@ class _HomeContentState extends State<HomeContent> {
                       } else if (responseBlocState is ResponseInitial) {
                         return Text("Try to drop and send something");
                       } else if (responseBlocState is ResponseSuccess &&
-                          responseBlocState.response.isCreated) {
+                          responseBlocState.response.rawBody.isNotEmpty) {
                         return ResponseChat(
                           response: responseBlocState.response,
                         );

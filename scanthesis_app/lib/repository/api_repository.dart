@@ -10,7 +10,11 @@ class ApiRepository {
     dio.options.baseUrl = baseUrl;
   }
 
-  Future<ApiResponse> sendRequest(ApiRequest request) async {
+  Future<ApiResponse<T>> sendRequest<T>(
+    ApiRequest request, {
+    required T Function(Map<String, dynamic> json) jsonParser,
+    required T Function(String plainText) textParser,
+  }) async {
     try {
       final formData = FormData.fromMap({
         "images": [
@@ -28,12 +32,21 @@ class ApiRepository {
       final statusCode = response.statusCode;
 
       if (data is Map<String, dynamic>) {
-        return ApiResponse.fromJson(data, statusCode: statusCode);
+        return ApiResponse<T>.fromJson(
+          data,
+          parser: jsonParser,
+          statusCode: statusCode,
+        );
       } else if (data is String) {
-        return ApiResponse.fromPlainText(data, statusCode: statusCode);
+        return ApiResponse<T>.fromPlainText(
+          data,
+          parser: textParser,
+          statusCode: statusCode,
+        );
       } else {
-        return ApiResponse.fromPlainText(
+        return ApiResponse<T>.fromPlainText(
           data.toString(),
+          parser: textParser,
           statusCode: statusCode,
         );
       }
@@ -76,14 +89,18 @@ class ApiRepository {
           break;
       }
 
-      return ApiResponse.failure(
+      return ApiResponse<T>.failure(
         errorMessage: errorMessage,
         statusCode: statusCode,
       );
     }
   }
 
-  Future<ApiResponse> checkConnection(String urlPath) async {
+  Future<ApiResponse<T>> checkConnection<T>(
+    String urlPath, {
+    required T Function(Map<String, dynamic> json) jsonParser,
+    required T Function(String plainText) textParser,
+  }) async {
     try {
       final Response response = await dio.get(urlPath);
 
@@ -91,12 +108,21 @@ class ApiRepository {
       final statusCode = response.statusCode;
 
       if (data is Map<String, dynamic>) {
-        return ApiResponse.fromJson(data, statusCode: statusCode);
+        return ApiResponse<T>.fromJson(
+          data,
+          parser: jsonParser,
+          statusCode: statusCode,
+        );
       } else if (data is String) {
-        return ApiResponse.fromPlainText(data, statusCode: statusCode);
+        return ApiResponse<T>.fromPlainText(
+          data,
+          parser: textParser,
+          statusCode: statusCode,
+        );
       } else {
-        return ApiResponse.fromPlainText(
+        return ApiResponse<T>.fromPlainText(
           data.toString(),
+          parser: textParser,
           statusCode: statusCode,
         );
       }
@@ -139,7 +165,7 @@ class ApiRepository {
           break;
       }
 
-      return ApiResponse.failure(
+      return ApiResponse<T>.failure(
         errorMessage: errorMessage,
         statusCode: statusCode,
       );

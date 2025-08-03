@@ -2,8 +2,8 @@ part of 'chats_bloc.dart';
 
 @immutable
 sealed class ChatsState {
-  final List<Chat> chats;
-  final List<Chat> selectedChats;
+  final List<Chat<MyCustomResponse>> chats;
+  final List<Chat<MyCustomResponse>> selectedChats;
 
   const ChatsState({required this.chats, required this.selectedChats});
 }

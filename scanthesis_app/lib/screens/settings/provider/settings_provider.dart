@@ -141,7 +141,15 @@ class SettingsProvider extends ChangeNotifier {
 
     try {
       ApiRepository apiRepository = ApiRepository(baseUrl: baseUrl);
-      ApiResponse apiResponse = await apiRepository.checkConnection(urlPath);
+      ApiResponse apiResponse = await apiRepository.checkConnection<MyCustomResponse>(
+        urlPath,
+        jsonParser: (Map<String, dynamic> json) {
+          return MyCustomResponse.fromJson(json);
+        },
+        textParser: (String plainText) {
+          return MyCustomResponse(response: plainText);
+        },
+      );
 
       _lastStatusCode = apiResponse.statusCode;
       _lastResponseText = apiResponse.text;

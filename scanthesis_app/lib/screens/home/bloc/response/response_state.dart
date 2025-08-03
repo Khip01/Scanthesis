@@ -2,17 +2,17 @@ part of 'response_bloc.dart';
 
 @immutable
 sealed class ResponseState {
-  final ApiResponse response;
+  final ApiResponse<MyCustomResponse> response;
 
   const ResponseState({required this.response});
 }
 
 final class ResponseInitial extends ResponseState {
-  ResponseInitial() : super(response: ApiResponse.success(body: ""));
+  ResponseInitial() : super(response: ApiResponse<MyCustomResponse>.empty());
 }
 
 final class ResponseLoading extends ResponseState {
-  ResponseLoading() : super(response: ApiResponse.success(body: ""));
+  ResponseLoading() : super(response: ApiResponse<MyCustomResponse>.empty());
 }
 
 final class ResponseSuccess extends ResponseState {

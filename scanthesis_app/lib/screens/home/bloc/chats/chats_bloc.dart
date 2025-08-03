@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:scanthesis_app/models/api_response.dart';
 import 'package:scanthesis_app/models/chat.dart';
 import 'package:scanthesis_app/screens/settings/provider/settings_provider.dart';
 import 'package:scanthesis_app/utils/helper_util.dart';
@@ -25,10 +26,10 @@ class ChatsBloc extends Bloc<ChatsEvent, ChatsState> {
   }
 
    _addChat(AddChatEvent event, Emitter<ChatsState> emit) async {
-    final List<Chat> previousChats = List.from(state.chats);
+    final List<Chat<MyCustomResponse>> previousChats = List.from(state.chats);
 
     emit(ChatsLoading());
-    Chat chat = event.chat;
+    Chat<MyCustomResponse> chat = event.chat;
 
     // check if chat history is enabled
     if (settingsProvider.getIsUseChatHistory) {
@@ -51,7 +52,7 @@ class ChatsBloc extends Bloc<ChatsEvent, ChatsState> {
   }
 
   _removeMultipleChat(RemoveMultipleChatEvent event, Emitter<ChatsState> emit) async {
-    final remainingChats = <Chat>[];
+    final remainingChats = <Chat<MyCustomResponse>>[];
 
     for (var chat in state.chats) {
       if (event.chats.contains(chat)) {

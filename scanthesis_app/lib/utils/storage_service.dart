@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:scanthesis_app/models/api_response.dart';
 import 'package:scanthesis_app/models/chat.dart';
 import 'package:scanthesis_app/provider/theme_provider.dart';
 import 'package:scanthesis_app/screens/home/bloc/chats/chats_bloc.dart';
@@ -39,7 +40,7 @@ class StorageService {
     final String? imageDir = getImageDirectory();
     final String? baseUrl = getBaseUrl();
     final String? testUrl = getConnectionTestUrl();
-    final List<Chat>? chats = getAllChatHistory();
+    final List<Chat<MyCustomResponse>>? chats = getAllChatHistory();
 
     if (themeMode != null) {
       themeProvider.setTheme(themeMode);
@@ -148,41 +149,48 @@ class StorageService {
   }
 
   // TODO: CHAT HISTORY
-  Future saveChatHistory(Chat chat) async {
-    List<Chat> chatsHistory = getAllChatHistory() ?? [];
+  Future saveChatHistory(Chat<MyCustomResponse> chat) async {
+    List<Chat<MyCustomResponse>> chatsHistory = getAllChatHistory() ?? [];
     chatsHistory.add(chat);
     await _saveChatList(chatsHistory);
   }
 
-  Future removeMultipleChatHistory(List<Chat> chatToRemove) async {
-    List<Chat> chatsHistory = getAllChatHistory() ?? [];
+  Future removeMultipleChatHistory(List<Chat<MyCustomResponse>> chatToRemove) async {
+    List<Chat<MyCustomResponse>> chatsHistory = getAllChatHistory() ?? [];
     chatsHistory.removeWhere(
       (chat) => chatToRemove.any((removeChat) => _isSameChat(chat, removeChat)),
     );
     await _saveChatList(chatsHistory);
   }
 
-  List<Chat>? getAllChatHistory() {
+  List<Chat<MyCustomResponse>>? getAllChatHistory() {
     List<String>? chatsHistoryStr = prefs.getStringList(_keyChatsHistory);
 
     if (chatsHistoryStr == null) return null;
 
-    List<Chat>? chatsHistory =
-        chatsHistoryStr
-            .map((chatStr) => Chat.fromJson(jsonDecode(chatStr)))
-            .toList();
+    List<Chat<MyCustomResponse>>? chatsHistory =
+        chatsHistoryStr.map((chatStr) {
+          return Chat<MyCustomResponse>.fromJson(
+            jsonDecode(chatStr),
+            parser: (json) => MyCustomResponse.fromJson(json),
+          );
+        }).toList();
 
     return chatsHistory;
   }
 
   // chat history: helper function
-  Future<void> _saveChatList(List<Chat> chats) async {
+  Future<void> _saveChatList(List<Chat<MyCustomResponse>> chats) async {
     List<String> chatsHistoryStr =
-        chats.map((chatStr) => jsonEncode(chatStr.toJson())).toList();
+        chats.map((chat) {
+          return jsonEncode(chat.toJson(parser: (data) => data.toJson()));
+        }).toList();
+
     await prefs.setStringList(_keyChatsHistory, chatsHistoryStr);
   }
 
-  bool _isSameChat(Chat a, Chat b) {
-    return jsonEncode(a.toJson()) == jsonEncode(b.toJson());
+  bool _isSameChat(Chat<MyCustomResponse> a, Chat<MyCustomResponse> b) {
+    return jsonEncode(a.toJson(parser: (data) => data.toJson())) ==
+        jsonEncode(b.toJson(parser: (data) => data.toJson()));
   }
 }

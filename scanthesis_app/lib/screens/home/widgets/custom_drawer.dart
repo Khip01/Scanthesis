@@ -12,6 +12,8 @@ import 'package:scanthesis_app/screens/router.dart';
 import 'package:scanthesis_app/utils/style_util.dart';
 import 'package:scanthesis_app/values/chats_dummy.dart';
 
+import '../../../models/api_response.dart';
+
 class CustomDrawer extends StatefulWidget {
   final Duration duration;
 
@@ -173,10 +175,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
     }
 
     // Warning: Nested Function
-    Widget drawerHistory(List<Chat> chatsHistory) {
+    Widget drawerHistory(List<Chat<MyCustomResponse>> chatsHistory) {
       return BlocBuilder<ChatsBloc, ChatsState>(
         builder: (chatsContext, chatsState) {
-          List<Chat> selectedChats = chatsState.selectedChats;
+          List<Chat<MyCustomResponse>> selectedChats = chatsState.selectedChats;
 
           return Expanded(
             child: Padding(
@@ -204,7 +206,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                 chat: chatsHistory[index],
                                 onPressed: () {
                                   // TODO: Open Chat
-                                  Chat chat = chatsHistory[index];
+                                  Chat<MyCustomResponse> chat = chatsHistory[index];
                                   context.read<RequestBloc>().add(
                                     AddRequestEvent(request: chat.request),
                                   );

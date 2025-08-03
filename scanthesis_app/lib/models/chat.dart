@@ -1,26 +1,31 @@
 import 'package:scanthesis_app/models/api_request.dart';
 import 'package:scanthesis_app/models/api_response.dart';
 
-class Chat {
+class Chat<T> {
   final ApiRequest request;
-  final ApiResponse response;
+  final ApiResponse<T> response;
 
   Chat({required this.request, required this.response});
 
-  Chat copyWith({ApiRequest? request, ApiResponse? response}) {
-    return Chat(
+  Chat<T> copyWith({ApiRequest? request, ApiResponse<T>? response}) {
+    return Chat<T>(
       request: request ?? this.request,
       response: response ?? this.response,
     );
   }
 
-  Map<String, dynamic> toJson () => {
+  Map<String, dynamic> toJson({
+    required Map<String, dynamic> Function(T data) parser,
+  }) => {
     "request": request.toJson(),
-    "response": response.toJson(),
+    "response": response.toRawDataJson(parser: parser),
   };
 
-  factory Chat.fromJson(Map<String, dynamic> json) => Chat(
+  factory Chat.fromJson(
+    Map<String, dynamic> json, {
+    required T Function(Map<String, dynamic> json) parser,
+  }) => Chat<T>(
     request: ApiRequest.fromJson(json["request"]),
-    response: ApiResponse.fromJson(json["response"]),
+    response: ApiResponse<T>.fromJson(json["response"], parser: parser),
   );
 }

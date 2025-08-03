@@ -22,9 +22,13 @@ class ResponseBloc extends Bloc<ResponseEvent, ResponseState> {
 
   _addResponse(AddResponseEvent event, Emitter<ResponseState> emit) async {
     emit(ResponseLoading());
-    final ApiResponse response = await ApiRepository(
+    final ApiResponse<MyCustomResponse> response = await ApiRepository(
       baseUrl: settingsProvider.getBaseUrlEndpoint,
-    ).sendRequest(event.request);
+    ).sendRequest<MyCustomResponse>(event.request, jsonParser: (Map<String, dynamic> json) {
+      return MyCustomResponse.fromJson(json);
+    }, textParser: (String plainText) {
+      return MyCustomResponse(response: plainText);
+    });
 
     if (response.isError) {
       emit(
@@ -39,10 +43,8 @@ class ResponseBloc extends Bloc<ResponseEvent, ResponseState> {
     emit(ResponseInitial());
   }
 
-  _addResponseSuccess(
-    AddResponseSuccessEvent event,
-    Emitter<ResponseState> emit,
-  ) {
+  _addResponseSuccess(AddResponseSuccessEvent event,
+      Emitter<ResponseState> emit,) {
     emit(
       ResponseSuccess(response: event.response.copyWith(isFromHistory: true)),
     );
