@@ -75,10 +75,12 @@ class ScreenCaptureHandler {
       return tempFile;
     } catch (e) {
       if (context.mounted) {
+        String delayMessageWindows =
+            Platform.isWindows ? "Please keep trying again." : "";
         HelperUtil.showErrorDialog(
           title: "Unexpected Error",
           message:
-              "We encountered an error while accessing your screen capture: ${e.toString().split('\n')[0]}",
+              "We encountered an error while accessing your screen capture: ${e.toString().split('\n')[0]}\n\n$delayMessageWindows",
           context: context,
         );
       }
@@ -96,7 +98,8 @@ class ScreenCaptureHandler {
 
   static Future<Uint8List?> _getImageBytesFromClipboardWithTimeout() async {
     final stopwatch = Stopwatch()..start();
-    const maxWaitTimeMs = 3000; // 3-second timeout limit
+    double maxWaitTimeMs =
+        (Platform.isWindows ? 10 : 5) * 1000; // 3 or 10 second timeout limit
     const checkIntervalMs = 200; // 200ms delay interval
 
     while (stopwatch.elapsedMilliseconds < maxWaitTimeMs) {

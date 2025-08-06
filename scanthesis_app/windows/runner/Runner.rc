@@ -89,11 +89,11 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.khip" "\0"
+            VALUE "CompanyName", "com.example" "\0"
             VALUE "FileDescription", "scanthesis_app" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "scanthesis_app" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2025 com.khip. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2025 com.example. All rights reserved." "\0"
             VALUE "OriginalFilename", "scanthesis_app.exe" "\0"
             VALUE "ProductName", "scanthesis_app" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
