@@ -22,7 +22,6 @@ import 'package:scanthesis_app/screens/home/widgets/send_button_shortcut.dart';
 import 'package:scanthesis_app/screens/settings/provider/settings_provider.dart';
 import 'package:scanthesis_app/utils/helper_util.dart';
 import 'package:scanthesis_app/utils/style_util.dart';
-import 'package:scanthesis_app/values/strings.dart';
 
 import '../bloc/file_picker/file_picker_bloc.dart';
 
@@ -43,18 +42,6 @@ class FloatingInput extends StatefulWidget {
 
 class _FloatingInputState extends State<FloatingInput> {
   final TextEditingController promptController = TextEditingController();
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _sendButtonFocusNode = FocusNode();
-  // }
-  //
-  // @override
-  // void dispose() {
-  //   _sendButtonFocusNode.dispose();
-  //   super.dispose();
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -631,6 +618,8 @@ class _ListFileWidgetState extends State<ListFileWidget> {
   }
 
   Widget _customTitle(File file) {
+    String pathDivider = Platform.isWindows ? '\\' : '/';
+
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.only(right: 12, top: 8, bottom: 8),
@@ -640,7 +629,7 @@ class _ListFileWidgetState extends State<ListFileWidget> {
           // mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              file.path.split('/').last,
+              file.path.split(pathDivider).last,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 16,

@@ -43,7 +43,7 @@ class PreviewImage extends StatelessWidget {
                 SizedBox(height: 12),
                 ConstrainedBox(
                   constraints: BoxConstraints(maxWidth: windowWidth * 3 / 4),
-                  child: Text(
+                  child: SelectableText(
                     fileName,
                     textAlign: TextAlign.center,
                     style: TextStyle(
