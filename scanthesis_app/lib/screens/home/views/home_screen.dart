@@ -15,7 +15,6 @@ import 'package:scanthesis_app/screens/home/bloc/response/response_bloc.dart';
 import 'package:scanthesis_app/screens/home/provider/preview_image_provider.dart';
 import 'package:scanthesis_app/screens/home/widgets/custom_drawer.dart';
 import 'package:scanthesis_app/screens/home/widgets/floating_input.dart';
-import 'package:scanthesis_app/screens/home/widgets/custom_app_bar.dart';
 import 'package:scanthesis_app/screens/home/widgets/preview_image.dart';
 import 'package:scanthesis_app/screens/home/widgets/request_chat.dart';
 import 'package:scanthesis_app/screens/home/widgets/response_chat.dart';
@@ -34,10 +33,6 @@ class HomeScreen extends StatelessWidget {
         width: MediaQuery.sizeOf(context).width,
         child: Column(
           children: [
-            if (Platform.isWindows)
-              const CustomAppBar()
-            else
-              const SizedBox.shrink(),
             DropzoneArea(),
           ],
         ),
