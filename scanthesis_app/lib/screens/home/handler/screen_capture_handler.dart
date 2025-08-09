@@ -99,7 +99,7 @@ class ScreenCaptureHandler {
   static Future<Uint8List?> _getImageBytesFromClipboardWithTimeout() async {
     final stopwatch = Stopwatch()..start();
     double maxWaitTimeMs =
-        (Platform.isWindows ? 10 : 5) * 1000; // 3 or 10 second timeout limit
+        (Platform.isWindows ? 10 : 3) * 1000; // 3 or 10 second timeout limit
     const checkIntervalMs = 200; // 200ms delay interval
 
     while (stopwatch.elapsedMilliseconds < maxWaitTimeMs) {

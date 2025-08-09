@@ -5,7 +5,7 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   bitsdojo_window_windows
   desktop_drop
-  irondash_engine_context
+  pasteboard
   screen_capturer_windows
 )
 

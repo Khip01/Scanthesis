@@ -129,22 +129,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.1"
-  device_info_plus:
-    dependency: transitive
-    description:
-      name: device_info_plus
-      sha256: "98f28b42168cc509abc92f88518882fd58061ea372d7999aecc424345c7bff6a"
-      url: "https://pub.dev"
-    source: hosted
-    version: "11.5.0"
-  device_info_plus_platform_interface:
-    dependency: transitive
-    description:
-      name: device_info_plus_platform_interface
-      sha256: e1ea89119e34903dca74b883d0dd78eb762814f97fb6c76f35e9ff74d261a18f
-      url: "https://pub.dev"
-    source: hosted
-    version: "7.0.3"
   dio:
     dependency: "direct main"
     description:
@@ -321,22 +305,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.2"
-  irondash_engine_context:
-    dependency: transitive
-    description:
-      name: irondash_engine_context
-      sha256: "2bb0bc13dfda9f5aaef8dde06ecc5feb1379f5bb387d59716d799554f3f305d7"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.5.5"
-  irondash_message_channel:
-    dependency: transitive
-    description:
-      name: irondash_message_channel
-      sha256: b4101669776509c76133b8917ab8cfc704d3ad92a8c450b92934dd8884a2f060
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.7.0"
   json_annotation:
     dependency: transitive
     description:
@@ -417,6 +385,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0"
+  pasteboard:
+    dependency: "direct main"
+    description:
+      name: pasteboard
+      sha256: "9ff73ada33f79a59ff91f6c01881fd4ed0a0031cfc4ae2d86c0384471525fca1"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.0"
   path:
     dependency: transitive
     description:
@@ -489,14 +465,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.1.0"
-  pixel_snap:
-    dependency: transitive
-    description:
-      name: pixel_snap
-      sha256: "677410ea37b07cd37ecb6d5e6c0d8d7615a7cf3bd92ba406fd1ac57e937d1fb0"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.1.5"
   platform:
     dependency: transitive
     description:
@@ -670,24 +638,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.1"
-  super_clipboard:
-    dependency: "direct main"
-    description:
-      path: super_clipboard
-      ref: disable-windows-support
-      resolved-ref: eff7d4ac447f162256a94a550d669d2cba7a0402
-      url: "https://github.com/Khip01/super_native_extensions.git"
-    source: git
-    version: "0.9.1"
-  super_native_extensions:
-    dependency: transitive
-    description:
-      path: super_native_extensions
-      ref: disable-windows-support
-      resolved-ref: eff7d4ac447f162256a94a550d669d2cba7a0402
-      url: "https://github.com/Khip01/super_native_extensions.git"
-    source: git
-    version: "0.9.1"
   term_glyph:
     dependency: transitive
     description:
@@ -792,14 +742,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.14.0"
-  win32_registry:
-    dependency: transitive
-    description:
-      name: win32_registry
-      sha256: "6f1b564492d0147b330dd794fee8f512cec4977957f310f9951b5f9d83618dae"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.0"
   xdg_directories:
     dependency: transitive
     description:

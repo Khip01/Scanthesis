@@ -8,7 +8,7 @@
 
 #include <bitsdojo_window_windows/bitsdojo_window_plugin.h>
 #include <desktop_drop/desktop_drop_plugin.h>
-#include <irondash_engine_context/irondash_engine_context_plugin_c_api.h>
+#include <pasteboard/pasteboard_plugin.h>
 #include <screen_capturer_windows/screen_capturer_windows_plugin_c_api.h>
 
 void RegisterPlugins(flutter::PluginRegistry* registry) {
@@ -16,8 +16,8 @@ void RegisterPlugins(flutter::PluginRegistry* registry) {
       registry->GetRegistrarForPlugin("BitsdojoWindowPlugin"));
   DesktopDropPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("DesktopDropPlugin"));
-  IrondashEngineContextPluginCApiRegisterWithRegistrar(
-      registry->GetRegistrarForPlugin("IrondashEngineContextPluginCApi"));
+  PasteboardPluginRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("PasteboardPlugin"));
   ScreenCapturerWindowsPluginCApiRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("ScreenCapturerWindowsPluginCApi"));
 }

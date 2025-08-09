@@ -126,42 +126,41 @@ class _FloatingInputState extends State<FloatingInput> {
                                   ),
                                 ),
                               ),
-                              if (!Platform.isWindows)
-                                Tooltip(
-                                  message: "Paste Copied Image",
-                                  child: IconButton(
-                                    onPressed:
-                                        clipboardImageProvider.isLoading
-                                            ? () {}
-                                            : () async {
-                                              await _actionButtonClipboard(
-                                                filePickerContext:
-                                                    filePickerContext,
-                                              );
-                                            },
-                                    icon:
-                                        clipboardImageProvider.isLoading
-                                            ? CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                              color:
-                                                  Theme.of(
-                                                    context,
-                                                  ).iconTheme.color,
-                                              constraints: BoxConstraints(
-                                                maxHeight: 20,
-                                                maxWidth: 20,
-                                                minHeight: 20,
-                                                minWidth: 20,
-                                              ),
-                                            )
-                                            : Icon(Icons.paste, size: 20),
-                                    style: IconButton.styleFrom(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
+                              Tooltip(
+                                message: "Paste Copied Image",
+                                child: IconButton(
+                                  onPressed:
+                                      clipboardImageProvider.isLoading
+                                          ? () {}
+                                          : () async {
+                                            await _actionButtonClipboard(
+                                              filePickerContext:
+                                                  filePickerContext,
+                                            );
+                                          },
+                                  icon:
+                                      clipboardImageProvider.isLoading
+                                          ? CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color:
+                                                Theme.of(
+                                                  context,
+                                                ).iconTheme.color,
+                                            constraints: BoxConstraints(
+                                              maxHeight: 20,
+                                              maxWidth: 20,
+                                              minHeight: 20,
+                                              minWidth: 20,
+                                            ),
+                                          )
+                                          : Icon(Icons.paste, size: 20),
+                                  style: IconButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
                                 ),
+                              ),
                               Tooltip(
                                 message: "Capture Screen",
                                 child: IconButton(

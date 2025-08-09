@@ -46,6 +46,7 @@ dependencies:
   dio: ^5.8.0+1
   go_router: ^16.0.0
   shared_preferences: ^2.5.3
+  pasteboard: ^0.4.0
 
   # modified package
   flutter_highlighting:
@@ -53,11 +54,11 @@ dependencies:
       url: https://github.com/Khip01/dart-highlighting.git
       path: flutter_highlighting
       ref: text_selection_fixed
-  super_clipboard:
-    git:
-      url: https://github.com/Khip01/super_native_extensions.git
-      path: super_clipboard
-      ref: disable-windows-support
+#  super_clipboard:
+#    git:
+#      url: https://github.com/Khip01/super_native_extensions.git
+#      path: super_clipboard
+#      ref: disable-windows-support
 
 dev_dependencies:
   flutter_test:
