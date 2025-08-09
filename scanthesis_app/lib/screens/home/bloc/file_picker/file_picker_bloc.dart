@@ -21,8 +21,22 @@ class FilePickerBloc extends Bloc<FilePickerEvent, FilePickerState> {
   }
 
   _addMultipleFile(AddMultipleFileEvent event, Emitter<FilePickerState> emit) {
-    if (state.files.length + event.files.length > 7){
-      emit(FilePickerError(errorMessage: "You can only attach up to 7 images", files: state.files));
+    int attachmentLimit = 7;
+
+    if (state.files.length + event.files.length > attachmentLimit) {
+      List<File> filesToBeAdded = [];
+      for (int i = 1; i <= attachmentLimit - state.files.length; i++) {
+        filesToBeAdded.add(event.files[i - 1]);
+      }
+      emit(
+        FilePickerError(
+          errorMessage:
+              "You can only attach up to $attachmentLimit images\nRecently added files ${filesToBeAdded.length}, failed files added ${event.files.length - filesToBeAdded.length}",
+          files: state.files,
+        ),
+      );
+      state.files.addAll(filesToBeAdded);
+      emit(FilePickerLoaded(files: state.files));
     } else {
       state.files.addAll(event.files);
       emit(FilePickerLoaded(files: state.files));
@@ -42,7 +56,7 @@ class FilePickerBloc extends Bloc<FilePickerEvent, FilePickerState> {
     emit(FilePickerLoaded(files: state.files));
   }
 
-  _resetFiles(ResetFilePickerErrorEvent event, Emitter<FilePickerState> emit){
+  _resetFiles(ResetFilePickerErrorEvent event, Emitter<FilePickerState> emit) {
     emit(FilePickerLoaded(files: state.files));
   }
 

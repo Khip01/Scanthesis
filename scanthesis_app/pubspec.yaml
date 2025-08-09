@@ -54,11 +54,6 @@ dependencies:
       url: https://github.com/Khip01/dart-highlighting.git
       path: flutter_highlighting
       ref: text_selection_fixed
-#  super_clipboard:
-#    git:
-#      url: https://github.com/Khip01/super_native_extensions.git
-#      path: super_clipboard
-#      ref: disable-windows-support
 
 dev_dependencies:
   flutter_test:

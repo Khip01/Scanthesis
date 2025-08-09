@@ -160,10 +160,6 @@ class _ResponseChatState extends State<ResponseChat> {
     required String code,
     required bool isDarkMode,
   }) {
-    if (languageName.isEmpty) {
-      languageName = "plaintext";
-    }
-
     return Container(
       padding: EdgeInsets.symmetric(vertical: 14, horizontal: 18),
       // height: 900,
