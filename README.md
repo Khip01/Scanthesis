@@ -28,6 +28,34 @@
 - **Customizable Backend**: Use the included Golang API example (using Gemini 1.5 Flash) or configure your own AI service
 - **Markdown Output**: Receive AI responses formatted in Markdown
 
+## Development Requirements
+
+### Environment Setup
+- **Flutter**: Version 3.32.4 or above
+- **Supported Development Platforms**:
+  - **Windows**: Windows 11 Home 23H2 with Android Studio Hedgehog | 2023.1.1 Patch 2
+  - **Linux**: Ubuntu/Debian based systems (Tested on KDE Plasma 6 Wayland) with Android Studio Meerkat Feature Drop | 2024.3.2 Patch 1
+- **Additional Tools**:
+  - Postman (for API testing)
+
+### Prerequisites
+Before running the application, ensure your Flutter environment is properly configured:
+
+```bash
+# Verify Flutter installation and dependencies
+flutter doctor
+```
+
+Make sure all platform-specific requirements are met:
+- For Windows: Windows desktop development is enabled
+- For Linux: Linux desktop development is enabled
+
+```bash
+# Enable desktop development
+flutter config --enable-windows-desktop
+flutter config --enable-linux-desktop
+```
+
 ## Technical Implementation
 This application serves as a desktop interface for AI services, allowing you to:
 - Configure API endpoints in the settings page
