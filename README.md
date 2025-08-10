@@ -12,7 +12,7 @@
 </div>
 
 <p align="center">
-  <img src="https://i.ibb.co.com/yKpD2w7/app-clean.jpg" alt="Scanthesis App Screenshots" style="max-height: 50vh; border-radius:12px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+  <img src="https://i.ibb.co.com/yKpD2w7/app-clean.jpg" alt="Scanthesis App Screenshots" style="height: 65vh; border-radius:12px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
 </p>
 
 ## Overview
@@ -62,7 +62,7 @@ If you prefer to use your own AI backend:
 1. Launch the Scanthesis application and navigate to the settings page
 2. Enter your custom API endpoint URL in the designated field
     <p align="left">
-      <img src="https://i.ibb.co.com/m3SXzJp/api-settings-page.png" alt="google asset error" style="max-height:500px; border-radius:12px">
+      <img src="https://i.ibb.co.com/m3SXzJp/api-settings-page.png" alt="Scanthesis settings - API Endpoint" style="width:600px; border-radius:12px">
     </p>
 
 3. If your API returns a different JSON structure than the default, you'll need to modify the response model:
