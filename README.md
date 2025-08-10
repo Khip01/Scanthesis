@@ -47,8 +47,8 @@ The repository includes a simple Golang API implementation that connects to Gemi
    API_KEY="your_api_key_here"
    ENDPOINT="http://127.0.0.1:8080/api"
    ```
-   > [!NOTE]
-   > You can obtain an API key from [Google AI Studio](https://aistudio.google.com/apikey)
+> [!NOTE]
+> You can obtain an API key from [Google AI Studio](https://aistudio.google.com/apikey)
 4. Run the API server:
    ```
    go run main.go
