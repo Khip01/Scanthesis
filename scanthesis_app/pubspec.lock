@@ -181,10 +181,10 @@ packages:
     dependency: "direct main"
     description:
       name: file_picker
-      sha256: "8f9f429998f9232d65bc4757af74475ce44fc80f10704ff5dfa8b1d14fc429b9"
+      sha256: "970d33d79e1da667b6da222575fd7f2e30e323ca76251504477e6d51405b2d9a"
       url: "https://pub.dev"
     source: hosted
-    version: "10.2.3"
+    version: "10.2.4"
   fixnum:
     dependency: transitive
     description:
@@ -211,7 +211,7 @@ packages:
     description:
       path: flutter_highlighting
       ref: text_selection_fixed
-      resolved-ref: "3bfedfd4aa9c0ffd46b192ec1c6441c08a7771f1"
+      resolved-ref: "592a5dd7ef666aade1c0732b29e8a54d07027ad9"
       url: "https://github.com/Khip01/dart-highlighting.git"
     source: git
     version: "0.9.1+11.8.0"
