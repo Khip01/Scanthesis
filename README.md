@@ -12,7 +12,7 @@
 </div>
 
 <p align="center">
-  <img src="https://i.ibb.co.com/yKpD2w7/app-clean.jpg" alt="Scanthesis App Screenshots" style="height: 65vh; border-radius:12px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+  <img src="https://i.ibb.co.com/yKpD2w7/app-clean.jpg" alt="Scanthesis App Screenshots" style="width: 750px; border-radius:12px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
 </p>
 
 ## Overview
