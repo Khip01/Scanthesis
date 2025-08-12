@@ -22,6 +22,7 @@ import 'package:scanthesis_app/screens/home/widgets/send_button_shortcut.dart';
 import 'package:scanthesis_app/screens/settings/provider/settings_provider.dart';
 import 'package:scanthesis_app/utils/helper_util.dart';
 import 'package:scanthesis_app/utils/style_util.dart';
+import 'package:window_manager/window_manager.dart';
 
 import '../bloc/file_picker/file_picker_bloc.dart';
 
@@ -252,7 +253,9 @@ class _FloatingInputState extends State<FloatingInput> {
   Future _actionButtonTakeScreenshot({
     required BuildContext filePickerContext,
   }) async {
+    windowManager.minimize();
     File? file = await ScreenCaptureHandler.handleClickCapture(context);
+    windowManager.show();
     if (file == null) return;
 
     if (!filePickerContext.mounted) return;

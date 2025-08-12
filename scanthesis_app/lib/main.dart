@@ -18,9 +18,13 @@ import 'package:scanthesis_app/screens/settings/provider/settings_provider.dart'
 import 'package:scanthesis_app/utils/init_value_util.dart';
 import 'package:scanthesis_app/utils/storage_service.dart';
 import 'package:scanthesis_app/utils/theme_util.dart';
+import 'package:window_manager/window_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await windowManager.ensureInitialized();
+
   final SettingsProvider settingsProvider =
       await InitValueUtil.initSettingsProvider();
   final ThemeProvider themeProvider = ThemeProvider();
