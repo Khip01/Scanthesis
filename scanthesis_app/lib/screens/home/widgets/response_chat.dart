@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_highlighting/flutter_highlighting.dart';
@@ -52,19 +53,40 @@ class _ResponseChatState extends State<ResponseChat> {
               child: Column(
                 children: [
                   _codeCardHeader(languageName: name, codeToCopy: code),
-                  Scrollbar(
-                    interactive: true,
-                    thumbVisibility: true,
-                    trackVisibility: true,
-                    radius: Radius.circular(2),
-                    controller: codeScrollController,
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
+                  Listener(
+                    onPointerSignal: (PointerSignalEvent event) {
+                      if (event is PointerScrollEvent) {
+                        final bool isShiftPressed = HardwareKeyboard
+                            .instance
+                            .logicalKeysPressed
+                            .contains(LogicalKeyboardKey.shift);
+
+                        if (isShiftPressed) {
+                          final newOffset =
+                              codeScrollController.offset + event.scrollDelta.dy;
+                          codeScrollController.jumpTo(
+                            newOffset.clamp(
+                              codeScrollController.position.minScrollExtent,
+                              codeScrollController.position.maxScrollExtent,
+                            ),
+                          );
+                        }
+                      }
+                    },
+                    child: Scrollbar(
+                      interactive: true,
+                      thumbVisibility: true,
+                      trackVisibility: true,
+                      radius: Radius.circular(2),
                       controller: codeScrollController,
-                      child: _codeCardContent(
-                        languageName: name,
-                        code: code,
-                        isDarkMode: isDarkMode,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        controller: codeScrollController,
+                        child: _codeCardContent(
+                          languageName: name,
+                          code: code,
+                          isDarkMode: isDarkMode,
+                        ),
                       ),
                     ),
                   ),
@@ -163,7 +185,8 @@ class _ResponseChatState extends State<ResponseChat> {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 14, horizontal: 18),
       // height: 900,
-      constraints: BoxConstraints(minWidth: 730 - 32), // 32 = 18 padding horizontal
+      constraints: BoxConstraints(minWidth: 730 - 32),
+      // 32 = 18 padding horizontal
       color: Theme.of(context).colorScheme.onSecondary,
       // child: Text(
       //   code,
