@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:scanthesis_app/models/api_request.dart';
 import 'package:scanthesis_app/models/api_response.dart';
+import 'package:scanthesis_app/utils/helper_util.dart';
 
 class ApiRepository {
   late Dio dio;
@@ -21,7 +22,7 @@ class ApiRepository {
           for (final file in request.files)
             await MultipartFile.fromFile(
               file.path,
-              filename: file.path.split('/').last,
+              filename: HelperUtil.getFileName(file),
             ),
         ],
         "prompt": request.prompt,

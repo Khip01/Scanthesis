@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:scanthesis_app/provider/drawer_provider.dart';
 import 'package:scanthesis_app/screens/home/bloc/file_picker/file_picker_bloc.dart';
+import 'package:scanthesis_app/screens/home/provider/preview_image_provider.dart';
 import 'package:scanthesis_app/screens/home/provider/screen_capture_provider.dart';
 import 'package:scanthesis_app/screens/router.dart';
 import 'package:scanthesis_app/utils/helper_util.dart';
@@ -29,6 +30,7 @@ class ScreenCaptureHandler {
     );
 
     // perform navigation
+    context.read<PreviewImageProvider>().closeIsPreviewModeState();
     context.read<DrawerProvider>().setDrawerState(false);
     context.goNamed(RouterEnum.home.name);
   }

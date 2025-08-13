@@ -22,7 +22,6 @@ import 'package:scanthesis_app/screens/home/widgets/send_button_shortcut.dart';
 import 'package:scanthesis_app/screens/settings/provider/settings_provider.dart';
 import 'package:scanthesis_app/utils/helper_util.dart';
 import 'package:scanthesis_app/utils/style_util.dart';
-import 'package:window_manager/window_manager.dart';
 
 import '../bloc/file_picker/file_picker_bloc.dart';
 
@@ -605,8 +604,6 @@ class _ListFileWidgetState extends State<ListFileWidget> {
   }
 
   Widget _customTitle(File file) {
-    String pathDivider = Platform.isWindows ? '\\' : '/';
-
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.only(right: 12, top: 8, bottom: 8),
@@ -616,7 +613,7 @@ class _ListFileWidgetState extends State<ListFileWidget> {
           // mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              file.path.split(pathDivider).last,
+              HelperUtil.getFileName(file),
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 16,

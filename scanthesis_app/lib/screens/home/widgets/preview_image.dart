@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:scanthesis_app/screens/home/provider/preview_image_provider.dart';
+import 'package:scanthesis_app/utils/helper_util.dart';
 
 class PreviewImage extends StatelessWidget {
   const PreviewImage({super.key});
@@ -17,7 +18,7 @@ class PreviewImage extends StatelessWidget {
 
     if (previewImageProvider.isPreviewMode &&
         previewImageProvider.file != null) {
-      String fileName = previewImageProvider.file!.path.split('/').last;
+      String fileName = HelperUtil.getFileName(previewImageProvider.file!);
 
       return GestureDetector(
         onTap: () {

@@ -3,7 +3,6 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 
@@ -70,6 +69,16 @@ class HelperUtil {
     }
 
     return candidate;
+  }
+
+  static String getFileName(File file) {
+    if (file.path.isEmpty) return '';
+    if (Platform.isWindows) {
+      return file.path.split('\\').last;
+    } else if (Platform.isMacOS || Platform.isLinux) {
+      return file.path.split('/').last;
+    }
+    return '';
   }
 
   static Future deleteFiles(List<File> files) async {
