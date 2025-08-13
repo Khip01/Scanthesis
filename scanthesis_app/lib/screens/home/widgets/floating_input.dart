@@ -169,9 +169,8 @@ class _FloatingInputState extends State<FloatingInput> {
                                       screenCaptureProvider.isLoading
                                           ? () {}
                                           : () async {
-                                            await _actionButtonTakeScreenshot(
-                                              filePickerContext:
-                                                  filePickerContext,
+                                            await ScreenCaptureHandler.actionButtonTakeScreenshot(
+                                              context: filePickerContext,
                                             );
                                           },
                                   icon:
@@ -242,20 +241,6 @@ class _FloatingInputState extends State<FloatingInput> {
     required BuildContext filePickerContext,
   }) async {
     File? file = await ClipboardHandler.getImageFromClipboard(context);
-    if (file == null) return;
-
-    if (!filePickerContext.mounted) return;
-    filePickerContext.read<FilePickerBloc>().add(
-      AddSingleFileEvent(file: file),
-    );
-  }
-
-  Future _actionButtonTakeScreenshot({
-    required BuildContext filePickerContext,
-  }) async {
-    windowManager.minimize();
-    File? file = await ScreenCaptureHandler.handleClickCapture(context);
-    windowManager.show();
     if (file == null) return;
 
     if (!filePickerContext.mounted) return;

@@ -3,7 +3,11 @@ import 'package:go_router/go_router.dart';
 import 'package:scanthesis_app/screens/home/views/home_screen.dart';
 import 'package:scanthesis_app/screens/settings/views/settings_screen.dart';
 
+// for getting global context
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 final GoRouter router = GoRouter(
+  navigatorKey: navigatorKey,
   initialLocation: "/",
   routes: [
     GoRoute(

@@ -1,6 +1,7 @@
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:scanthesis_app/provider/drawer_provider.dart';
 import 'package:scanthesis_app/provider/theme_provider.dart';
@@ -24,6 +25,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await windowManager.ensureInitialized();
+  await hotKeyManager.unregisterAll();
 
   final SettingsProvider settingsProvider =
       await InitValueUtil.initSettingsProvider();
@@ -38,10 +40,6 @@ void main() async {
   );
 
   runApp(
-    // ChangeNotifierProvider(
-    //   create: (_) => ThemeProvider(),
-    //   child: MyApp(),
-    // ),
     MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: themeProvider),
@@ -72,7 +70,7 @@ void main() async {
 class MyApp extends StatelessWidget {
   final ChatsBloc initedChatsBloc;
 
-  const MyApp({super.key, required this.initedChatsBloc});
+  MyApp({super.key, required this.initedChatsBloc});
 
   @override
   Widget build(BuildContext context) {
@@ -95,13 +93,7 @@ class MyApp extends StatelessWidget {
           },
         ),
         BlocProvider(create: (_) => RequestBloc()),
-        BlocProvider(
-          create: (context) {
-            final SettingsProvider settingsProvider =
-                Provider.of<SettingsProvider>(context, listen: false);
-            return initedChatsBloc;
-          },
-        ),
+        BlocProvider(create: (context) => initedChatsBloc),
       ],
       child: MaterialApp.router(
         theme: ThemeUtil.globalLightTheme,

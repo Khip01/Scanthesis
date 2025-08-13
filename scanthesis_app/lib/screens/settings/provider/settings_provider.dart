@@ -1,12 +1,16 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:scanthesis_app/models/api_response.dart';
 import 'package:scanthesis_app/repository/api_repository.dart';
 
 class SettingsProvider extends ChangeNotifier {
   // Default Browse Directory
   Directory defaultBrowseDirectory, defaultImageStoreDirectory;
+
+  // Screenshot Keybind
+  HotKey? screenshotKeybind;
 
   // Custom Prompt
   String _defaultCustomPrompt =
@@ -34,6 +38,9 @@ class SettingsProvider extends ChangeNotifier {
   // GETTER
   // Default Browse Directory
   Directory get getDefaultBrowseDirectory => defaultBrowseDirectory;
+
+  // Screenshot Keybind
+  HotKey? get getScreenshotKeybind => screenshotKeybind;
 
   // Custom Prompt
   String get getDefaultCustomPrompt => _defaultCustomPrompt;
@@ -72,6 +79,11 @@ class SettingsProvider extends ChangeNotifier {
   // Default Browse Directory
   setDefaultBrowseDirectory(Directory directory) {
     defaultBrowseDirectory = directory;
+    notifyListeners();
+  }
+
+  void setScreenshotKeybind(HotKey hotKey){
+    screenshotKeybind = hotKey;
     notifyListeners();
   }
 

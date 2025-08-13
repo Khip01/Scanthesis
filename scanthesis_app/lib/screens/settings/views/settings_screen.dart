@@ -4,9 +4,16 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gpt_markdown/gpt_markdown.dart';
+import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:scanthesis_app/provider/theme_provider.dart';
+import 'package:scanthesis_app/screens/home/handler/screen_capture_handler.dart';
+import 'package:scanthesis_app/screens/router.dart';
+import 'package:scanthesis_app/screens/settings/handler/shortcut_hotkey_handler.dart';
 import 'package:scanthesis_app/screens/settings/provider/settings_provider.dart';
+import 'package:scanthesis_app/screens/settings/widgets/improved_hotkey_view.dart';
+import 'package:scanthesis_app/screens/settings/widgets/record_hotkey_dialog.dart';
+import 'package:scanthesis_app/utils/helper_util.dart';
 import 'package:scanthesis_app/utils/storage_service.dart';
 import 'package:scanthesis_app/utils/style_util.dart';
 import 'package:scanthesis_app/values/strings.dart';
@@ -133,6 +140,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         subSectionDescBody:
                             "Specifies the starting directory when users browse files, reducing navigation effort.",
                         child: defaultBrowseDirectoryChild(),
+                      ),
+                      TooltipVisibility(
+                        visible: HelperUtil.isLinuxWayland(),
+                        child: Tooltip(
+                          message:
+                              "This feature is not supported on Linux Wayland.",
+                          verticalOffset: 60,
+                          child: AbsorbPointer(
+                            absorbing: HelperUtil.isLinuxWayland(),
+                            child: Opacity(
+                              opacity: HelperUtil.isLinuxWayland() ? 0.4 : 1.0,
+                              child: SubSectionWidget(
+                                subSectionTitle: "Screenshot Shortcut",
+                                subSectionDescHead:
+                                    "Set a key combination for taking screenshots..",
+                                subSectionDescBody:
+                                    "Define the keyboard shortcut to instantly capture your screen without manually navigating menus.",
+                                child: screenshotShortcutChild(),
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                       SubSectionWidget(
                         subSectionTitle: "Default Custom Prompt",
@@ -367,6 +396,93 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         );
       },
+    );
+  }
+
+  Widget screenshotShortcutChild() {
+    SettingsProvider settingsProvider = Provider.of<SettingsProvider>(context);
+    HotKey? screenshotKeybind = settingsProvider.getScreenshotKeybind;
+    ThemeData themeData = Theme.of(context);
+
+    if (HelperUtil.isLinuxWayland()) {
+      return Container(
+        width: double.maxFinite,
+        margin: EdgeInsets.only(top: 8),
+        child: Text(
+          "Screenshot shortcut is not supported on Linux Wayland.",
+          style: TextStyle(color: Colors.red),
+        ),
+      );
+    } else if (screenshotKeybind == null) {
+      return Container(
+        width: double.maxFinite,
+        margin: EdgeInsets.only(top: 8),
+        child: Text(
+          "No screenshot shortcut set. Try to restart this app.",
+          style: TextStyle(color: Colors.red),
+        ),
+      );
+    }
+
+    void createNewShortcutDialog() {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return RecordHotkeyDialog(
+            oldHotkey: screenshotKeybind,
+            onHotKeyRecorded: (newHotKey) async {
+              await ShortcutHotKeyHandler.unregisterShortcut(screenshotKeybind);
+              await ShortcutHotKeyHandler.registerShortcut(
+                newHotKey,
+                keyDownHandler: (_) async {
+                  if (navigatorKey.currentState == null) return;
+                  final BuildContext globalContext =
+                      navigatorKey.currentState!.context;
+                  await ScreenCaptureHandler.actionButtonTakeScreenshot(
+                    context: globalContext,
+                  );
+                },
+              );
+              settingsProvider.setScreenshotKeybind(newHotKey);
+              storage.saveScreenshotHotkeyToPrefs(newHotKey);
+            },
+          );
+        },
+      );
+    }
+
+    Widget editKeybindButton = Tooltip(
+      message: "Edit screenshot shortcut",
+      child: SizedBox(
+        height: 40,
+        width: 40,
+        child: IconButton(
+          onPressed: () => createNewShortcutDialog(),
+          icon: Icon(Icons.edit, size: 20),
+          style: IconButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    return Container(
+      margin: EdgeInsets.only(top: 8),
+      child: Row(
+        children: [
+          ImprovedHotKeyView(
+            hotKey: screenshotKeybind,
+            keyBackgroundColor: themeData.colorScheme.surface,
+            keyTextColor: themeData.colorScheme.onSurface,
+            borderColor: themeData.dividerColor.withValues(alpha: 0.5),
+          ),
+          SizedBox(width: 8),
+          editKeybindButton,
+        ],
+      ),
     );
   }
 

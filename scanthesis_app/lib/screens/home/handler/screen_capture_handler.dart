@@ -2,13 +2,37 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:scanthesis_app/provider/drawer_provider.dart';
+import 'package:scanthesis_app/screens/home/bloc/file_picker/file_picker_bloc.dart';
 import 'package:scanthesis_app/screens/home/provider/screen_capture_provider.dart';
+import 'package:scanthesis_app/screens/router.dart';
 import 'package:scanthesis_app/utils/helper_util.dart';
 import 'package:screen_capturer/screen_capturer.dart';
+import 'package:window_manager/window_manager.dart';
 
 class ScreenCaptureHandler {
+
+  static Future actionButtonTakeScreenshot({
+    required BuildContext context,
+  }) async {
+    windowManager.minimize();
+    File? file = await ScreenCaptureHandler.handleClickCapture(context);
+    windowManager.show();
+    if (file == null) return;
+
+    if (!context.mounted) return;
+    context.read<FilePickerBloc>().add(
+      AddSingleFileEvent(file: file),
+    );
+
+    // perform navigation
+    context.read<DrawerProvider>().setDrawerState(false);
+    context.goNamed(RouterEnum.home.name);
+  }
+
   static Future<File?> handleClickCapture(BuildContext context) async {
     // ask permission in macOS
     if (Platform.isMacOS) {

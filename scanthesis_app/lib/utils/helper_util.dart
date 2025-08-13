@@ -2,6 +2,8 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 
@@ -134,5 +136,10 @@ class HelperUtil {
             actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           ),
     );
+  }
+
+  static bool isLinuxWayland() {
+    // WAYLAND_DISPLAY available → session Wayland
+    return Platform.environment.containsKey('WAYLAND_DISPLAY');
   }
 }
