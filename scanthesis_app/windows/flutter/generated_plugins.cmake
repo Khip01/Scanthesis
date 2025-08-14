@@ -9,6 +9,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   pasteboard
   screen_capturer_windows
   screen_retriever_windows
+  tray_manager
   window_manager
 )
 

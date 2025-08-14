@@ -21,9 +21,31 @@ import 'package:scanthesis_app/screens/home/widgets/response_chat.dart';
 import 'package:scanthesis_app/screens/settings/provider/settings_provider.dart';
 import 'package:scanthesis_app/utils/storage_service.dart';
 import 'package:scanthesis_app/utils/style_util.dart';
+import 'package:tray_manager/tray_manager.dart';
+import 'package:window_manager/window_manager.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> with TrayListener, WindowListener {
+
+  @override
+  void initState() {
+    trayManager.addListener(this);
+    windowManager.addListener(this);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    trayManager.removeListener(this);
+    windowManager.addListener(this);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +60,24 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  @override
+  void onTrayIconMouseDown() {
+    super.onTrayIconMouseDown();
+    windowManager.show();
+  }
+
+  @override
+  void onTrayIconRightMouseDown() async {
+    super.onTrayIconRightMouseDown();
+    await trayManager.popUpContextMenu(bringAppToFront: true);
+  }
+
+  @override
+  void onWindowClose() async {
+    await windowManager.hide();
+    super.onWindowClose();
   }
 }
 

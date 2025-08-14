@@ -5,7 +5,6 @@ import 'package:scanthesis_app/screens/home/bloc/file_picker/file_picker_bloc.da
 import 'package:scanthesis_app/screens/home/provider/custom_prompt_provider.dart';
 import 'package:scanthesis_app/screens/settings/provider/settings_provider.dart';
 import 'package:scanthesis_app/utils/style_util.dart';
-import 'package:scanthesis_app/values/strings.dart';
 
 class CustomPromptField extends StatefulWidget {
   final FocusNode sendButtonFocusNode;

@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
 
 class ImprovedHotKeyView extends StatelessWidget {

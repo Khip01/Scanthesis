@@ -1,4 +1,6 @@
 class Strings {
+  static const String pathToTrayIcon = "assets/tray_icons";
+
   static const String aboutApp = """
 # 🚀 Scanthesis App
 

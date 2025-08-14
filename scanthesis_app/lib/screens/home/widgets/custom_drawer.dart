@@ -10,7 +10,6 @@ import 'package:scanthesis_app/screens/home/bloc/request/request_bloc.dart';
 import 'package:scanthesis_app/screens/home/bloc/response/response_bloc.dart';
 import 'package:scanthesis_app/screens/router.dart';
 import 'package:scanthesis_app/utils/style_util.dart';
-import 'package:scanthesis_app/values/chats_dummy.dart';
 
 import '../../../models/api_response.dart';
 

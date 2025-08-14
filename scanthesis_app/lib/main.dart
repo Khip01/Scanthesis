@@ -1,7 +1,5 @@
-import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:scanthesis_app/provider/drawer_provider.dart';
 import 'package:scanthesis_app/provider/theme_provider.dart';
@@ -16,19 +14,17 @@ import 'package:scanthesis_app/screens/home/provider/preview_image_provider.dart
 import 'package:scanthesis_app/screens/home/provider/screen_capture_provider.dart';
 import 'package:scanthesis_app/screens/router.dart';
 import 'package:scanthesis_app/screens/settings/provider/settings_provider.dart';
-import 'package:scanthesis_app/utils/init_value_util.dart';
+import 'package:scanthesis_app/utils/init_util.dart';
 import 'package:scanthesis_app/utils/storage_service.dart';
 import 'package:scanthesis_app/utils/theme_util.dart';
-import 'package:window_manager/window_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await windowManager.ensureInitialized();
-  await hotKeyManager.unregisterAll();
+  await InitUtil.initAppManager();
 
   final SettingsProvider settingsProvider =
-      await InitValueUtil.initSettingsProvider();
+      await InitUtil.initSettingsProvider();
   final ThemeProvider themeProvider = ThemeProvider();
   final ChatsBloc chatsBloc = ChatsBloc(settingsProvider: settingsProvider);
 
@@ -54,17 +50,6 @@ void main() async {
       child: MyApp(initedChatsBloc: chatsBloc),
     ),
   );
-
-  // For Windows: set window when app opened
-  doWhenWindowReady(() {
-    final win = appWindow;
-    const initialSize = Size(800, 600);
-    win.minSize = initialSize;
-    win.size = initialSize;
-    win.alignment = Alignment.center;
-    win.title = "Scanthesis App";
-    win.show();
-  });
 }
 
 class MyApp extends StatelessWidget {
