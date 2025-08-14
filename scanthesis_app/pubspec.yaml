@@ -59,6 +59,7 @@ dependencies:
       ref: text_selection_fixed
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.14.4
   flutter_test:
     sdk: flutter
 
@@ -69,6 +70,18 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
 
+flutter_launcher_icons:
+  image_path: "assets/app_icon/scanthesis-app-icon-600x600.png"
+  windows:
+    generate: true
+    image_path: "assets/app_icon/scanthesis-app-icon-600x600.png"
+    icon_size: 256
+  macos:
+    generate: true
+    image_path: "assets/app_icon/scanthesis-app-icon-600x600.png"
+  linux:
+    generate: true
+    image_path: "assets/app_icon/scanthesis-app-icon-600x600.png"
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

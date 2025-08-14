@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/widgets.dart';
 import 'package:scanthesis_app/screens/home/handler/screen_capture_handler.dart';
 import 'package:scanthesis_app/screens/router.dart';
@@ -11,6 +13,9 @@ class SystemTrayPopUp {
         label: 'Open Scanthesis',
         onClick: (_) async {
           await windowManager.show();
+          if (Platform.isLinux) {
+            await windowManager.focus();
+          }
         },
       ),
       MenuItem(
@@ -21,6 +26,7 @@ class SystemTrayPopUp {
           await ScreenCaptureHandler.actionButtonTakeScreenshot(
             context: context,
           );
+
         },
       ),
       MenuItem.separator(),

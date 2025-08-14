@@ -19,9 +19,16 @@ class ScreenCaptureHandler {
   static Future actionButtonTakeScreenshot({
     required BuildContext context,
   }) async {
-    windowManager.minimize();
+    if (!HelperUtil.isLinuxWayland()) {
+      // hide window before capture
+      await windowManager.minimize();
+    }
     File? file = await ScreenCaptureHandler.handleClickCapture(context);
-    windowManager.show();
+    if (!HelperUtil.isLinuxWayland()) {
+      // show window before get clipboard image
+      await windowManager.show();
+    }
+    if (Platform.isLinux) windowManager.focus();
     if (file == null) return;
 
     if (!context.mounted) return;
@@ -70,6 +77,11 @@ class ScreenCaptureHandler {
       );
       String imagePath = "${tempDir.path}/scanthesis_app/$fileName";
 
+      if (Platform.isLinux && HelperUtil.isLinuxWayland()) {
+        // hide window before capture
+        await windowManager.hide();
+      }
+
       // capture the screen
       await screenCapturer.capture(
         mode: CaptureMode.region,
@@ -77,6 +89,11 @@ class ScreenCaptureHandler {
         imagePath: imagePath,
         silent: true,
       );
+
+      if (Platform.isLinux && HelperUtil.isLinuxWayland()) {
+        // show window before get clipboard image
+        await windowManager.show();
+      }
 
       final imageBytes = await _getImageBytesFromClipboardWithTimeout();
 
@@ -136,9 +153,9 @@ class ScreenCaptureHandler {
         return imageBytes;
       }
 
-      // print(
-      //   "Waiting for clipboard data... ${stopwatch.elapsedMilliseconds}ms elapsed",
-      // );
+      print(
+        "Waiting for clipboard data... ${stopwatch.elapsedMilliseconds}ms elapsed",
+      );
       await Future.delayed(Duration(milliseconds: checkIntervalMs));
     }
 

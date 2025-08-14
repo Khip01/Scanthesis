@@ -1,5 +1,7 @@
 class Strings {
   static const String pathToTrayIcon = "assets/tray_icons";
+  static const String trayIconIco = "$pathToTrayIcon/scanthesis-icon-144x144.ico";
+  static const String trayIconPng = "$pathToTrayIcon/scanthesis-icon-144x144.png";
 
   static const String aboutApp = """
 # 🚀 Scanthesis App

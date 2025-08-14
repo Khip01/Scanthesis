@@ -45,11 +45,11 @@ class InitUtil {
     final Menu menu = SystemTrayPopUp.popUpMenu;
     await trayManager.setContextMenu(menu);
     String trayIcon =
-        Platform.isWindows
-            ? "tray_icon_original.ico"
-            : "tray_icon_original.png";
-    await trayManager.setIcon("${Strings.pathToTrayIcon}/$trayIcon");
-    await trayManager.setToolTip("Scanthesis");
+        Platform.isWindows ? Strings.trayIconIco : Strings.trayIconPng;
+    await trayManager.setIcon(trayIcon);
+    if (!Platform.isLinux) {
+      await trayManager.setToolTip("Scanthesis");
+    }
 
     // setup window when app opened (window manager)
     doWhenWindowReady(() {
