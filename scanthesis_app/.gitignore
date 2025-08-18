@@ -43,3 +43,14 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+/AppDir/
+/deb_package/
+/linux_packages/
+/appimagetool
+
+
+# Temporary files created during the build process
+*.AppImage
+*.deb
+*.rpm
+*.tar.zst

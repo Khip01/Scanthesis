@@ -56,6 +56,21 @@ flutter config --enable-windows-desktop
 flutter config --enable-linux-desktop
 ```
 
+#### Linux System Dependencies
+If developing on Linux, you'll need to install additional system packages for certain Flutter plugins:
+
+```bash
+# For tray_manager plugin (system tray functionality)
+# For Ubuntu/Debian-based distributions
+sudo apt-get install libayatana-appindicator3-dev
+# OR alternative package (for older distributions)
+sudo apt-get install appindicator3-0.1 libappindicator3-dev
+
+# For hotkey_manager plugin (keyboard shortcuts)
+sudo apt-get install keybinder-3.0
+```
+These packages are required for the application's system tray and global hotkey functionality to work correctly.
+
 ## Technical Implementation
 This application serves as a desktop interface for AI services, allowing you to:
 - Configure API endpoints in the settings page
@@ -131,3 +146,55 @@ For reference, the application sends requests in the following format:
 
 Ensure your custom API can handle this format or modify the request model in the source code if necessary.
       
+## Linux Distribution Packages
+
+Scanthesis provides a convenient way to build and package the application for various Linux distributions. The included scripts automatically create packages for Debian-based systems (.deb), Fedora/RHEL (.rpm), Arch Linux (.tar.zst), and a universal AppImage.
+
+### Building Linux Packages
+
+To build the application for Linux and create distribution packages:
+
+1. Navigate to the `scanthesis_app` directory
+2. Run the build and package script:
+   ```bash
+   cd scanthesis_app
+   chmod +x build_and_package_linux.sh
+   ./build_and_package_linux.sh
+   ```
+3. The packages will be created in the linux_packages directory:
+- `scanthesis_1.0.0_amd64.deb` - For Debian, Ubuntu, Linux Mint, etc.
+- `rpm_output/scanthesis-1.0.0-1.fc42.x86_64.rpm` - For Fedora, RHEL, CentOS, etc.
+- `scanthesis-1.0.0-1-x86_64.pkg.tar.zst` - For Arch Linux, Manjaro, etc.
+- `scanthesis_1.0.0-x86_64.AppImage` - Universal Linux package
+
+### Installation from Packages
+#### Debian/Ubuntu and derivatives:
+```bash
+sudo dpkg -i linux_packages/scanthesis_1.0.0_amd64.deb
+```
+#### Fedora/RHEL and derivatives:
+```bash
+sudo rpm -i linux_packages/rpm_output/scanthesis-1.0.0-1.fc42.x86_64.rpm
+```
+#### Arch Linux and derivatives:
+```bash
+sudo pacman -U linux_packages/scanthesis-1.0.0-1-x86_64.pkg.tar.zst
+```
+#### Any Linux distribution (AppImage):
+```bash
+chmod +x linux_packages/scanthesis_1.0.0-x86_64.AppImage
+./linux_packages/scanthesis_1.0.0-x86_64.AppImage
+```
+
+### Advanced Options
+The packaging script supports several options:
+
+```bash
+./build_and_package_linux.sh --help
+```
+Common options include:
+- `--app-name NAME`: Set the application name (default: scanthesis)
+- `--version VERSION`: Set the application version (default: 1.0.0)
+- `--icon PATH`: Path to the application icon (default: assets/app_icon/scanthesis-app-icon-600x600.png)
+- `--force-docker`: Use Docker for all package formats regardless of native tools
+- `--no-docker`: Don't use Docker even if native tools are missing
