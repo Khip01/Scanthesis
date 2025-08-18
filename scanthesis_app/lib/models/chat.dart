@@ -1,5 +1,5 @@
-import 'package:scanthesis_app/models/api_request.dart';
-import 'package:scanthesis_app/models/api_response.dart';
+import 'package:scanthesis/models/api_request.dart';
+import 'package:scanthesis/models/api_response.dart';
 
 class Chat<T> {
   final ApiRequest request;

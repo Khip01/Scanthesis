@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:scanthesis_app/screens/home/provider/custom_prompt_provider.dart';
+import 'package:scanthesis/screens/home/provider/custom_prompt_provider.dart';
 
 part 'file_picker_event.dart';
 

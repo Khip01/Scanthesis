@@ -4,15 +4,15 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
-import 'package:scanthesis_app/models/api_response.dart';
-import 'package:scanthesis_app/models/chat.dart';
-import 'package:scanthesis_app/provider/theme_provider.dart';
-import 'package:scanthesis_app/screens/home/bloc/chats/chats_bloc.dart';
-import 'package:scanthesis_app/screens/home/handler/screen_capture_handler.dart';
-import 'package:scanthesis_app/screens/router.dart';
-import 'package:scanthesis_app/screens/settings/handler/shortcut_hotkey_handler.dart';
-import 'package:scanthesis_app/screens/settings/provider/settings_provider.dart';
-import 'package:scanthesis_app/utils/helper_util.dart';
+import 'package:scanthesis/models/api_response.dart';
+import 'package:scanthesis/models/chat.dart';
+import 'package:scanthesis/provider/theme_provider.dart';
+import 'package:scanthesis/screens/home/bloc/chats/chats_bloc.dart';
+import 'package:scanthesis/screens/home/handler/screen_capture_handler.dart';
+import 'package:scanthesis/screens/router.dart';
+import 'package:scanthesis/screens/settings/handler/shortcut_hotkey_handler.dart';
+import 'package:scanthesis/screens/settings/provider/settings_provider.dart';
+import 'package:scanthesis/utils/helper_util.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StorageService {

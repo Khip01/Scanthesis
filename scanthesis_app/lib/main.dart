@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
-import 'package:scanthesis_app/provider/drawer_provider.dart';
-import 'package:scanthesis_app/provider/theme_provider.dart';
-import 'package:scanthesis_app/screens/home/bloc/chats/chats_bloc.dart';
-import 'package:scanthesis_app/screens/home/bloc/file_picker/file_picker_bloc.dart';
-import 'package:scanthesis_app/screens/home/bloc/request/request_bloc.dart';
-import 'package:scanthesis_app/screens/home/bloc/response/response_bloc.dart';
-import 'package:scanthesis_app/screens/home/provider/clipboard_provider.dart';
-import 'package:scanthesis_app/screens/home/provider/custom_prompt_provider.dart';
-import 'package:scanthesis_app/screens/home/provider/open_file_provider.dart';
-import 'package:scanthesis_app/screens/home/provider/preview_image_provider.dart';
-import 'package:scanthesis_app/screens/home/provider/screen_capture_provider.dart';
-import 'package:scanthesis_app/screens/router.dart';
-import 'package:scanthesis_app/screens/settings/provider/settings_provider.dart';
-import 'package:scanthesis_app/utils/init_util.dart';
-import 'package:scanthesis_app/utils/storage_service.dart';
-import 'package:scanthesis_app/utils/theme_util.dart';
+import 'package:scanthesis/provider/drawer_provider.dart';
+import 'package:scanthesis/provider/theme_provider.dart';
+import 'package:scanthesis/screens/home/bloc/chats/chats_bloc.dart';
+import 'package:scanthesis/screens/home/bloc/file_picker/file_picker_bloc.dart';
+import 'package:scanthesis/screens/home/bloc/request/request_bloc.dart';
+import 'package:scanthesis/screens/home/bloc/response/response_bloc.dart';
+import 'package:scanthesis/screens/home/provider/clipboard_provider.dart';
+import 'package:scanthesis/screens/home/provider/custom_prompt_provider.dart';
+import 'package:scanthesis/screens/home/provider/open_file_provider.dart';
+import 'package:scanthesis/screens/home/provider/preview_image_provider.dart';
+import 'package:scanthesis/screens/home/provider/screen_capture_provider.dart';
+import 'package:scanthesis/screens/router.dart';
+import 'package:scanthesis/screens/settings/provider/settings_provider.dart';
+import 'package:scanthesis/utils/init_util.dart';
+import 'package:scanthesis/utils/storage_service.dart';
+import 'package:scanthesis/utils/theme_util.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

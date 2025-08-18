@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:scanthesis_app/screens/home/provider/preview_image_provider.dart';
+import 'package:scanthesis/screens/home/provider/preview_image_provider.dart';
 
 class DrawerProvider with ChangeNotifier {
   bool _isDrawerOpen = false;

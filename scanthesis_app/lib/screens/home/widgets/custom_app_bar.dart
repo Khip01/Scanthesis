@@ -1,6 +1,6 @@
 // import 'package:bitsdojo_window/bitsdojo_window.dart';
 // import 'package:flutter/material.dart';
-// import 'package:scanthesis_app/utils/style_util.dart';
+// import 'package:scanthesis/utils/style_util.dart';
 //
 // class CustomAppBar extends StatelessWidget {
 //   const CustomAppBar({super.key});

@@ -2,8 +2,8 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:scanthesis_app/screens/home/provider/preview_image_provider.dart';
-import 'package:scanthesis_app/utils/helper_util.dart';
+import 'package:scanthesis/screens/home/provider/preview_image_provider.dart';
+import 'package:scanthesis/utils/helper_util.dart';
 
 class PreviewImage extends StatelessWidget {
   const PreviewImage({super.key});

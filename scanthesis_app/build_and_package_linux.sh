@@ -61,6 +61,8 @@ else
     FLUTTER_CMD="flutter"
 fi
 
+mkdir -p build/native_assets/linux
+
 echo "🚀 Starting Flutter build for Linux..."
 $FLUTTER_CMD build linux $FLUTTER_BUILD_ARGS
 

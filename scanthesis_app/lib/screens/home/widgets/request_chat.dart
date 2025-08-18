@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:scanthesis_app/models/api_request.dart';
-import 'package:scanthesis_app/screens/home/provider/preview_image_provider.dart';
+import 'package:scanthesis/models/api_request.dart';
+import 'package:scanthesis/screens/home/provider/preview_image_provider.dart';
 
 class RequestChat extends StatefulWidget {
   final ApiRequest request;

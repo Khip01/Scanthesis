@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:scanthesis_app/models/api_request.dart';
+import 'package:scanthesis/models/api_request.dart';
 
 part 'request_event.dart';
 part 'request_state.dart';

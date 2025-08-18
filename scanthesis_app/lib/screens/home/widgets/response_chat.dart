@@ -6,11 +6,11 @@ import 'package:flutter_highlighting/flutter_highlighting.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:provider/provider.dart';
-import 'package:scanthesis_app/models/api_response.dart';
-import 'package:scanthesis_app/provider/theme_provider.dart';
-import 'package:scanthesis_app/utils/code_theme_util.dart';
+import 'package:scanthesis/models/api_response.dart';
+import 'package:scanthesis/provider/theme_provider.dart';
+import 'package:scanthesis/utils/code_theme_util.dart';
 
-import 'package:scanthesis_app/utils/style_util.dart';
+import 'package:scanthesis/utils/style_util.dart';
 
 class ResponseChat extends StatefulWidget {
   final ApiResponse response;

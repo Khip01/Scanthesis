@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:pasteboard/pasteboard.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:scanthesis_app/screens/home/provider/clipboard_provider.dart';
-import 'package:scanthesis_app/utils/helper_util.dart';
+import 'package:scanthesis/screens/home/provider/clipboard_provider.dart';
+import 'package:scanthesis/utils/helper_util.dart';
 
 class ClipboardHandler {
   static Future<File?> getImageFromClipboard(BuildContext context) async {

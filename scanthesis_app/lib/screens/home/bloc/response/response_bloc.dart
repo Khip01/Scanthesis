@@ -2,10 +2,10 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:scanthesis_app/models/api_request.dart';
-import 'package:scanthesis_app/models/api_response.dart';
-import 'package:scanthesis_app/repository/api_repository.dart';
-import 'package:scanthesis_app/screens/settings/provider/settings_provider.dart';
+import 'package:scanthesis/models/api_request.dart';
+import 'package:scanthesis/models/api_response.dart';
+import 'package:scanthesis/repository/api_repository.dart';
+import 'package:scanthesis/screens/settings/provider/settings_provider.dart';
 
 part 'response_event.dart';
 

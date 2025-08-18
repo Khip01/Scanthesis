@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/widgets.dart';
-import 'package:scanthesis_app/screens/home/handler/screen_capture_handler.dart';
-import 'package:scanthesis_app/screens/router.dart';
+import 'package:scanthesis/screens/home/handler/screen_capture_handler.dart';
+import 'package:scanthesis/screens/router.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 

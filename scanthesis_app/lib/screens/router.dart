@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
-import 'package:scanthesis_app/screens/home/views/home_screen.dart';
-import 'package:scanthesis_app/screens/settings/views/settings_screen.dart';
+import 'package:scanthesis/screens/home/views/home_screen.dart';
+import 'package:scanthesis/screens/settings/views/settings_screen.dart';
 
 // for getting global context
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();

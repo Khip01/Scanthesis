@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
-import 'package:scanthesis_app/screens/home/bloc/file_picker/file_picker_bloc.dart';
-import 'package:scanthesis_app/screens/home/provider/custom_prompt_provider.dart';
-import 'package:scanthesis_app/screens/settings/provider/settings_provider.dart';
-import 'package:scanthesis_app/utils/style_util.dart';
+import 'package:scanthesis/screens/home/bloc/file_picker/file_picker_bloc.dart';
+import 'package:scanthesis/screens/home/provider/custom_prompt_provider.dart';
+import 'package:scanthesis/screens/settings/provider/settings_provider.dart';
+import 'package:scanthesis/utils/style_util.dart';
 
 class CustomPromptField extends StatefulWidget {
   final FocusNode sendButtonFocusNode;

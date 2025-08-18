@@ -3,13 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:scanthesis_app/models/chat.dart';
-import 'package:scanthesis_app/provider/drawer_provider.dart';
-import 'package:scanthesis_app/screens/home/bloc/chats/chats_bloc.dart';
-import 'package:scanthesis_app/screens/home/bloc/request/request_bloc.dart';
-import 'package:scanthesis_app/screens/home/bloc/response/response_bloc.dart';
-import 'package:scanthesis_app/screens/router.dart';
-import 'package:scanthesis_app/utils/style_util.dart';
+import 'package:scanthesis/models/chat.dart';
+import 'package:scanthesis/provider/drawer_provider.dart';
+import 'package:scanthesis/screens/home/bloc/chats/chats_bloc.dart';
+import 'package:scanthesis/screens/home/bloc/request/request_bloc.dart';
+import 'package:scanthesis/screens/home/bloc/response/response_bloc.dart';
+import 'package:scanthesis/screens/router.dart';
+import 'package:scanthesis/utils/style_util.dart';
 
 import '../../../models/api_response.dart';
 

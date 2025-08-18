@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
-import 'package:scanthesis_app/models/api_response.dart';
-import 'package:scanthesis_app/repository/api_repository.dart';
+import 'package:scanthesis/models/api_response.dart';
+import 'package:scanthesis/repository/api_repository.dart';
 
 class SettingsProvider extends ChangeNotifier {
   // Default Browse Directory

@@ -6,9 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
-import 'package:scanthesis_app/screens/settings/provider/settings_provider.dart';
-import 'package:scanthesis_app/values/strings.dart';
-import 'package:scanthesis_app/widgets/system_tray_popup.dart';
+import 'package:scanthesis/screens/settings/provider/settings_provider.dart';
+import 'package:scanthesis/values/strings.dart';
+import 'package:scanthesis/widgets/system_tray_popup.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 

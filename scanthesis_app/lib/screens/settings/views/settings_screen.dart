@@ -6,17 +6,17 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:provider/provider.dart';
-import 'package:scanthesis_app/provider/theme_provider.dart';
-import 'package:scanthesis_app/screens/home/handler/screen_capture_handler.dart';
-import 'package:scanthesis_app/screens/router.dart';
-import 'package:scanthesis_app/screens/settings/handler/shortcut_hotkey_handler.dart';
-import 'package:scanthesis_app/screens/settings/provider/settings_provider.dart';
-import 'package:scanthesis_app/screens/settings/widgets/improved_hotkey_view.dart';
-import 'package:scanthesis_app/screens/settings/widgets/record_hotkey_dialog.dart';
-import 'package:scanthesis_app/utils/helper_util.dart';
-import 'package:scanthesis_app/utils/storage_service.dart';
-import 'package:scanthesis_app/utils/style_util.dart';
-import 'package:scanthesis_app/values/strings.dart';
+import 'package:scanthesis/provider/theme_provider.dart';
+import 'package:scanthesis/screens/home/handler/screen_capture_handler.dart';
+import 'package:scanthesis/screens/router.dart';
+import 'package:scanthesis/screens/settings/handler/shortcut_hotkey_handler.dart';
+import 'package:scanthesis/screens/settings/provider/settings_provider.dart';
+import 'package:scanthesis/screens/settings/widgets/improved_hotkey_view.dart';
+import 'package:scanthesis/screens/settings/widgets/record_hotkey_dialog.dart';
+import 'package:scanthesis/utils/helper_util.dart';
+import 'package:scanthesis/utils/storage_service.dart';
+import 'package:scanthesis/utils/style_util.dart';
+import 'package:scanthesis/values/strings.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});

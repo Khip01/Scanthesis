@@ -2,11 +2,11 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:scanthesis_app/models/api_response.dart';
-import 'package:scanthesis_app/models/chat.dart';
-import 'package:scanthesis_app/screens/settings/provider/settings_provider.dart';
-import 'package:scanthesis_app/utils/helper_util.dart';
-import 'package:scanthesis_app/utils/storage_service.dart';
+import 'package:scanthesis/models/api_response.dart';
+import 'package:scanthesis/models/chat.dart';
+import 'package:scanthesis/screens/settings/provider/settings_provider.dart';
+import 'package:scanthesis/utils/helper_util.dart';
+import 'package:scanthesis/utils/storage_service.dart';
 
 part 'chats_event.dart';
 
