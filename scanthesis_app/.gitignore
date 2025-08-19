@@ -47,7 +47,7 @@ app.*.map.json
 /deb_package/
 /linux_packages/
 /appimagetool
-/windows/installer/scanthesis_setup.exe
+/windows/installer/*.exe
 
 
 # Temporary files created during the build process

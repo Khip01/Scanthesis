@@ -198,3 +198,24 @@ Common options include:
 - `--icon PATH`: Path to the application icon (default: assets/app_icon/scanthesis-app-icon-600x600.png)
 - `--force-docker`: Use Docker for all package formats regardless of native tools
 - `--no-docker`: Don't use Docker even if native tools are missing
+
+## Windows Installation
+
+Scanthesis also provides a way to create a Windows installer using Inno Setup.
+
+### Building Windows Installer
+
+To create a Windows installer:
+
+1. Make sure you have [Inno Setup](https://jrsoftware.org/isinfo.php) installed
+2. Build the Flutter application for Windows:
+   ```bash
+   cd scanthesis_app
+   flutter build windows --release
+   ```
+3. Run the Inno Setup script file (located at `windows/installer/scanthesis_build_installer.iss`) using the Inno Setup Compiler
+4. The installer will be created in the `windows/installer` folder named `scanthesis_setup_v{version}.exe` (where `{version}` is the version defined in the .iss file)
+
+### Installer Configuration
+
+If you want to customize the installer, you can modify the `windows/installer/scanthesis_build_installer.iss` file. This file contains the configuration for creating the Windows installer, including application information, files to include, and installation options.

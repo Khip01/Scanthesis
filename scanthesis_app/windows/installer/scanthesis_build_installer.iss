@@ -35,7 +35,7 @@ DisableProgramGroupPage=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only).
 ;PrivilegesRequired=lowest
 OutputDir=.
-OutputBaseFilename=scanthesis_setup
+OutputBaseFilename=scanthesis_setup_v{#MyAppVersion}
 SetupIconFile=..\..\assets\installer_icon\scanthesis_installer_icon.ico
 SolidCompression=yes
 WizardStyle=modern
