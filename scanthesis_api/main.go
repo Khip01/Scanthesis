@@ -3,82 +3,81 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"net/http"
-	"os"
+	"strings"
 
 	"github.com/google/generative-ai-go/genai"
-	"github.com/joho/godotenv"
 	"google.golang.org/api/option"
 )
 
 func main() {
+	endpointFlag := flag.String("endpoint", "", "API endpoint (e.g., localhost:8080)")
+	apiKeyFlag := flag.String("api_key", "", "API key for Gemini")
+	flag.Parse()
 
-	// Load environment variables from .env file
-	err := godotenv.Load()
-	if err != nil {
-		fmt.Println("Error loading .env file")
+	endpoint := *endpointFlag
+	apiKey := *apiKeyFlag
+
+	if endpoint == "" {
+		fmt.Println("Error: --endpoint argument is required")
+		return
+	}
+	if apiKey == "" {
+		fmt.Println("Error: --api_key argument is required")
 		return
 	}
 
 	// Check if the API is already running
-	resp, err := http.Get(os.Getenv("ENDPOINT") + "/")
+	resp, err := http.Get(endpoint + "/")
 	if err == nil && resp.StatusCode == http.StatusOK {
-		fmt.Println("API already running on " + os.Getenv("ENDPOINT") + "/")
+		fmt.Println("API already running on " + endpoint + "/")
 		return
 	}
 
-	// Endpoint
-	http.HandleFunc("/api/ocr", GeminiHandler)
+	http.HandleFunc("/api/ocr", func(w http.ResponseWriter, r *http.Request) {
+		GeminiHandler(w, r, apiKey)
+	})
 	http.HandleFunc("/api/check", APICheck)
 
-	// Listening
-	fmt.Println("Server started on " + os.Getenv("ENDPOINT") + "/ ...")
-	http.ListenAndServe(":8080", nil)
+	fmt.Println("Server started on " + endpoint + "/ ...")
+
+	port := "8080" // default
+	if idx := strings.LastIndex(endpoint, ":"); idx != -1 {
+		portPart := endpoint[idx+1:]
+		if slashIdx := strings.Index(portPart, "/"); slashIdx != -1 {
+			port = portPart[:slashIdx]
+		} else {
+			port = portPart
+		}
+	}
+	err = http.ListenAndServe(":"+port, nil)
+	if err != nil {
+		fmt.Println("Failed to start server:", err)
+	}
 }
 
-func GeminiHandler(w http.ResponseWriter, r *http.Request) {
+func GeminiHandler(w http.ResponseWriter, r *http.Request, apiKey string) {
 	context := context.Background()
-
-	apiKey := os.Getenv("API_KEY")
 	if apiKey == "" {
-		http.Error(w, "API_KEY not found in env", http.StatusInternalServerError)
-		return 
+		http.Error(w, "API_KEY argument is required", http.StatusInternalServerError)
+		return
 	}
 
-	// 1. Read Multipart data from the request 
 	err := r.ParseMultipartForm(50 << 20) // 50 MB limit total image file
 	if err != nil {
 		http.Error(w, "Failed to parse form: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	// // get the file from the form data
-	// file, handler, err := r.FormFile("image")
-	// if err != nil {
-	// 	http.Error(w, "Error retrieving file: "+err.Error(), http.StatusBadRequest)
-	// 	return
-	// }
-	// defer file.Close()
-
-	// fmt.Printf("Received file: %s (%d bytes)\n", handler.Filename, handler.Size)
-
-	// // 2. Reading file to []byte
-	// imgBytes, err := io.ReadAll(file)
-	// if err != nil {
-	// 	http.Error(w, "Error reading image file: "+err.Error(), http.StatusInternalServerError)
-	// 	return
-	// }
-
-	// get the file from the form data
 	files := r.MultipartForm.File["images"]
 	if len(files) == 0 {
-		http.Error(w, "No images provided", http.StatusBadRequest);
+		http.Error(w, "No images provided", http.StatusBadRequest)
 		return
 	}
-	
-	// 3. Create gemini client
+
 	client, err := genai.NewClient(context, option.WithAPIKey(apiKey))
 	if err != nil {
 		http.Error(w, "Failed to create Gemini client: "+err.Error(), http.StatusInternalServerError)
@@ -86,13 +85,10 @@ func GeminiHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer client.Close()
 
-	// 4. Create model
 	model := client.GenerativeModel("gemini-1.5-flash")
 
-	// 5. Create prompt and token
 	prompt := "Perform OCR on this image. Extract only the code and comments exactly as seen, without any explanation or additional content. Ensure the code is cleanly formatted and properly indented."
 
-	// check if there is any prompt included on request
 	customPrompt := r.FormValue("prompt")
 	if customPrompt != "" {
 		prompt = customPrompt
@@ -102,7 +98,6 @@ func GeminiHandler(w http.ResponseWriter, r *http.Request) {
 		genai.Text(prompt),
 	}
 
-	// insert all images
 	for _, fileHeader := range files {
 		file, err := fileHeader.Open()
 		if err != nil {
@@ -120,15 +115,12 @@ func GeminiHandler(w http.ResponseWriter, r *http.Request) {
 		req = append(req, genai.ImageData("image/png", imgBytes))
 	}
 
-
-	// 6. Generate content
 	res, err := model.GenerateContent(context, req...)
 	if err != nil {
 		http.Error(w, "Failed to generate content: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	
-	// 7. Take output from the response
+
 	var output string
 	for _, cand := range res.Candidates {
 		for _, part := range cand.Content.Parts {
@@ -138,17 +130,12 @@ func GeminiHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// w.Header().Set("Content-Type", "text/plain") // Uncomment this line to send the output as a response
-	// w.Write([]byte(output)) // Uncomment this line to send the output as a response
-
-	// Output with JSON
 	result := map[string]string{
 		"response": output,
 	}
-	
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(result)
-
 }
 
 func APICheck(w http.ResponseWriter, r *http.Request) {

@@ -1,3 +1,5 @@
 /.env
 /.vscode
 /build
+scanthesis_api_v*
+# *.exe
