@@ -81,22 +81,30 @@ This application serves as a desktop interface for AI services, allowing you to:
 
 ### Option 1: Using the Built-in Golang API
 
-The repository includes a simple Golang API implementation that connects to Gemini 1.5 Flash:
+The repository includes a simple Golang API implementation that connects to Gemini 1.5 Flash.
 
-1. Navigate to the `scanthesis_api` directory
-2. Copy `.env.example` to create a new `.env` file
-3. Configure your environment variables in the `.env` file:
+1. Navigate to the `scanthesis_api` directory.
+
+2. Run the API server using command-line arguments for endpoint and API key:
+
+   ```bash
+   # Linux/macOS
+   ./scanthesis_api --endpoint="localhost:8080" --api_key="your_api_key_here"
+
+   # Or if you want to build from source:
+   go run main.go --endpoint="localhost:8080" --api_key="your_api_key_here"
    ```
-   API_KEY="your_api_key_here"
-   ENDPOINT="http://127.0.0.1:8080/api"
+
+   ```cmd
+   :: Windows
+   scanthesis_api.exe --endpoint="localhost:8080" --api_key="your_api_key_here"
    ```
+
 > [!NOTE]
 > You can obtain an API key from [Google AI Studio](https://aistudio.google.com/apikey)
-4. Run the API server:
-   ```
-   go run main.go
-   ```
-5. Launch the Scanthesis desktop application and configure the endpoint URL in the settings page to match your API server (default: `http://127.0.0.1:8080/api`)
+
+3. Launch the Scanthesis desktop application and configure the endpoint URL in the settings page to match your API server (default: `http://localhost:8080/api/ocr`).
+
 
 ### Option 2: Using a Custom API
 
