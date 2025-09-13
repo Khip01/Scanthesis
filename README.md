@@ -38,6 +38,8 @@ This application serves as a desktop interface for AI services, allowing you to:
 
 ### So? What do you want to do with this repository? 🤔 💭
 
+<br>
+
 <details>
 <summary>I want to <strong>install this cool app on my device</strong> so I can use it 👊🏼😎</summary>
 
