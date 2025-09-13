@@ -28,6 +28,180 @@
 - **Customizable Backend**: Use the included Golang API example (using Gemini 1.5 Flash) or configure your own AI service
 - **Markdown Output**: Receive AI responses formatted in Markdown
 
+## Technical Implementation
+This application serves as a desktop interface for AI services, allowing you to:
+- Configure API endpoints in the settings page
+- Use the included Golang backend example (requires your API key)
+- Customize the JSON response structure to work with different AI providers
+
+<br>
+
+### So? What do you want to do with this repository? 🤔 💭
+
+<details>
+<summary>I want to <strong>install this cool app on my device</strong> so I can use it 👊🏼😎</summary>
+
+## Getting Started
+
+You can use either your own [My Custom API (Option 2)](#option-2-using-a-custom-api), or the [Simple Built-in Golang API that comes with this project (Option 1)](#option-1-using-the-built-in-golang-api) _(without the pain of creating your own API and manually editing the source code)_.
+
+### Option 1: Using the Built-in Golang API
+
+The repository includes a simple Golang API implementation that connects to Gemini 1.5 Flash.
+
+1. __Download the separate API from the [latest release](https://github.com/Khip01/Scanthesis/releases) according to your operating system (Windows/Linux).__
+
+2. __Run the API server using command-line arguments for endpoint and API key:__
+
+   ```bash
+   # Linux/macOS
+   ./scanthesis_api --endpoint="localhost:8080" --api_key="your_api_key_here"
+   ```
+
+   ```cmd
+   :: Windows
+   scanthesis_api.exe --endpoint="localhost:8080" --api_key="your_api_key_here"
+   ```
+
+   ```bash
+   # Or if you want to build from source (inside scanthesis_api folder from this project):
+   go run main.go --endpoint="localhost:8080" --api_key="your_api_key_here"
+   ```
+
+> [!NOTE]
+> You can obtain an API key from [Google AI Studio](https://aistudio.google.com/apikey)
+
+3. __Linux System Dependencies__ 
+
+If you are running this app on __Linux__, you’ll need to install some additional libraries so that the `tray_manager` (system tray) and `hotkey_manager` (global hotkeys) plugins work correctly.
+
+Install the required packages according to your Linux distribution:
+
+_Ubuntu / Debian-based_
+```bash
+sudo apt-get install libayatana-appindicator3-dev
+# or for older distributions:
+sudo apt-get install appindicator3-0.1 libappindicator3-dev
+
+sudo apt-get install keybinder-3.0
+```
+
+_Fedora / RHEL / CentOS_
+```bash
+sudo dnf install libappindicator-gtk3 keybinder3
+```
+
+_Arch Linux / Manjaro_
+```dart
+sudo pacman -S libappindicator-gtk3 keybinder3
+```
+
+_openSUSE_
+```dart
+sudo zypper install libappindicator-gtk3 keybinder3
+```
+
+4. __Launch the Scanthesis desktop application and configure the endpoint URL in the settings page to match your API server (default: `http://localhost:8080/api`).__
+
+5. __After that, you're __ready to use the app__ 🔥🎉__
+
+<br>
+<br>
+
+### Option 2: Using a Custom API
+
+If you prefer to use your own AI backend:
+
+1. Linux System Dependencies 
+
+If you are running this app on __Linux__, you’ll need to install some additional libraries so that the `tray_manager` (system tray) and `hotkey_manager` (global hotkeys) plugins work correctly.
+
+Install the required packages according to your Linux distribution:
+
+_Ubuntu / Debian-based_
+```bash
+sudo apt-get install libayatana-appindicator3-dev
+# or for older distributions:
+sudo apt-get install appindicator3-0.1 libappindicator3-dev
+
+sudo apt-get install keybinder-3.0
+```
+
+_Fedora / RHEL / CentOS_
+```bash
+sudo dnf install libappindicator-gtk3 keybinder3
+```
+
+_Arch Linux / Manjaro_
+```dart
+sudo pacman -S libappindicator-gtk3 keybinder3
+```
+
+_openSUSE_
+```dart
+sudo zypper install libappindicator-gtk3 keybinder3
+```
+
+2. Launch the Scanthesis application and navigate to the settings page
+3. Enter your custom API endpoint URL in the designated field
+    <p align="left">
+      <img src="https://i.ibb.co.com/m3SXzJp/api-settings-page.png" alt="Scanthesis settings - API Endpoint" style="width:600px; border-radius:12px">
+    </p>
+
+4. __If your API response returns a JSON structure that differs__ from the default JSON of this application, you'll need to manually modify the response model code of this app:
+   
+   Open `scanthesis_app/lib/models/api_response.dart` and customize the `MyCustomResponse` class to match your API's response structure:
+   
+   ```dart
+   class MyCustomResponse {
+     final String response;
+     // Add or modify fields according to your JSON response structure
+   
+     MyCustomResponse({required this.response});
+   
+     factory MyCustomResponse.fromJson(Map<String, dynamic> json) {
+       return MyCustomResponse(response: json['response']);
+     }
+   
+     Map<String, dynamic> toJson() => {"response": response};
+   
+     @override
+     String toString() => response;
+   }
+   ```
+
+5. Then build the application according to the [build instructions here](#development-requirements) as a developer 🤓.
+
+5. After that, you're ready to use the app 🔥🎉
+
+<br>
+
+> [!NOTE] 
+> The application is configured to send requests with the structure defined in `scanthesis_app/lib/models/api_request.dart`. Customizing the request format is not fully supported in the current version.
+
+For reference, the application sends requests in the following format:
+
+```json
+# Contents of the JSON Request Structure from Scanthesis to the API
+{
+  "files": ["path/to/file1.jpg", "path/to/file2.png"],
+  "prompt": "User's text prompt"
+}
+```
+
+Ensure your custom API can handle this format, or modify the request model in the source code if necessary.
+
+</details>
+
+
+
+<br>
+
+
+
+<details>
+<summary>I want to <strong>develop</strong> and understand <strong>this application as a developer</strong>, so i can contribute ☝️🤓</summary>
+
 ## Development Requirements
 
 ### Environment Setup
@@ -71,92 +245,7 @@ sudo apt-get install keybinder-3.0
 ```
 These packages are required for the application's system tray and global hotkey functionality to work correctly.
 
-## Technical Implementation
-This application serves as a desktop interface for AI services, allowing you to:
-- Configure API endpoints in the settings page
-- Use the included Golang backend example (requires your API key)
-- Customize the JSON response structure to work with different AI providers
-
-## Getting Started
-
-### Option 1: Using the Built-in Golang API
-
-The repository includes a simple Golang API implementation that connects to Gemini 1.5 Flash.
-
-1. Download the separate API from the [latest release](https://github.com/Khip01/Scanthesis/releases) according to your operating system (Windows/Linux).
-
-2. Run the API server using command-line arguments for endpoint and API key:
-
-   ```bash
-   # Linux/macOS
-   ./scanthesis_api --endpoint="localhost:8080" --api_key="your_api_key_here"
-   ```
-
-   ```cmd
-   :: Windows
-   scanthesis_api.exe --endpoint="localhost:8080" --api_key="your_api_key_here"
-   ```
-
-   ```bash
-   # Or if you want to build from source (inside scanthesis_api folder from this project):
-   go run main.go --endpoint="localhost:8080" --api_key="your_api_key_here"
-   ```
-
-> [!NOTE]
-> You can obtain an API key from [Google AI Studio](https://aistudio.google.com/apikey)
-
-3. Launch the Scanthesis desktop application and configure the endpoint URL in the settings page to match your API server (default: `http://localhost:8080/api/ocr`).
-
-
-### Option 2: Using a Custom API
-
-If you prefer to use your own AI backend:
-
-1. Launch the Scanthesis application and navigate to the settings page
-2. Enter your custom API endpoint URL in the designated field
-    <p align="left">
-      <img src="https://i.ibb.co.com/m3SXzJp/api-settings-page.png" alt="Scanthesis settings - API Endpoint" style="width:600px; border-radius:12px">
-    </p>
-
-3. If your API returns a different JSON structure than the default, you'll need to modify the response model:
-   
-   Open `scanthesis_app/lib/models/api_response.dart` and customize the `MyCustomResponse` class to match your API's response structure:
-   
-   ```dart
-   class MyCustomResponse {
-     final String response;
-     // Add or modify fields according to your JSON response structure
-   
-     MyCustomResponse({required this.response});
-   
-     factory MyCustomResponse.fromJson(Map<String, dynamic> json) {
-       return MyCustomResponse(response: json['response']);
-     }
-   
-     Map<String, dynamic> toJson() => {"response": response};
-   
-     @override
-     String toString() => response;
-   }
-   ```
-
-> [!NOTE] 
-> The application is configured to send requests with the structure defined in `scanthesis_app/lib/models/api_request.dart`. Customizing the request format is not fully supported in the current version.
-
-## API Request Format
-
-For reference, the application sends requests in the following format:
-
-```json
-{
-  "files": ["path/to/file1.jpg", "path/to/file2.png"],
-  "prompt": "User's text prompt"
-}
-```
-
-Ensure your custom API can handle this format or modify the request model in the source code if necessary.
-      
-## Linux Distribution Packages
+## Linux Build Instruction
 
 Scanthesis provides a convenient way to build and package the application for various Linux distributions. The included scripts automatically create packages for Debian-based systems (.deb), Fedora/RHEL (.rpm), Arch Linux (.tar.zst), and a universal AppImage.
 
@@ -209,7 +298,7 @@ Common options include:
 - `--force-docker`: Use Docker for all package formats regardless of native tools
 - `--no-docker`: Don't use Docker even if native tools are missing
 
-## Windows Installation
+## Windows Build Instruction
 
 Scanthesis also provides a way to create a Windows installer using Inno Setup.
 
@@ -229,3 +318,9 @@ To create a Windows installer:
 ### Installer Configuration
 
 If you want to customize the installer, you can modify the `windows/installer/scanthesis_build_installer.iss` file. This file contains the configuration for creating the Windows installer, including application information, files to include, and installation options.
+
+</details>
+
+
+
+
