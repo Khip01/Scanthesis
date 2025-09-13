@@ -83,21 +83,23 @@ This application serves as a desktop interface for AI services, allowing you to:
 
 The repository includes a simple Golang API implementation that connects to Gemini 1.5 Flash.
 
-1. Navigate to the `scanthesis_api` directory.
+1. Download the separate API from the [latest release](https://github.com/Khip01/Scanthesis/releases) according to your operating system (Windows/Linux).
 
 2. Run the API server using command-line arguments for endpoint and API key:
 
    ```bash
    # Linux/macOS
    ./scanthesis_api --endpoint="localhost:8080" --api_key="your_api_key_here"
-
-   # Or if you want to build from source:
-   go run main.go --endpoint="localhost:8080" --api_key="your_api_key_here"
    ```
 
    ```cmd
    :: Windows
    scanthesis_api.exe --endpoint="localhost:8080" --api_key="your_api_key_here"
+   ```
+
+   ```bash
+   # Or if you want to build from source (inside scanthesis_api folder from this project):
+   go run main.go --endpoint="localhost:8080" --api_key="your_api_key_here"
    ```
 
 > [!NOTE]
