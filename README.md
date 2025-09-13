@@ -68,7 +68,7 @@ The repository includes a simple Golang API implementation that connects to Gemi
    go run main.go --endpoint="localhost:8080" --api_key="your_api_key_here"
    ```
 
-> [!NOTE]
+> __ℹ️ NOTE__ \
 > You can obtain an API key from [Google AI Studio](https://aistudio.google.com/apikey)
 
 3. __Linux System Dependencies__ 
@@ -176,13 +176,12 @@ sudo zypper install libappindicator-gtk3 keybinder3
 
 <br>
 
-> [!NOTE] 
+> __ℹ️ NOTE__ \
 > The application is configured to send requests with the structure defined in `scanthesis_app/lib/models/api_request.dart`. Customizing the request format is not fully supported in the current version.
 
-For reference, the application sends requests in the following format:
-
+For reference, the application sends requests in the following format: <br>
+_Contents of the JSON Request Structure from Scanthesis to the API_
 ```json
-# Contents of the JSON Request Structure from Scanthesis to the API
 {
   "files": ["path/to/file1.jpg", "path/to/file2.png"],
   "prompt": "User's text prompt"
