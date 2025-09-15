@@ -73,39 +73,11 @@ The repository includes a simple Golang API implementation that connects to Gemi
 > __ℹ️ NOTE__ \
 > You can obtain an API key from [Google AI Studio](https://aistudio.google.com/apikey)
 
-3. __Linux System Dependencies__ 
+3. If __you are running this app on Linux__, you’ll need to install some additional libraries so that the `tray_manager` (system tray) and `hotkey_manager` (global hotkeys) plugins work correctly. You can see the installation tutorial for the [__REQUIRED System Dependencies__ in the following release section](https://github.com/Khip01/Scanthesis/releases).
 
-If you are running this app on __Linux__, you’ll need to install some additional libraries so that the `tray_manager` (system tray) and `hotkey_manager` (global hotkeys) plugins work correctly.
+4. Launch the Scanthesis desktop application and configure the endpoint URL in the settings page to match your API server (default: `http://localhost:8080/api`).
 
-Install the required packages according to your Linux distribution:
-
-_Ubuntu / Debian-based_
-```bash
-sudo apt-get install libayatana-appindicator3-dev
-# or for older distributions:
-sudo apt-get install appindicator3-0.1 libappindicator3-dev
-
-sudo apt-get install keybinder-3.0
-```
-
-_Fedora / RHEL / CentOS_
-```bash
-sudo dnf install libappindicator-gtk3 keybinder3
-```
-
-_Arch Linux / Manjaro_
-```dart
-sudo pacman -S libappindicator-gtk3 keybinder3
-```
-
-_openSUSE_
-```dart
-sudo zypper install libappindicator-gtk3 keybinder3
-```
-
-4. __Launch the Scanthesis desktop application and configure the endpoint URL in the settings page to match your API server (default: `http://localhost:8080/api`).__
-
-5. __After that, you're __ready to use the app__ 🔥🎉__
+5. After that, you're __ready to use the app__ 🔥🎉
 
 <br>
 <br>
@@ -114,36 +86,7 @@ sudo zypper install libappindicator-gtk3 keybinder3
 
 If you prefer to use your own AI backend:
 
-1. Linux System Dependencies 
-
-If you are running this app on __Linux__, you’ll need to install some additional libraries so that the `tray_manager` (system tray) and `hotkey_manager` (global hotkeys) plugins work correctly.
-
-Install the required packages according to your Linux distribution:
-
-_Ubuntu / Debian-based_
-```bash
-sudo apt-get install libayatana-appindicator3-dev
-# or for older distributions:
-sudo apt-get install appindicator3-0.1 libappindicator3-dev
-
-sudo apt-get install keybinder-3.0
-```
-
-_Fedora / RHEL / CentOS_
-```bash
-sudo dnf install libappindicator-gtk3 keybinder3
-```
-
-_Arch Linux / Manjaro_
-```dart
-sudo pacman -S libappindicator-gtk3 keybinder3
-```
-
-_openSUSE_
-```dart
-sudo zypper install libappindicator-gtk3 keybinder3
-```
-
+1. If __you are running this app on Linux__, you’ll need to install some additional libraries so that the `tray_manager` (system tray) and `hotkey_manager` (global hotkeys) plugins work correctly. You can see the installation tutorial for the [__REQUIRED System Dependencies__ in the following release section](https://github.com/Khip01/Scanthesis/releases).
 2. Launch the Scanthesis application and navigate to the settings page
 3. Enter your custom API endpoint URL in the designated field
     <p align="left">
