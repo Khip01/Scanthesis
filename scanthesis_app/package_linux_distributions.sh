@@ -28,8 +28,8 @@ APP_CATEGORY="Utility;"
 APP_LICENSE="MIT"
 
 # Dependencies
-DEB_DEPENDENCIES="libgtk-3-0, libblkid1, liblzma5"
-RPM_DEPENDENCIES="gtk3"
+DEB_DEPENDENCIES="libgtk-3-0, libblkid1, liblzma5, libkeybinder-3.0-0, libayatana-appindicator3-1"
+RPM_DEPENDENCIES="gtk3, keybinder3, libayatana-appindicator-gtk3"
 ARCH_DEPENDENCIES="gtk3"
 
 # Build configuration
@@ -368,29 +368,38 @@ EOF
     echo "✅ .deb package created: ${OUTPUT_DIR}/${APP_NAME}_${VERSION}_amd64.deb"
 }
 
-# Function to build AppImage (always native since it's just a wrapper)
 build_appimage() {
     echo "📦 Creating AppImage..."
-    mkdir -p AppDir/usr/{bin,lib,share/applications}
+    rm -rf AppDir
+    mkdir -p AppDir/usr/{bin,lib,share/applications,share/icons/hicolor/256x256/apps,share/icons/hicolor/128x128/apps}
 
-    # Copy application
     cp -r $BUNDLE_DIR/* AppDir/usr/bin/
 
-    # Copy icon to AppDir root - THIS IS IMPORTANT FOR APPIMAGETOOL
+    BUNDLE_LIBS=$(find "$BUNDLE_DIR/lib" -maxdepth 1 -name '*.so*' 2>/dev/null || true)
+    if [ -n "$BUNDLE_LIBS" ]; then
+        cp -a $BUNDLE_LIBS AppDir/usr/lib/
+    fi
+
+    for LIB_NAME in libkeybinder-3.0.so.0 libayatana-appindicator3.so.1 libdbusmenu-gtk3.so.4; do
+        LIB_PATH=$(ldconfig -p | awk -v lib="$LIB_NAME" '$1 == lib {print $NF; exit}')
+        if [ -n "$LIB_PATH" ] && [ -f "$LIB_PATH" ]; then
+            cp -L "$LIB_PATH" "AppDir/usr/lib/"
+            DEPS=$(ldd "$LIB_PATH" 2>/dev/null | awk '/=> \// {print $3}' | grep -vE 'libc\.so|libm\.so|libpthread|libdl\.so|librt\.so|ld-linux|linux-vdso' || true)
+            for DEP in $DEPS; do
+                DEP_BASE=$(basename "$DEP")
+                if [ ! -f "AppDir/usr/lib/$DEP_BASE" ]; then
+                    cp -L "$DEP" "AppDir/usr/lib/" 2>/dev/null || true
+                fi
+            done
+        fi
+    done
+
     if [[ -f "$APP_ICON" ]]; then
-        # Copy icon to both root directory and standard location
         cp -f "$APP_ICON" "AppDir/$APP_NAME.png"
-
-        # Also ensure we have the icon in standard locations
-        mkdir -p AppDir/usr/share/icons/hicolor/256x256/apps/
         cp -f "$APP_ICON" "AppDir/usr/share/icons/hicolor/256x256/apps/$APP_NAME.png"
-
-        # Copy icon for AppImage menu
-        mkdir -p AppDir/usr/share/icons/hicolor/128x128/apps/
         cp -f "$APP_ICON" "AppDir/usr/share/icons/hicolor/128x128/apps/$APP_NAME.png"
     fi
 
-    # Create desktop entry
     cat > AppDir/usr/share/applications/$APP_NAME.desktop << EOF
 [Desktop Entry]
 Name=$APP_NAME
@@ -400,19 +409,69 @@ Type=Application
 Categories=$APP_CATEGORY
 EOF
 
-    # Symlinks
     ln -sf usr/share/applications/$APP_NAME.desktop AppDir/$APP_NAME.desktop
-    ln -sf usr/bin/$APP_NAME AppDir/AppRun
 
-    # Download appimagetool if not available
-    if [ ! -f "appimagetool" ]; then
-        wget -O appimagetool "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
-        chmod +x appimagetool
+    cat > AppDir/AppRun << 'APPRUN_EOF'
+#!/bin/bash
+SELF_DIR="$(dirname "$(readlink -f "$0")")"
+export LD_LIBRARY_PATH="${SELF_DIR}/usr/lib:${LD_LIBRARY_PATH}"
+exec "${SELF_DIR}/usr/bin/scanthesis" "$@"
+APPRUN_EOF
+    chmod +x AppDir/AppRun
+
+    LINUXDEPLOY_URL="https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage"
+    GTK_PLUGIN_URL="https://raw.githubusercontent.com/linuxdeploy/linuxdeploy-plugin-gtk/master/linuxdeploy-plugin-gtk.sh"
+    APPIMAGETOOL_URL="https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage"
+
+    if [ ! -f "linuxdeploy-x86_64.AppImage" ]; then
+        wget -q -O linuxdeploy-x86_64.AppImage "$LINUXDEPLOY_URL"
+        chmod +x linuxdeploy-x86_64.AppImage
+    fi
+    if [ ! -f "linuxdeploy-plugin-gtk.sh" ]; then
+        wget -q -O linuxdeploy-plugin-gtk.sh "$GTK_PLUGIN_URL"
+        chmod +x linuxdeploy-plugin-gtk.sh
+    fi
+    if [ ! -f "appimagetool-x86_64.AppImage" ]; then
+        wget -q -O appimagetool-x86_64.AppImage "$APPIMAGETOOL_URL"
+        chmod +x appimagetool-x86_64.AppImage
     fi
 
-    # Generate AppImage
-    ARCH=x86_64 ./appimagetool AppDir "${OUTPUT_DIR}/${APP_NAME}_${VERSION}-x86_64.AppImage"
+    export DEPLOY_GTK_VERSION=3
+    ./linuxdeploy-x86_64.AppImage --appdir AppDir --plugin gtk --output appimage 2>/dev/null || true
+
+    if [ -f "AppDir/AppRun.bak" ]; then
+        mv AppDir/AppRun.bak AppDir/AppRun
+        chmod +x AppDir/AppRun
+    fi
+
+    ARCH=x86_64 ./appimagetool-x86_64.AppImage AppDir "${OUTPUT_DIR}/${APP_NAME}_${VERSION}-x86_64.AppImage"
     echo "✅ AppImage created: ${OUTPUT_DIR}/${APP_NAME}_${VERSION}-x86_64.AppImage"
+}
+
+build_tarball() {
+    echo "📦 Creating tar.gz..."
+    local TARBALL_DIR="${APP_NAME}-${VERSION}-linux-x86_64"
+    rm -rf "$TARBALL_DIR"
+    mkdir -p "$TARBALL_DIR"
+    cp -r $BUNDLE_DIR/* "$TARBALL_DIR/"
+    cat > "$TARBALL_DIR/DEPENDENCIES.txt" << EOF
+System dependencies required:
+- GTK3 (libgtk-3-0)
+- keybinder3 (libkeybinder-3.0-0)
+- ayatana-appindicator (libayatana-appindicator3-1)
+
+Install on Debian/Ubuntu:
+  sudo apt-get install libgtk-3-0 libkeybinder-3.0-0 libayatana-appindicator3-1
+
+Install on Fedora:
+  sudo dnf install gtk3 keybinder3 libayatana-appindicator-gtk3
+
+Run:
+  ./${APP_NAME}
+EOF
+    tar -czf "${OUTPUT_DIR}/${APP_NAME}-${VERSION}-linux-x86_64.tar.gz" "$TARBALL_DIR"
+    rm -rf "$TARBALL_DIR"
+    echo "✅ tar.gz created: ${OUTPUT_DIR}/${APP_NAME}-${VERSION}-linux-x86_64.tar.gz"
 }
 
 # Function to build RPM package natively
@@ -900,8 +959,13 @@ else
     echo "   Install rpm-build package or Docker to build .rpm packages"
 fi
 
-# 4. Create Arch Linux package (.tar.zst)
-if command -v makepkg &> /dev/null && [[ "$NEEDS_DOCKER_FOR_ARCH" == false ]]; then
+# 4. Create tar.gz bundle
+build_tarball
+
+# 5. Create Arch Linux package (.tar.zst)
+if [[ "${CI}" == "true" ]]; then
+    echo "⚠️ Skipping Arch Linux package creation in CI"
+elif command -v makepkg &> /dev/null && [[ "$NEEDS_DOCKER_FOR_ARCH" == false ]]; then
     build_arch_native
 elif command -v docker &> /dev/null && [[ "$NEEDS_DOCKER_FOR_ARCH" == true ]]; then
     build_arch_docker
@@ -993,18 +1057,29 @@ else
     echo "❌ .rpm: Not created"
 fi
 
-if ls "${OUTPUT_DIR}"/*.pkg.tar.zst &> /dev/null; then
-    echo "✅ .tar.zst: $(ls ${OUTPUT_DIR}/*.pkg.tar.zst | head -n1 | xargs basename) (Arch Linux)"
-elif [[ -f "${OUTPUT_DIR}/${APP_NAME}-${VERSION}-PKGBUILD.tar.gz" ]]; then
-    echo "✓ PKGBUILD: ${APP_NAME}-${VERSION}-PKGBUILD.tar.gz (Arch Linux)"
+if [[ "${CI}" != "true" ]]; then
+    if ls "${OUTPUT_DIR}"/*.pkg.tar.zst &> /dev/null; then
+        echo "✅ .tar.zst: $(ls ${OUTPUT_DIR}/*.pkg.tar.zst | head -n1 | xargs basename) (Arch Linux)"
+    elif [[ -f "${OUTPUT_DIR}/${APP_NAME}-${VERSION}-PKGBUILD.tar.gz" ]]; then
+        echo "✓ PKGBUILD: ${APP_NAME}-${VERSION}-PKGBUILD.tar.gz (Arch Linux)"
+    else
+        echo "❌ Arch package: Not created"
+    fi
+fi
+
+if [[ -f "${OUTPUT_DIR}/${APP_NAME}-${VERSION}-linux-x86_64.tar.gz" ]]; then
+    echo "✅ tar.gz: ${APP_NAME}-${VERSION}-linux-x86_64.tar.gz"
 else
-    echo "❌ Arch package: Not created"
+    echo "❌ tar.gz: Not created"
 fi
 
 echo ""
 echo "Installation instructions:"
 echo "• .deb: sudo dpkg -i ${OUTPUT_DIR}/${APP_NAME}_${VERSION}_amd64.deb"
 echo "• .rpm: sudo rpm -i ${OUTPUT_DIR}/rpm_output/*.rpm"
-echo "• .tar.zst: sudo pacman -U ${OUTPUT_DIR}/*.pkg.tar.zst"
 echo "• AppImage: chmod +x ${OUTPUT_DIR}/${APP_NAME}_${VERSION}-x86_64.AppImage && ./${OUTPUT_DIR}/${APP_NAME}_${VERSION}-x86_64.AppImage"
-echo "• PKGBUILD: tar -xf ${OUTPUT_DIR}/${APP_NAME}-${VERSION}-PKGBUILD.tar.gz && cd extracted_dir && makepkg -si"
+echo "• tar.gz: tar -xzf ${OUTPUT_DIR}/${APP_NAME}-${VERSION}-linux-x86_64.tar.gz && cd ${APP_NAME}-${VERSION}-linux-x86_64 && ./scanthesis"
+if [[ "${CI}" != "true" ]]; then
+    echo "• .tar.zst: sudo pacman -U ${OUTPUT_DIR}/*.pkg.tar.zst"
+    echo "• PKGBUILD: tar -xf ${OUTPUT_DIR}/${APP_NAME}-${VERSION}-PKGBUILD.tar.gz && cd extracted_dir && makepkg -si"
+fi

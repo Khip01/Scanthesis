@@ -1,0 +1,116 @@
+name: Test Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  linux-packages:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            clang cmake ninja-build pkg-config libgtk-3-dev \
+            libkeybinder-3.0-0 libayatana-appindicator3-1 libdbusmenu-gtk3-4 \
+            libfuse2 desktop-file-utils
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Flutter pub get
+        working-directory: scanthesis_app
+        run: flutter pub get
+
+      - name: Build Linux
+        working-directory: scanthesis_app
+        run: flutter build linux --release
+
+      - name: Package distributions
+        working-directory: scanthesis_app
+        env:
+          CI: "true"
+        run: |
+          chmod +x package_linux_distributions.sh
+          ./package_linux_distributions.sh \
+            --app-name scanthesis \
+            --version test \
+            --bundle-dir build/linux/x64/release/bundle
+
+      - name: Verify artifacts exist
+        working-directory: scanthesis_app
+        run: |
+          PKGDIR="linux_packages"
+          MISSING=""
+          for f in \
+            "${PKGDIR}/scanthesis_test-x86_64.AppImage" \
+            "${PKGDIR}/scanthesis_test_amd64.deb" \
+            "${PKGDIR}/scanthesis_test-linux-x86_64.tar.gz"; do
+            if [ ! -f "$f" ]; then
+              MISSING="$MISSING $f"
+            fi
+          done
+          if ls ${PKGDIR}/rpm_output/*.rpm 1>/dev/null 2>&1; then
+            echo "RPM found"
+          else
+            MISSING="$MISSING rpm"
+          fi
+          if [ -n "$MISSING" ]; then
+            echo "Missing artifacts:$MISSING"
+            exit 1
+          fi
+
+      - name: Verify AppImage libraries
+        working-directory: scanthesis_app
+        run: |
+          APPIMAGE="linux_packages/scanthesis_test-x86_64.AppImage"
+          chmod +x "$APPIMAGE"
+          TEMP_DIR=$(mktemp -d)
+          ./"$APPIMAGE" --appimage-extract > /dev/null 2>&1
+          SQUASHFS_ROOT="$TEMP_DIR/squashfs-root"
+          mv squashfs-root "$SQUASHFS_ROOT"
+          MISSING_LIBS=$(find "$SQUASHFS_ROOT/usr/lib" -name '*.so*' -exec ldd {} \; 2>/dev/null | grep 'not found' | awk '{print $1}' | sort -u || true)
+          if [ -n "$MISSING_LIBS" ]; then
+            echo "AppImage has unresolved libraries:"
+            echo "$MISSING_LIBS"
+            exit 1
+          fi
+          echo "All libraries resolved"
+          rm -rf "$SQUASHFS_ROOT" "$TEMP_DIR"
+
+      - name: Verify deb dependencies
+        working-directory: scanthesis_app
+        run: |
+          dpkg-deb -I linux_packages/scanthesis_test_amd64.deb | grep -q "libkeybinder-3.0-0" || { echo "deb missing keybinder dep"; exit 1; }
+          dpkg-deb -I linux_packages/scanthesis_test_amd64.deb | grep -q "libayatana-appindicator3-1" || { echo "deb missing appindicator dep"; exit 1; }
+          echo "deb dependencies OK"
+
+      - name: Verify rpm dependencies
+        working-directory: scanthesis_app
+        run: |
+          RPM=$(ls linux_packages/rpm_output/*.rpm | head -1)
+          rpm -qp --requires "$RPM" | grep -q "keybinder3" || { echo "rpm missing keybinder dep"; exit 1; }
+          rpm -qp --requires "$RPM" | grep -q "libayatana-appindicator-gtk3" || { echo "rpm missing appindicator dep"; exit 1; }
+          echo "rpm dependencies OK"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-packages-test
+          path: |
+            scanthesis_app/linux_packages/*.AppImage
+            scanthesis_app/linux_packages/*.deb
+            scanthesis_app/linux_packages/*.tar.gz
+            scanthesis_app/linux_packages/rpm_output/*.rpm
+          retention-days: 7
+
+</content>

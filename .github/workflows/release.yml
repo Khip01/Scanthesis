@@ -1,0 +1,82 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '*'
+
+permissions:
+  contents: write
+
+jobs:
+  linux:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Derive version from tag
+        id: ver
+        run: |
+          RAW="${GITHUB_REF_NAME#v}"
+          echo "version=$RAW" >> "$GITHUB_OUTPUT"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            clang cmake ninja-build pkg-config libgtk-3-dev \
+            libkeybinder-3.0-0 libayatana-appindicator3-1 libdbusmenu-gtk3-4 \
+            libfuse2 desktop-file-utils
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Flutter pub get
+        working-directory: scanthesis_app
+        run: flutter pub get
+
+      - name: Build Linux
+        working-directory: scanthesis_app
+        run: flutter build linux --release --build-name "${{ steps.ver.outputs.version }}"
+
+      - name: Package distributions
+        working-directory: scanthesis_app
+        env:
+          CI: "true"
+        run: |
+          chmod +x package_linux_distributions.sh
+          ./package_linux_distributions.sh \
+            --app-name scanthesis \
+            --version "${{ steps.ver.outputs.version }}" \
+            --bundle-dir build/linux/x64/release/bundle
+
+      - name: Upload to GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        working-directory: scanthesis_app
+        run: |
+          VERSION="${{ steps.ver.outputs.version }}"
+          PKGDIR="linux_packages"
+          FILES=""
+          for f in \
+            "${PKGDIR}/scanthesis_${VERSION}-x86_64.AppImage" \
+            "${PKGDIR}/scanthesis_${VERSION}_amd64.deb" \
+            "${PKGDIR}/rpm_output/"*.rpm \
+            "${PKGDIR}/scanthesis-${VERSION}-linux-x86_64.tar.gz"; do
+            if ls $f 1>/dev/null 2>&1; then
+              FILES="$FILES $f"
+            fi
+          done
+          if [ -z "$FILES" ]; then
+            echo "No artifacts found"
+            exit 1
+          fi
+          gh release create "${GITHUB_REF_NAME}" $FILES \
+            --repo "${{ github.repository }}" \
+            --title "${GITHUB_REF_NAME}" \
+            --generate-notes || \
+          gh release upload "${GITHUB_REF_NAME}" $FILES \
+            --repo "${{ github.repository }}" \
+            --clobber

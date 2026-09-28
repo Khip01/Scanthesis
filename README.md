@@ -73,11 +73,9 @@ The repository includes a simple Golang API implementation that connects to Gemi
 > __ℹ️ NOTE__ \
 > You can obtain an API key from [Google AI Studio](https://aistudio.google.com/apikey)
 
-3. If __you are running this app on Linux__, you’ll need to install some additional libraries so that the `tray_manager` (system tray) and `hotkey_manager` (global hotkeys) plugins work correctly. You can see the installation tutorial for the [__REQUIRED System Dependencies__ in the following release section](https://github.com/Khip01/Scanthesis/releases).
+3. Launch the Scanthesis desktop application and configure the endpoint URL in the settings page to match your API server (default: `http://localhost:8080/api`).
 
-4. Launch the Scanthesis desktop application and configure the endpoint URL in the settings page to match your API server (default: `http://localhost:8080/api`).
-
-5. After that, you're __ready to use the app__ 🔥🎉
+4. After that, you are ready to use the app.
 
 <br>
 <br>
@@ -86,14 +84,13 @@ The repository includes a simple Golang API implementation that connects to Gemi
 
 If you prefer to use your own AI backend:
 
-1. If __you are running this app on Linux__, you’ll need to install some additional libraries so that the `tray_manager` (system tray) and `hotkey_manager` (global hotkeys) plugins work correctly. You can see the installation tutorial for the [__REQUIRED System Dependencies__ in the following release section](https://github.com/Khip01/Scanthesis/releases).
-2. Launch the Scanthesis application and navigate to the settings page
-3. Enter your custom API endpoint URL in the designated field
+1. Launch the Scanthesis application and navigate to the settings page
+2. Enter your custom API endpoint URL in the designated field
     <p align="left">
       <img src="https://i.ibb.co.com/m3SXzJp/api-settings-page.png" alt="Scanthesis settings - API Endpoint" style="width:600px; border-radius:12px">
     </p>
 
-4. __If your API response returns a JSON structure that differs__ from the default JSON of this application, you'll need to manually modify the response model code of this app:
+3. __If your API response returns a JSON structure that differs__ from the default JSON of this application, you'll need to manually modify the response model code of this app:
    
    Open `scanthesis_app/lib/models/api_response.dart` and customize the `MyCustomResponse` class to match your API's response structure:
    
@@ -115,7 +112,7 @@ If you prefer to use your own AI backend:
    }
    ```
 
-5. Then build the application according to the [build instructions here](#development-requirements) as a developer 🤓.
+4. Then build the application according to the [build instructions here](#development-requirements) as a developer 🤓.
 
 5. After that, you're ready to use the app 🔥🎉
 
@@ -191,9 +188,13 @@ These packages are required for the application's system tray and global hotkey 
 
 ## Linux Build Instruction
 
-Scanthesis provides a convenient way to build and package the application for various Linux distributions. The included scripts automatically create packages for Debian-based systems (.deb), Fedora/RHEL (.rpm), Arch Linux (.tar.zst), and a universal AppImage.
+Scanthesis provides a convenient way to build and package the application for various Linux distributions. The included scripts automatically create packages for Debian-based systems (.deb), Fedora/RHEL (.rpm), Arch Linux (.tar.zst), a self-contained AppImage, and a portable tar.gz bundle.
 
-### Building Linux Packages
+### Automated Release Builds
+
+Pushing any tag (e.g. `git tag v1.1.0 && git push origin v1.1.0`) triggers a GitHub Actions workflow that builds all Linux packages on Ubuntu 22.04 and uploads them to a GitHub Release automatically. The AppImage is self-contained and bundles all required libraries (keybinder, ayatana-appindicator). No manual system dependency installation is needed for release binaries.
+
+### Building Linux Packages Locally
 
 To build the application for Linux and create distribution packages:
 
@@ -205,28 +206,38 @@ To build the application for Linux and create distribution packages:
    ./build_and_package_linux.sh
    ```
 3. The packages will be created in the linux_packages directory:
-- `scanthesis_1.0.0_amd64.deb` - For Debian, Ubuntu, Linux Mint, etc.
-- `rpm_output/scanthesis-1.0.0-1.fc42.x86_64.rpm` - For Fedora, RHEL, CentOS, etc.
-- `scanthesis-1.0.0-1-x86_64.pkg.tar.zst` - For Arch Linux, Manjaro, etc.
-- `scanthesis_1.0.0-x86_64.AppImage` - Universal Linux package
+- `scanthesis_<version>_amd64.deb` - For Debian, Ubuntu, Linux Mint, etc.
+- `rpm_output/scanthesis-<version>-1.fc42.x86_64.rpm` - For Fedora, RHEL, CentOS, etc.
+- `scanthesis-<version>-1-x86_64.pkg.tar.zst` - For Arch Linux, Manjaro, etc.
+- `scanthesis_<version>-x86_64.AppImage` - Universal Linux package (self-contained)
+- `scanthesis-<version>-linux-x86_64.tar.gz` - Portable bundle with dependency notes
 
 ### Installation from Packages
+
+Replace `<version>` with the actual release version.
+
 #### Debian/Ubuntu and derivatives:
 ```bash
-sudo dpkg -i linux_packages/scanthesis_1.0.0_amd64.deb
+sudo dpkg -i linux_packages/scanthesis_<version>_amd64.deb
 ```
 #### Fedora/RHEL and derivatives:
 ```bash
-sudo rpm -i linux_packages/rpm_output/scanthesis-1.0.0-1.fc42.x86_64.rpm
+sudo rpm -i linux_packages/rpm_output/scanthesis-<version>-1.fc42.x86_64.rpm
 ```
 #### Arch Linux and derivatives:
 ```bash
-sudo pacman -U linux_packages/scanthesis-1.0.0-1-x86_64.pkg.tar.zst
+sudo pacman -U linux_packages/scanthesis-<version>-1-x86_64.pkg.tar.zst
 ```
 #### Any Linux distribution (AppImage):
 ```bash
-chmod +x linux_packages/scanthesis_1.0.0-x86_64.AppImage
-./linux_packages/scanthesis_1.0.0-x86_64.AppImage
+chmod +x linux_packages/scanthesis_<version>-x86_64.AppImage
+./linux_packages/scanthesis_<version>-x86_64.AppImage
+```
+#### Any Linux distribution (tar.gz):
+```bash
+tar -xzf linux_packages/scanthesis-<version>-linux-x86_64.tar.gz
+cd scanthesis-<version>-linux-x86_64
+./scanthesis
 ```
 
 ### Advanced Options
