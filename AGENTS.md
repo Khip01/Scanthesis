@@ -53,6 +53,19 @@ These are required because the native packages do not bundle shared libraries.
 
 When `CI=true` is set, the packaging script skips Arch Linux package creation. This prevents unreproducible Arch artifacts from appearing in GitHub Releases.
 
+## File Writing Hygiene
+
+After using the write tool to create or overwrite any file, always re-read it with the read tool to verify it is clean. Check for leaked tool artifacts such as XML-like tags, protocol markers, or other non-file text. If contamination is found, rewrite the file immediately.
+
+## Test Build Workflow
+
+`.github/workflows/test-build.yml` runs on every push to main and every PR targeting main. It builds all Linux packages with CI=true and verifies:
+- All expected artifacts exist (AppImage, deb, rpm, tar.gz)
+- AppImage has no unresolved shared libraries
+- deb and rpm contain required dependency metadata
+
+This workflow does not create releases or upload artifacts to GitHub Releases. It only validates that the packaging pipeline works correctly.
+
 ## Code Style
 
 - No comments unless explicitly requested
