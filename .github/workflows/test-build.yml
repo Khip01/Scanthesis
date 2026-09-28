@@ -44,7 +44,7 @@ jobs:
           chmod +x package_linux_distributions.sh
           ./package_linux_distributions.sh \
             --app-name scanthesis \
-            --version test \
+            --version 0.0.0 \
             --bundle-dir build/linux/x64/release/bundle
 
       - name: Verify artifacts exist
@@ -53,9 +53,9 @@ jobs:
           PKGDIR="linux_packages"
           MISSING=""
           for f in \
-            "${PKGDIR}/scanthesis_test-x86_64.AppImage" \
-            "${PKGDIR}/scanthesis_test_amd64.deb" \
-            "${PKGDIR}/scanthesis_test-linux-x86_64.tar.gz"; do
+            "${PKGDIR}/scanthesis_0.0.0-x86_64.AppImage" \
+            "${PKGDIR}/scanthesis_0.0.0_amd64.deb" \
+            "${PKGDIR}/scanthesis-0.0.0-linux-x86_64.tar.gz"; do
             if [ ! -f "$f" ]; then
               MISSING="$MISSING $f"
             fi
@@ -73,7 +73,7 @@ jobs:
       - name: Verify AppImage libraries
         working-directory: scanthesis_app
         run: |
-          APPIMAGE="linux_packages/scanthesis_test-x86_64.AppImage"
+          APPIMAGE="linux_packages/scanthesis_0.0.0-x86_64.AppImage"
           chmod +x "$APPIMAGE"
           TEMP_DIR=$(mktemp -d)
           ./"$APPIMAGE" --appimage-extract > /dev/null 2>&1
@@ -91,8 +91,8 @@ jobs:
       - name: Verify deb dependencies
         working-directory: scanthesis_app
         run: |
-          dpkg-deb -I linux_packages/scanthesis_test_amd64.deb | grep -q "libkeybinder-3.0-0" || { echo "deb missing keybinder dep"; exit 1; }
-          dpkg-deb -I linux_packages/scanthesis_test_amd64.deb | grep -q "libayatana-appindicator3-1" || { echo "deb missing appindicator dep"; exit 1; }
+          dpkg-deb -I linux_packages/scanthesis_0.0.0_amd64.deb | grep -q "libkeybinder-3.0-0" || { echo "deb missing keybinder dep"; exit 1; }
+          dpkg-deb -I linux_packages/scanthesis_0.0.0_amd64.deb | grep -q "libayatana-appindicator3-1" || { echo "deb missing appindicator dep"; exit 1; }
           echo "deb dependencies OK"
 
       - name: Verify rpm dependencies
