@@ -192,7 +192,7 @@ Scanthesis provides a convenient way to build and package the application for va
 
 ### Automated Release Builds
 
-Pushing any tag (e.g. `git tag v1.1.0 && git push origin v1.1.0`) triggers a GitHub Actions workflow that builds all Linux packages on Ubuntu 22.04 and uploads them to a GitHub Release automatically. The AppImage is self-contained and bundles all required libraries (keybinder, ayatana-appindicator). No manual system dependency installation is needed for release binaries.
+Pushing any tag (e.g. `git tag v2.0.1 && git push origin v2.0.1`) triggers a GitHub Actions workflow that builds all packages on Ubuntu 22.04 and Windows, and uploads them to a GitHub Release automatically: AppImage, deb, rpm, tar.gz, Windows installer, and both API binaries (Linux and Windows). The AppImage is self-contained and bundles all required libraries (keybinder, ayatana-appindicator). No manual system dependency installation is needed for release binaries.
 
 ### Building Linux Packages Locally
 
@@ -248,7 +248,7 @@ The packaging script supports several options:
 ```
 Common options include:
 - `--app-name NAME`: Set the application name (default: scanthesis)
-- `--version VERSION`: Set the application version (default: 1.0.0)
+- `--version VERSION`: Set the application version (default: 2.0.1)
 - `--icon PATH`: Path to the application icon (default: assets/app_icon/scanthesis-app-icon-600x600.png)
 - `--force-docker`: Use Docker for all package formats regardless of native tools
 - `--no-docker`: Don't use Docker even if native tools are missing

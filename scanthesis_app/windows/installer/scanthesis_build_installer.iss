@@ -2,7 +2,9 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Scanthesis"
-#define MyAppVersion "1.0.0"
+#ifndef MyAppVersion
+  #define MyAppVersion "2.0.1"
+#endif
 #define MyAppPublisher "Khip01"
 #define MyAppURL "https://github.com/Khip01/Scanthesis"
 #define MyAppExeName "scanthesis.exe"

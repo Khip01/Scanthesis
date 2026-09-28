@@ -11,25 +11,28 @@
 Pushing any tag triggers GitHub Actions to build and upload all Linux packages automatically.
 
 ```bash
-git tag v1.1.0
-git push origin v1.1.0
+git tag v2.0.1
+git push origin v2.0.1
 ```
 
-The workflow runs on `ubuntu-22.04` to ensure glibc compatibility (max 2.35). It builds Flutter, runs the packaging script with `CI=true`, and uploads artifacts via `gh release create`.
+The workflow runs on `ubuntu-22.04` for Linux and API, and `windows-latest` for the installer, to ensure glibc compatibility (max 2.35). Four jobs run in parallel (linux, windows, api), then a publish job creates the GitHub Release with `gh release create`. If a release for that tag already exists, same-named assets are replaced with `--clobber`.
 
 Artifacts produced per release:
 - `scanthesis_<version>_amd64.deb`
 - `scanthesis-<version>-1.fc42.x86_64.rpm`
 - `scanthesis_<version>-x86_64.AppImage`
 - `scanthesis-<version>-linux-x86_64.tar.gz`
+- `scanthesis_setup_v<version>.exe`
+- `scanthesis_api_v<version>_linux_amd64`
+- `scanthesis_api_v<version>.exe`
 
-Arch Linux packages (`.pkg.tar.zst`) are skipped in CI.
+Arch Linux packages (`.pkg.tar.zst`) and macOS builds are skipped.
 
 ## Packaging Conventions
 
 ### Version Management
 
-Version is passed dynamically via `--version` flag from the git tag. Do not hardcode versions in scripts when releasing. The `pubspec.yaml` and `.iss` files retain their base version for local development only.
+Version is passed dynamically via `--version` flag from the git tag. Do not hardcode versions in scripts when releasing. The `pubspec.yaml`, `.iss`, and build script defaults all carry the same current version (`2.0.1`) for local development only; CI overrides them (`--build-name` for Flutter, `/DMyAppVersion` for Inno Setup). Keep these in sync when bumping.
 
 ### AppImage Requirements
 

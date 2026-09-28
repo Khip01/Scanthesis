@@ -28,7 +28,7 @@ jobs:
             clang cmake ninja-build pkg-config libgtk-3-dev \
             libkeybinder-3.0-dev libayatana-appindicator3-dev \
             libkeybinder-3.0-0 libayatana-appindicator3-1 libdbusmenu-gtk3-4 \
-            libfuse2 desktop-file-utils
+            libfuse2 desktop-file-utils rpm
 
       - uses: subosito/flutter-action@v2
         with:
@@ -53,24 +53,127 @@ jobs:
             --version "${{ steps.ver.outputs.version }}" \
             --bundle-dir build/linux/x64/release/bundle
 
-      - name: Upload to GitHub Release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Verify artifacts
         working-directory: scanthesis_app
         run: |
           VERSION="${{ steps.ver.outputs.version }}"
           PKGDIR="linux_packages"
-          FILES=""
+          MISSING=""
           for f in \
             "${PKGDIR}/scanthesis_${VERSION}-x86_64.AppImage" \
             "${PKGDIR}/scanthesis_${VERSION}_amd64.deb" \
-            "${PKGDIR}/rpm_output/"*.rpm \
             "${PKGDIR}/scanthesis-${VERSION}-linux-x86_64.tar.gz"; do
-            if ls $f 1>/dev/null 2>&1; then
-              FILES="$FILES $f"
+            if [ ! -f "$f" ]; then
+              MISSING="$MISSING $f"
             fi
           done
-          if [ -z "$FILES" ]; then
+          if ! ls ${PKGDIR}/rpm_output/*.rpm 1>/dev/null 2>&1; then
+            MISSING="$MISSING rpm"
+          fi
+          if [ -n "$MISSING" ]; then
+            echo "Missing artifacts:$MISSING"
+            exit 1
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-packages
+          path: |
+            scanthesis_app/linux_packages/*.AppImage
+            scanthesis_app/linux_packages/*.deb
+            scanthesis_app/linux_packages/*.tar.gz
+            scanthesis_app/linux_packages/rpm_output/*.rpm
+          if-no-files-found: error
+          retention-days: 1
+
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Derive version from tag
+        id: ver
+        run: |
+          RAW="${GITHUB_REF_NAME#v}"
+          "version=$RAW" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Flutter pub get
+        working-directory: scanthesis_app
+        run: flutter pub get
+
+      - name: Build Windows
+        working-directory: scanthesis_app
+        run: flutter build windows --release --build-name "${{ steps.ver.outputs.version }}"
+
+      - name: Build installer
+        shell: pwsh
+        run: |
+          $iss = "scanthesis_app/windows/installer/scanthesis_build_installer.iss"
+          $compiler = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          & $compiler /DMyAppVersion=${{ steps.ver.outputs.version }} $iss
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer
+          path: scanthesis_app/windows/installer/scanthesis_setup_v${{ steps.ver.outputs.version }}.exe
+          if-no-files-found: error
+          retention-days: 1
+
+  api:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Derive version from tag
+        id: ver
+        run: |
+          RAW="${GITHUB_REF_NAME#v}"
+          echo "version=$RAW" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24.x"
+          cache-dependency-path: scanthesis_api/go.sum
+
+      - name: Build API binaries
+        working-directory: scanthesis_api
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o "scanthesis_api_v${VERSION}_linux_amd64" .
+          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o "scanthesis_api_v${VERSION}.exe" .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: api-binaries
+          path: |
+            scanthesis_api/scanthesis_api_v${{ steps.ver.outputs.version }}_linux_amd64
+            scanthesis_api/scanthesis_api_v${{ steps.ver.outputs.version }}.exe
+          if-no-files-found: error
+          retention-days: 1
+
+  publish:
+    needs: [linux, windows, api]
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Create or update GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          FILES=$(find artifacts -type f | tr '\n' ' ')
+          if [ -z "${FILES// }" ]; then
             echo "No artifacts found"
             exit 1
           fi

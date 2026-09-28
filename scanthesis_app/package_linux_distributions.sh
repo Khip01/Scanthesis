@@ -7,7 +7,7 @@
 #==============================================================================
 # Application information
 APP_NAME="scanthesis"
-VERSION="1.0.0"
+VERSION="2.0.1"
 APP_DESCRIPTION="Scanthesis - AI-powered code extractor"
 DEFAULT_BUNDLE_DIR="build/linux/x64/release/bundle"
 DEFAULT_ICON_PATH="assets/app_icon/scanthesis-app-icon-600x600.png"

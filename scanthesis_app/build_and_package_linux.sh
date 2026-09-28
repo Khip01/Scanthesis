@@ -6,7 +6,7 @@
 #==============================================================================
 # Application information - should match values in package_linux_distributions.sh
 APP_NAME="scanthesis"
-VERSION="1.0.0"
+VERSION="2.0.1"
 
 # Build configuration
 FLUTTER_BUILD_ARGS="--release"  # Default build mode
