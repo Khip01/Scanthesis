@@ -94,8 +94,9 @@ jobs:
 
       - name: Derive version from tag
         id: ver
+        shell: pwsh
         run: |
-          RAW="${GITHUB_REF_NAME#v}"
+          $RAW = "${env:GITHUB_REF_NAME}" -replace '^v',''
           "version=$RAW" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
       - uses: subosito/flutter-action@v2
