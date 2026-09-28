@@ -112,5 +112,3 @@ jobs:
             scanthesis_app/linux_packages/*.tar.gz
             scanthesis_app/linux_packages/rpm_output/*.rpm
           retention-days: 7
-
-</content>
